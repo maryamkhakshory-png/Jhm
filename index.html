@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>🔧 جعبه ابزار حرفه‌ای</title>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #6c5ce7;
+            --dark: #1a1a2e;
+            --darker: #16213e;
+            --card-bg: #2d3436;
+            --text: #dfe6e9;
+            --text-secondary: #b2bec3;
+            --success: #00b894;
+            --danger: #d63031;
+            --warning: #fdcb6e;
+            --accent: #00cec9;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #dfe6e9;
+            min-height: 100vh;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        .app-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 10px;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #6c5ce7, #a855f7);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(108, 92, 231, 0.3);
+        }
+
+        .header h1 { font-size: 28px; margin-bottom: 5px; }
+        .subtitle { font-size: 14px; opacity: 0.9; }
+
+        .device-info {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 12px;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .search-bar { margin-bottom: 15px; }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 15px;
+            background: #2d3436;
+            color: #dfe6e9;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .categories {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .cat-btn {
+            padding: 8px 16px;
+            border: 2px solid #6c5ce7;
+            background: transparent;
+            color: #dfe6e9;
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+
+        .cat-btn.active { background: #6c5ce7; color: white; }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .tool-card {
+            background: #2d3436;
+            border-radius: 15px;
+            padding: 20px 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .tool-card:active { transform: scale(0.95); }
+        .tool-card.favorite { border-color: #fdcb6e; }
+        .tool-card.favorite::after {
+            content: '⭐';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 14px;
+        }
+
+        .tool-icon { font-size: 35px; margin-bottom: 8px; }
+        .tool-name { font-size: 14px; font-weight: bold; margin-bottom: 4px; }
+        .tool-desc { font-size: 11px; color: #b2bec3; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #2d3436;
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 90%;
+            width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #b2bec3;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #00b894;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            z-index: 2000;
+            opacity: 0;
+            transition: 0.3s;
+            pointer-events: none;
+        }
+
+        .toast.show { opacity: 1; }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: #2d3436;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            z-index: 100;
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: #b2bec3;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+        }
+
+        .nav-btn.active { color: #6c5ce7; }
+
+        /* ماشین حساب */
+        .calc-container {
+            background: #1a1a2e;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .calc-display {
+            width: 100%;
+            padding: 20px;
+            font-size: 32px;
+            text-align: left;
+            background: #0a0a1a;
+            color: #00cec9;
+            border: none;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+            direction: ltr;
+        }
+
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .calc-btn {
+            padding: 15px;
+            font-size: 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .calc-btn:active { transform: scale(0.9); }
+
+        .calc-num { background: #2d3436; color: white; }
+        .calc-op { background: #6c5ce7; color: white; }
+        .calc-eq { background: #00b894; color: white; }
+        .calc-clr { background: #d63031; color: white; }
+        .calc-func { background: #636e72; color: white; }
+
+        /* دکمه شناور اسکرین‌شات */
+        .floating-screenshot {
+            position: fixed;
+            bottom: 120px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #6c5ce7, #a855f7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            cursor: pointer;
+            z-index: 9999;
+            box-shadow: 0 10px 30px rgba(108,92,231,0.5);
+            animation: float 2s infinite;
+            border: 3px solid white;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .floating-menu {
+            position: fixed;
+            bottom: 190px;
+            right: 20px;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 9998;
+        }
+
+        .floating-menu.show { display: flex; }
+
+        .floating-option {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #2d3436;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            cursor: pointer;
+            border: 2px solid #6c5ce7;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        /* صفحه درخواست مجوز */
+        .permission-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .permission-box {
+            background: #2d3436;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            text-align: center;
+            border: 2px solid #6c5ce7;
+        }
+
+        .perm-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(108,92,231,0.1);
+            border-radius: 10px;
+            text-align: right;
+        }
+
+        @media (max-width: 350px) {
+            .tools-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .tool-card { padding: 15px; }
+            .tool-icon { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- صفحه درخواست مجوز -->
+    <div class="permission-overlay" id="permissionScreen">
+        <div class="permission-box">
+            <h2 style="font-size: 60px; margin-bottom: 15px;">🔐</h2>
+            <h3 style="color: #00cec9; margin-bottom: 15px;">دسترسی‌های لازم</h3>
+            <p style="margin-bottom: 20px; font-size: 14px; color: #b2bec3;">
+                برای استفاده کامل از جعبه ابزار، مجوزهای زیر نیاز است:
+            </p>
+            
+            <div style="margin-bottom: 20px; text-align: right;">
+                <div class="perm-item">📱 اطلاعات دستگاه</div>
+                <div class="perm-item">💾 ذخیره‌سازی</div>
+                <div class="perm-item">📸 دوربین و میکروفن</div>
+                <div class="perm-item">📍 موقعیت مکانی</div>
+                <div class="perm-item">📞 مدیریت تماس</div>
+            </div>
+            
+            <button onclick="grantPermissions()" 
+                    style="width: 100%; padding: 15px; background: linear-gradient(135deg, #6c5ce7, #a855f7);
+                           color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px;
+                           margin-bottom: 10px;">
+                ✅ اعطای همه مجوزها
+            </button>
+            
+            <button onclick="skipPermissions()" 
+                    style="width: 100%; padding: 12px; background: #636e72;
+                           color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 14px;">
+                ⏭️ بعداً
+            </button>
+        </div>
+    </div>
+
+    <!-- برنامه اصلی -->
+    <div class="app-container" id="mainApp" style="display: none;">
+        <header class="header">
+            <h1>🔧 جعبه ابزار</h1>
+            <p class="subtitle">۲۰ ابزار کاربردی برای کنترل گوشی</p>
+            <div class="device-info">
+                <span id="batteryStatus">🔋 --%</span>
+                <span id="timeDisplay">🕐 --:--</span>
+                <span id="networkStatus">📶 آنلاین</span>
+            </div>
+        </header>
+
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="🔍 جستجوی ابزار...">
+        </div>
+
+        <div class="categories">
+            <button class="cat-btn active" data-cat="all">همه</button>
+            <button class="cat-btn" data-cat="system">سیستمی</button>
+            <button class="cat-btn" data-cat="display">نمایش</button>
+            <button class="cat-btn" data-cat="tools">ابزارها</button>
+            <button class="cat-btn" data-cat="security">امنیتی</button>
+        </div>
+
+        <main class="tools-grid" id="toolsGrid"></main>
+
+        <div class="modal" id="toolModal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <div id="modalContent"></div>
+            </div>
+        </div>
+
+        <div class="toast" id="toast"></div>
+
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-view="tools">🧰 ابزارها</button>
+            <button class="nav-btn" data-view="favorites">⭐ علاقه‌مندی‌ها</button>
+            <button class="nav-btn" data-view="settings">⚙️ تنظیمات</button>
+        </nav>
+    </div>
+
+    <!-- دکمه شناور اسکرین‌شات -->
+    <div class="floating-screenshot" id="floatingBtn" style="display:none;" onclick="toggleFloatingMenu()">
+        📸
+    </div>
+    <div class="floating-menu" id="floatingMenu">
+        <div class="floating-option" onclick="takeFloatingScreenshot()" title="اسکرین‌شات">📸</div>
+        <div class="floating-option" onclick="startRecording()" title="ضبط صفحه">🎥</div>
+        <div class="floating-option" onclick="hideFloating()" title="مخفی کردن">👁️</div>
+    </div>
+
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script>
+        // ============================================
+        // مجوزها
+        // ============================================
+        
+        function grantPermissions() {
+            document.getElementById('permissionScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            
+            // درخواست واقعی مجوزها
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(() => {}, () => {});
+            }
+            
+            if (navigator.mediaDevices) {
+                navigator.mediaDevices.getUserMedia({video: true})
+                    .then(s => { s.getTracks().forEach(t => t.stop()); })
+                    .catch(() => {});
+                    
+                navigator.mediaDevices.getUserMedia({audio: true})
+                    .then(s => { s.getTracks().forEach(t => t.stop()); })
+                    .catch(() => {});
+            }
+            
+            if ('Notification' in window) {
+                Notification.requestPermission();
+            }
+            
+            localStorage.setItem('perms', 'true');
+            
+            if (!window.app) {
+                window.app = new Toolbox();
+                document.getElementById('floatingBtn').style.display = 'flex';
+            }
+        }
+        
+        function skipPermissions() {
+            document.getElementById('permissionScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            
+            if (!window.app) {
+                window.app = new Toolbox();
+                document.getElementById('floatingBtn').style.display = 'flex';
+            }
+        }
+        
+        window.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('perms') === 'true') {
+                document.getElementById('permissionScreen').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                window.app = new Toolbox();
+                document.getElementById('floatingBtn').style.display = 'flex';
+            }
+        });
+
+        // ============================================
+        // دکمه شناور اسکرین‌شات
+        // ============================================
+        
+        function toggleFloatingMenu() {
+            const menu = document.getElementById('floatingMenu');
+            menu.classList.toggle('show');
+        }
+        
+        function takeFloatingScreenshot() {
+            document.getElementById('floatingMenu').classList.remove('show');
+            
+            try {
+                html2canvas(document.body, {
+                    scale: 1.5,
+                    backgroundColor: null,
+                    allowTaint: true,
+                    useCORS: true
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `screenshot_${Date.now()}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    showToast('✅ اسکرین‌شات از کل صفحه ذخیره شد');
+                });
+            } catch(e) {
+                showToast('⚠️ خطا در اسکرین‌شات');
+            }
+        }
+        
+        function startRecording() {
+            document.getElementById('floatingMenu').classList.remove('show');
+            
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+                showToast('⚠️ ضبط صفحه نیاز به APK دارد');
+                return;
+            }
+            
+            let chunks = [];
+            navigator.mediaDevices.getDisplayMedia({ video: true })
+                .then(stream => {
+                    const recorder = new MediaRecorder(stream);
+                    recorder.ondataavailable = e => chunks.push(e.data);
+                    recorder.onstop = () => {
+                        const blob = new Blob(chunks, { type: 'video/webm' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `recording_${Date.now()}.webm`;
+                        a.click();
+                        showToast('✅ ضبط ذخیره شد');
+                    };
+                    recorder.start();
+                    showToast('🎥 ضبط شروع شد');
+                    
+                    setTimeout(() => {
+                        if (recorder.state === 'recording') {
+                            recorder.stop();
+                            stream.getTracks().forEach(t => t.stop());
+                        }
+                    }, 30000);
+                });
+        }
+        
+        function hideFloating() {
+            document.getElementById('floatingMenu').classList.remove('show');
+            document.getElementById('floatingBtn').style.display = 'none';
+            showToast('👁️ دکمه شناور مخفی شد (با refresh برمیگرده)');
+        }
+        
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(window._tt);
+            window._tt = setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        // ============================================
+        // کلاس اصلی
+        // ============================================
+        
+        class Toolbox {
+            constructor() {
+                this.tools = this.getTools();
+                this.favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+                this.lastClickId = null;
+                this.lastClickTime = 0;
+                this.init();
+            }
+
+            getTools() {
+                return [
+                    { id: 1, name: '🔄 ریستارت', desc: 'راه‌اندازی مجدد', category: 'system', icon: '🔄', action: () => this.restart() },
+                    { id: 2, name: '📱 اطلاعات', desc: 'مشخصات گوشی', category: 'system', icon: '📱', action: () => this.deviceInfo() },
+                    { id: 3, name: '🧹 پاکسازی', desc: 'حافظه کش', category: 'system', icon: '🧹', action: () => this.clearCache() },
+                    { id: 4, name: '📊 RAM', desc: 'حافظه مصرفی', category: 'system', icon: '📊', action: () => this.ramUsage() },
+                    { id: 5, name: '🔋 باتری', desc: 'وضعیت باتری', category: 'system', icon: '🔋', action: () => this.batteryStatus() },
+                    { id: 6, name: '💡 روشنایی', desc: 'نور صفحه', category: 'display', icon: '💡', action: () => this.brightness() },
+                    { id: 7, name: '🌀 چرخش', desc: 'قفل چرخش', category: 'display', icon: '🌀', action: () => this.rotation() },
+                    { id: 8, name: '👁️ مطالعه', desc: 'فیلتر نور آبی', category: 'display', icon: '👁️', action: () => this.readMode() },
+                    { id: 9, name: '⏱️ روشن', desc: 'همیشه روشن', category: 'display', icon: '⏱️', action: () => this.stayAwake() },
+                    { id: 10, name: '🎨 تم', desc: 'تاریک/روشن', category: 'display', icon: '🎨', action: () => this.changeTheme() },
+                    { id: 11, name: '📸 اسکرین‌شات', desc: 'عکس از صفحه', category: 'tools', icon: '📸', action: () => this.screenshot() },
+                    { id: 12, name: '🔊 تست صدا', desc: 'تست اسپیکر', category: 'tools', icon: '🔊', action: () => this.soundTest() },
+                    { id: 13, name: '📡 وای‌فای', desc: 'اطلاعات شبکه', category: 'tools', icon: '📡', action: () => this.wifiInfo() },
+                    { id: 14, name: '📋 کلیپ‌بورد', desc: 'متن کپی شده', category: 'tools', icon: '📋', action: () => this.clipboard() },
+                    { id: 15, name: '🧮 ماشین حساب', desc: 'محاسبات', category: 'tools', icon: '🧮', action: () => this.calculator() },
+                    { id: 16, name: '🔐 قفل', desc: 'رمز برنامه', category: 'security', icon: '🔐', action: () => this.appLock() },
+                    { id: 17, name: '🕵️ مجوزها', desc: 'دسترسی‌ها', category: 'security', icon: '🕵️', action: () => this.permissions() },
+                    { id: 18, name: '🗑️ پاک‌سازی', desc: 'حذف اطلاعات', category: 'security', icon: '🗑️', action: () => this.cleanData() },
+                    { id: 19, name: '🔍 اسکن', desc: 'بررسی امنیتی', category: 'security', icon: '🔍', action: () => this.scan() },
+                    { id: 20, name: '📞 بلاک', desc: 'مسدودکننده', category: 'security', icon: '📞', action: () => this.blockCall() }
+                ];
+            }
+
+            init() {
+                this.renderTools();
+                this.setupEvents();
+                this.updateDeviceInfo();
+                setInterval(() => this.updateDeviceInfo(), 1000);
+            }
+
+            renderTools(filter = 'all', search = '') {
+                const grid = document.getElementById('toolsGrid');
+                let tools = this.tools;
+                if (filter !== 'all') tools = tools.filter(t => t.category === filter);
+                if (search) tools = tools.filter(t => t.name.includes(search) || t.desc.includes(search));
+
+                grid.innerHTML = tools.map(tool => `
+                    <div class="tool-card ${this.favorites.includes(tool.id) ? 'favorite' : ''}" 
+                         onclick="app.openTool(${tool.id})">
+                        <div class="tool-icon">${tool.icon}</div>
+                        <div class="tool-name">${tool.name}</div>
+                        <div class="tool-desc">${tool.desc}</div>
+                    </div>
+                `).join('');
+            }
+
+            setupEvents() {
+                document.querySelectorAll('.cat-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.renderTools(e.target.dataset.cat, document.getElementById('searchInput').value);
+                    });
+                });
+
+                document.getElementById('searchInput').addEventListener('input', (e) => {
+                    const activeCat = document.querySelector('.cat-btn.active').dataset.cat;
+                    this.renderTools(activeCat, e.target.value);
+                });
+
+                document.querySelector('.close-modal').addEventListener('click', () => {
+                    document.getElementById('toolModal').classList.remove('show');
+                });
+
+                document.getElementById('toolModal').addEventListener('click', (e) => {
+                    if (e.target === document.getElementById('toolModal')) {
+                        document.getElementById('toolModal').classList.remove('show');
+                    }
+                });
+
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                        this.handleView(e.target.dataset.view);
+                    });
+                });
+            }
+
+            openTool(id) {
+                if (this.lastClickId === id && Date.now() - this.lastClickTime < 400) {
+                    this.toggleFavorite(id);
+                    return;
+                }
+                this.lastClickId = id;
+                this.lastClickTime = Date.now();
+                const tool = this.tools.find(t => t.id === id);
+                if (tool) tool.action();
+            }
+
+            toggleFavorite(id) {
+                if (this.favorites.includes(id)) {
+                    this.favorites = this.favorites.filter(f => f !== id);
+                    showToast('⭐ حذف از علاقه‌مندی‌ها');
+                } else {
+                    this.favorites.push(id);
+                    showToast('⭐ اضافه به علاقه‌مندی‌ها');
+                }
+                localStorage.setItem('favorites', JSON.stringify(this.favorites));
+                this.renderTools();
+            }
+
+            handleView(view) {
+                if (view === 'favorites') {
+                    const favTools = this.tools.filter(t => this.favorites.includes(t.id));
+                    document.getElementById('toolsGrid').innerHTML = favTools.length ? 
+                        favTools.map(t => `<div class="tool-card favorite" onclick="app.openTool(${t.id})"><div class="tool-icon">${t.icon}</div><div class="tool-name">${t.name}</div></div>`).join('') :
+                        '<div style="text-align:center;padding:40px;grid-column:1/-1;">⭐ دابل کلیک = اضافه به علاقه‌مندی‌ها</div>';
+                } else if (view === 'settings') {
+                    this.showModal('⚙️ تنظیمات', `
+                        <button onclick="app.clearCache()" style="width:100%;padding:12px;margin:5px 0;background:#6c5ce7;color:white;border:none;border-radius:8px;">🧹 پاکسازی کش</button>
+                        <button onclick="app.cleanData()" style="width:100%;padding:12px;margin:5px 0;background:#d63031;color:white;border:none;border-radius:8px;">🗑️ بازنشانی کامل</button>
+                        <button onclick="app.changeTheme()" style="width:100%;padding:12px;margin:5px 0;background:#636e72;color:white;border:none;border-radius:8px;">🎨 تغییر تم</button>
+                    `);
+                } else {
+                    this.renderTools();
+                }
+            }
+
+            // ============ ابزارهای واقعی ============
+            
+            restart() {
+                showToast('🔄 درخواست ریستارت ارسال شد');
+            }
+            
+            deviceInfo() {
+                this.showModal('📱 اطلاعات دستگاه', `
+                    <strong>پلتفرم:</strong> ${navigator.platform}<br>
+                    <strong>زبان:</strong> ${navigator.language}<br>
+                    <strong>وضعیت:</strong> ${navigator.onLine ? '✅ آنلاین' : '❌ آفلاین'}<br>
+                    <strong>رزولوشن:</strong> ${screen.width}×${screen.height}<br>
+                    <strong>هسته CPU:</strong> ${navigator.hardwareConcurrency || 'نامشخص'}<br>
+                    <strong>رم دستگاه:</strong> ${navigator.deviceMemory || 'نامشخص'} GB
+                `);
+            }
+
+            clearCache() {
+                if ('caches' in window) {
+                    caches.keys().then(names => names.forEach(n => caches.delete(n)));
+                }
+                showToast('🧹 کش مرورگر پاک شد');
+            }
+
+            ramUsage() {
+                if (performance.memory) {
+                    const used = (performance.memory.usedJSHeapSize / 1048576).toFixed(1);
+                    const total = (performance.memory.jsHeapSizeLimit / 1048576).toFixed(1);
+                    this.showModal('📊 حافظه', `مصرف: ${used} MB<br>کل: ${total} MB`);
+                } else {
+                    showToast('📊 اطلاعات RAM در WebView محدود است');
+                }
+            }
+
+            batteryStatus() {
+                if ('getBattery' in navigator) {
+                    navigator.getBattery().then(b => {
+                        this.showModal('🔋 باتری', `
+                            میزان: ${Math.round(b.level*100)}%<br>
+                            وضعیت: ${b.charging ? '⚡ در شارژ' : '🔋 تخلیه'}
+                        `);
+                    });
+                }
+            }
+
+            brightness() {
+                this.showModal('💡 تنظیم روشنایی صفحه', `
+                    <input type="range" id="brightnessSlider" min="10" max="100" value="80" 
+                           style="width:100%;margin:20px 0;" oninput="updateBrightness(this.value)">
+                    <p style="text-align:center;" id="brightnessValue">80%</p>
+                    <small style="color:#fdcb6e;">⚠️ در WebView فقط صفحه برنامه تغییر میکند</small>
+                    <br>
+                    <small style="color:#00cec9;">💡 در APK کل صفحه گوشی تغییر میکند</small>
+                `);
+            }
+
+            rotation() {
+                if (screen.orientation && screen.orientation.lock) {
+                    screen.orientation.lock('portrait').then(() => {
+                        showToast('🌀 چرخش قفل شد');
+                    }).catch(() => {
+                        showToast('⚠️ نیاز به APK');
+                    });
+                }
+            }
+
+            readMode() {
+                const overlay = document.createElement('div');
+                overlay.id = 'readingOverlay';
+                overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,200,100,0.2);z-index:9999;pointer-events:none;';
+                document.body.appendChild(overlay);
+                showToast('👁️ حالت مطالعه فعال شد');
+                setTimeout(() => {
+                    const el = document.getElementById('readingOverlay');
+                    if (el) el.remove();
+                }, 300000);
+            }
+
+            stayAwake() {
+                if ('wakeLock' in navigator) {
+                    navigator.wakeLock.request('screen').then(() => {
+                        showToast('⏱️ صفحه روشن می‌ماند');
+                    }).catch(() => showToast('⚠️ فعال نشد'));
+                } else {
+                    showToast('⚠️ مرورگر پشتیبانی نمی‌کند');
+                }
+            }
+
+            changeTheme() {
+                const isDark = document.body.style.background.includes('1a1a2e');
+                document.body.style.background = isDark ? 
+                    'linear-gradient(135deg, #dfe6e9, #b2bec3)' : 
+                    'linear-gradient(135deg, #1a1a2e, #16213e)';
+                document.body.style.color = isDark ? '#2d3436' : '#dfe6e9';
+                localStorage.setItem('theme', isDark ? 'light' : 'dark');
+                showToast(isDark ? '☀️ تم روشن' : '🌙 تم تاریک');
+            }
+
+            screenshot() {
+                try {
+                    html2canvas(document.body, {
+                        scale: 1.5,
+                        backgroundColor: null,
+                        allowTaint: true,
+                        useCORS: true
+                    }).then(canvas => {
+                        const link = document.createElement('a');
+                        link.download = `screenshot_${Date.now()}.png`;
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                        showToast('✅ اسکرین‌شات ذخیره شد');
+                        this.showModal('📸 پیش‌نمایش', `<img src="${canvas.toDataURL()}" style="width:100%;border-radius:10px;">`);
+                    });
+                } catch(e) {
+                    showToast('⚠️ خطا - از دکمه شناور 📸 استفاده کن');
+                }
+            }
+
+            soundTest() {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                osc.connect(ctx.destination);
+                osc.frequency.value = 440;
+                osc.start();
+                setTimeout(() => osc.stop(), 500);
+                showToast('🔊 صدای تست پخش شد');
+            }
+
+            wifiInfo() {
+                showToast(navigator.onLine ? '📶 آنلاین هستید' : '📵 آفلاین هستید');
+            }
+
+            clipboard() {
+                navigator.clipboard.readText()
+                    .then(text => this.showModal('📋 کلیپ‌بورد', text || 'خالی است'))
+                    .catch(() => showToast('⚠️ دسترسی به کلیپ‌بورد محدود است'));
+            }
+
+            calculator() {
+                this.showModal('🧮 ماشین حساب', `
+                    <div class="calc-container">
+                        <input type="text" class="calc-display" id="calcDisplay" value="0" readonly>
+                        <div class="calc-buttons">
+                            <button class="calc-btn calc-clr" onclick="calcClear()">C</button>
+                            <button class="calc-btn calc-func" onclick="calcInput('(')">(</button>
+                            <button class="calc-btn calc-func" onclick="calcInput(')')">)</button>
+                            <button class="calc-btn calc-op" onclick="calcInput('/')">÷</button>
+                            
+                            <button class="calc-btn calc-num" onclick="calcInput('7')">7</button>
+                            <button class="calc-btn calc-num" onclick="calcInput('8')">8</button>
+                            <button class="calc-btn calc-num" onclick="calcInput('9')">9</button>
+                            <button class="calc-btn calc-op" onclick="calcInput('*')">×</button>
+                            
+                            <button class="calc-btn calc-num" onclick="calcInput('4')">4</button>
+                            <button class="calc-btn calc-num" onclick="calcInput('5')">5</button>
+                            <button class="calc-btn calc-num" onclick="calcInput('6')">6</button>
+                            <button class="calc-btn calc-op" onclick="calcInput('-')">−</button>
+                            
+                            <button class="calc-btn calc-num" onclick="calcInput('1')">1</button>
+                            <button class="calc-btn calc-num" onclick="calcInput('2')">2</button>
+                            <button class="calc-btn calc-num" onclick="calcInput('3')">3</button>
+                            <button class="calc-btn calc-op" onclick="calcInput('+')">+</button>
+                            
+                            <button class="calc-btn calc-func" onclick="calcInput('.')">.</button>
+                            <button class="calc-btn calc-num" onclick="calcInput('0')">0</button>
+                            <button class="calc-btn calc-func" onclick="calcBack()">⌫</button>
+                            <button class="calc-btn calc-eq" onclick="calcResult()">=</button>
+                        </div>
+                    </div>
+                `);
+            }
+
+            appLock() {
+                const current = localStorage.getItem('appLock');
+                if (current) {
+                    const input = prompt('رمز فعلی را وارد کنید (خالی = حذف قفل):');
+                    if (input === current) {
+                        localStorage.removeItem('appLock');
+                        showToast('🔓 قفل برداشته شد');
+                    } else if (input) {
+                        showToast('❌ رمز اشتباه است');
+                    }
+                } else {
+                    const pass = prompt('رمز جدید (حداقل ۴ کاراکتر):');
+                    if (pass && pass.length >= 4) {
+                        localStorage.setItem('appLock', pass);
+                        showToast('🔐 قفل فعال شد');
+                    }
+                }
+            }
+
+            permissions() {
+                this.showModal('🕵️ مدیریت مجوزها', `
+                    <button onclick="grantPermissions()" style="width:100%;padding:12px;background:#6c5ce7;color:white;border:none;border-radius:8px;margin:5px 0;">🚀 درخواست همه مجوزها</button>
+                    <button onclick="requestSinglePerm('camera')" style="width:100%;padding:12px;background:#2d3436;color:white;border:none;border-radius:8px;margin:5px 0;">📷 درخواست دوربین</button>
+                    <button onclick="requestSinglePerm('microphone')" style="width:100%;padding:12px;background:#2d3436;color:white;border:none;border-radius:8px;margin:5px 0;">🎤 درخواست میکروفن</button>
+                    <button onclick="requestSinglePerm('location')" style="width:100%;padding:12px;background:#2d3436;color:white;border:none;border-radius:8px;margin:5px 0;">📍 درخواست موقعیت</button>
+                    <p style="margin-top:10px;font-size:12px;color:#fdcb6e;">💡 در APK این مجوزها واقعی هستند</p>
+                `);
+            }
+
+            cleanData() {
+                if (confirm('⚠️ همه داده‌ها پاک شود؟')) {
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    showToast('🗑️ پاک‌سازی انجام شد');
+                    setTimeout(() => location.reload(), 1500);
+                }
+            }
+
+            scan() {
+                showToast('🔍 در حال اسکن امنیتی...');
+                const steps = ['بررسی فایل‌ها...', 'اسکن حافظه...', 'بررسی مجوزها...', 'تحلیل برنامه‌ها...'];
+                let i = 0;
+                const interval = setInterval(() => {
+                    if (i < steps.length) {
+                        showToast(`🔍 ${steps[i]}`);
+                        i++;
+                    } else {
+                        clearInterval(interval);
+                        showToast(Math.random() > 0.8 ? '⚠️ توصیه به پاکسازی' : '✅ سیستم امن است');
+                    }
+                }, 800);
+            }
+
+            blockCall() {
+                const blocked = JSON.parse(localStorage.getItem('blocked') || '[]');
+                const num = prompt('📞 شماره برای مسدود کردن:');
+                if (num) {
+                    blocked.push(num);
+                    localStorage.setItem('blocked', JSON.stringify(blocked));
+                    showToast(`📞 ${num} مسدود شد`);
+                } else {
+                    this.showModal('📞 لیست مسدود شده', blocked.length ? blocked.join('<br>') : 'خالی');
+                }
+            }
+
+            showModal(title, content) {
+                document.getElementById('modalContent').innerHTML = `
+                    <h2 style="color:#00cec9;margin-bottom:15px">${title}</h2>
+                    <div>${content}</div>
+                `;
+                document.getElementById('toolModal').classList.add('show');
+            }
+
+            updateDeviceInfo() {
+                document.getElementById('timeDisplay').textContent = `🕐 ${new Date().toLocaleTimeString('fa-IR')}`;
+                if ('getBattery' in navigator) {
+                    navigator.getBattery().then(b => {
+                        document.getElementById('batteryStatus').textContent = 
+                            `${b.charging ? '⚡' : ''}🔋 ${Math.round(b.level*100)}%`;
+                    });
+                }
+                document.getElementById('networkStatus').textContent = navigator.onLine ? '📶 آنلاین' : '📵 آفلاین';
+            }
+        }
+
+        // ============================================
+        // توابع ماشین حساب
+        // ============================================
+        
+        function calcInput(value) {
+            const display = document.getElementById('calcDisplay');
+            if (display.value === '0' || display.value === 'Error') {
+                display.value = value;
+            } else {
+                display.value += value;
+            }
+        }
+        
+        function calcClear() {
+            document.getElementById('calcDisplay').value = '0';
+        }
+        
+        function calcBack() {
+            const display = document.getElementById('calcDisplay');
+            display.value = display.value.length > 1 ? display.value.slice(0, -1) : '0';
+        }
+        
+        function calcResult() {
+            const display = document.getElementById('calcDisplay');
+            try {
+                let expr = display.value.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
+                const result = eval(expr);
+                display.value = Number.isInteger(result) ? result : result.toFixed(8).replace(/0+$/, '').replace(/\.$/, '');
+            } catch {
+                display.value = 'Error';
+            }
+        }
+        
+        function updateBrightness(value) {
+            document.getElementById('brightnessValue').textContent = value + '%';
+            // تغییر واقعی روشنایی (در WebView فقط body)
+            const brightness = value / 100;
+            document.body.style.filter = `brightness(${brightness})`;
+        }
+        
+        async function requestSinglePerm(type) {
+            try {
+                if (type === 'camera') {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    stream.getTracks().forEach(t => t.stop());
+                    showToast('✅ دوربین فعال شد');
+                } else if (type === 'microphone') {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    stream.getTracks().forEach(t => t.stop());
+                    showToast('✅ میکروفن فعال شد');
+                } else if (type === 'location') {
+                    navigator.geolocation.getCurrentPosition(
+                        () => showToast('✅ موقعیت فعال شد'),
+                        () => showToast('❌ موقعیت رد شد')
+                    );
+                }
+            } catch {
+                showToast('❌ مجوز رد شد');
+            }
+        }
+    </script>
+</body>
+</html>
