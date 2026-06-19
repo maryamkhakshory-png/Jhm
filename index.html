@@ -6,1799 +6,1869 @@
     <meta name="theme-color" content="#0a0a1a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>🔧 جعبه ابزار حرفه‌ای</title>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.0/dist/tesseract.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-    
+    <title>تصویریار - ۱۵ ابزار حرفه‌ای پردازش تصویر</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.0/dist/tesseract.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js">
+    </script>
+
     <style>
         :root {
-            --bg-primary: #0a0a1a;
-            --bg-secondary: #12122a;
-            --glass-bg: rgba(255, 255, 255, 0.04);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-            --text-primary: #e8e8f0;
-            --text-secondary: #a0a0b8;
+            --bg: #0a0a1a;
+            --bg2: #14142a;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.06);
+            --text: #e0e0f0;
+            --text2: #9999b0;
             --accent: #6c5ce7;
-            --accent-light: #a855f7;
-            --accent-glow: rgba(108, 92, 231, 0.3);
-            --success: #00b894;
-            --danger: #ff6b6b;
-            --warning: #fdcb6e;
-            --info: #74b9ff;
-            --radius-sm: 10px;
-            --radius-md: 16px;
-            --radius-lg: 24px;
-            --radius-xl: 32px;
-            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --accent2: #a855f7;
+            --green: #00b894;
+            --red: #ff6b6b;
+            --yellow: #fdcb6e;
+            --radius: 14px;
+            --radius2: 22px;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
-            font-family: 'Segoe UI', 'Tahoma', 'Roboto', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Tahoma', sans-serif;
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
             overflow-x: hidden;
             -webkit-tap-highlight-color: transparent;
-            -webkit-font-smoothing: antialiased;
             user-select: none;
             -webkit-user-select: none;
-            line-height: 1.6;
             touch-action: manipulation;
         }
-
-        ::-webkit-scrollbar { width: 0; height: 0; }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+        ::-webkit-scrollbar {
+            width: 0;
+            height: 0;
         }
-        @keyframes fadeInScale {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes fadeScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
         @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.04);
+            }
         }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
         }
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-
-        .app-container {
+        .app {
             max-width: 500px;
             margin: 0 auto;
+            padding: 8px 10px 30px;
             min-height: 100vh;
-            position: relative;
-            padding: 0 10px 30px;
         }
-
         .page {
             display: none;
-            animation: fadeInScale 0.35s ease;
+            animation: fadeScale 0.3s ease;
             padding-bottom: 20px;
         }
-        .page.active { display: block; }
+        .page.active {
+            display: block;
+        }
 
-        /* هدر */
-        .app-header {
-            background: var(--glass-bg);
+        /* Header */
+        .header {
+            background: var(--glass);
             backdrop-filter: blur(30px);
             -webkit-backdrop-filter: blur(30px);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-lg);
-            padding: 20px 24px;
-            margin: 16px 0;
-            text-align: center;
-            box-shadow: var(--glass-shadow);
-            animation: fadeInUp 0.5s ease;
-        }
-        .app-header .logo { font-size: 48px; margin-bottom: 8px; animation: float 3s ease-in-out infinite; }
-        .app-header h1 {
-            font-size: 24px; font-weight: 700;
-            background: linear-gradient(135deg, var(--accent), var(--accent-light));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text; margin-bottom: 4px;
-        }
-        .app-header .subtitle { font-size: 13px; color: var(--text-secondary); opacity: 0.8; }
-
-        /* تولبار */
-        .toolbar {
-            background: var(--glass-bg);
-            backdrop-filter: blur(30px);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-md);
-            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius2);
+            padding: 18px;
             margin: 12px 0;
+            text-align: center;
+        }
+        .header .logo {
+            font-size: 44px;
+            animation: pulse 3s infinite;
+        }
+        .header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 4px 0;
+        }
+        .header .sub {
+            font-size: 12px;
+            color: var(--text2);
+        }
+
+        /* Toolbar */
+        .toolbar {
+            background: var(--glass);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px 14px;
+            margin: 10px 0;
             display: flex;
             align-items: center;
-            gap: 12px;
-            box-shadow: var(--glass-shadow);
+            gap: 10px;
             position: sticky;
-            top: 10px;
+            top: 8px;
             z-index: 100;
         }
-        .toolbar .back-btn {
-            width: 40px; height: 40px; border-radius: 50%;
-            background: var(--accent); border: none; color: white;
-            font-size: 20px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: var(--transition); flex-shrink: 0;
+        .toolbar .back {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .toolbar .back-btn:active { transform: scale(0.9); }
-        .toolbar .tool-title { font-size: 17px; font-weight: 600; flex: 1; text-align: center; }
-
-        /* جستجو */
-        .search-bar { margin: 12px 0; }
-        .search-bar input {
-            width: 100%; padding: 14px 20px;
-            background: var(--glass-bg); backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border); border-radius: var(--radius-xl);
-            color: var(--text-primary); font-size: 15px; outline: none; transition: var(--transition);
+        .toolbar .title {
+            font-size: 16px;
+            font-weight: 600;
+            flex: 1;
+            text-align: center;
         }
-        .search-bar input:focus { border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
-        .search-bar input::placeholder { color: var(--text-secondary); }
 
-        /* دسته‌بندی */
-        .categories { display: flex; gap: 8px; margin: 12px 0; overflow-x: auto; padding: 4px 0; }
-        .categories::-webkit-scrollbar { height: 0; }
+        /* Search & Categories */
+        .search {
+            margin: 10px 0;
+        }
+        .search input {
+            width: 100%;
+            padding: 12px 18px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            color: var(--text);
+            font-size: 14px;
+            outline: none;
+        }
+        .search input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(108, 92, 231, 0.2);
+        }
+        .cats {
+            display: flex;
+            gap: 7px;
+            margin: 10px 0;
+            overflow-x: auto;
+            padding: 2px 0;
+        }
+        .cats::-webkit-scrollbar {
+            height: 0;
+        }
         .cat-btn {
-            padding: 10px 18px; border: 1px solid var(--glass-border);
-            background: var(--glass-bg); backdrop-filter: blur(10px);
-            color: var(--text-secondary); border-radius: var(--radius-xl);
-            cursor: pointer; white-space: nowrap; font-size: 13px; font-weight: 500; transition: var(--transition);
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            background: var(--glass);
+            color: var(--text2);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            white-space: nowrap;
+            transition: 0.2s;
         }
-        .cat-btn.active { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 4px 15px var(--accent-glow); }
-        .cat-btn:active { transform: scale(0.95); }
-
-        /* استات */
-        .stats-row { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
-        .stat-chip {
-            background: var(--glass-bg); backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border); border-radius: var(--radius-xl);
-            padding: 8px 14px; font-size: 12px; color: var(--text-secondary);
-            display: flex; align-items: center; gap: 6px;
+        .cat-btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
         }
 
-        /* شبکه ابزارها */
-        .tools-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 16px 0; }
-        .tool-card {
-            background: var(--glass-bg); backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border); border-radius: var(--radius-md);
-            padding: 20px 14px; text-align: center; cursor: pointer;
-            transition: var(--transition); animation: fadeInUp 0.5s ease backwards;
-            position: relative;
+        /* Stats */
+        .stats {
+            display: flex;
+            gap: 7px;
+            margin: 10px 0;
+            flex-wrap: wrap;
         }
-        .tool-card:active { transform: scale(0.95); border-color: var(--accent); }
-        .tool-card .tool-icon { font-size: 36px; margin-bottom: 10px; }
-        .tool-card .tool-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-        .tool-card .tool-desc { font-size: 11px; color: var(--text-secondary); }
+        .stat {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 11px;
+            color: var(--text2);
+            cursor: pointer;
+        }
 
-        /* دکمه‌ها */
+        /* Tools Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 14px 0;
+        }
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            animation: fadeUp 0.4s ease backwards;
+        }
+        .card:active {
+            transform: scale(0.95);
+            border-color: var(--accent);
+        }
+        .card .icon {
+            font-size: 34px;
+            margin-bottom: 8px;
+        }
+        .card .name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .card .desc {
+            font-size: 11px;
+            color: var(--text2);
+        }
+
+        /* Buttons */
         .btn {
-            width: 100%; padding: 14px; border: none; border-radius: var(--radius-md);
-            cursor: pointer; font-size: 14px; font-weight: 600; margin: 6px 0;
-            transition: var(--transition); display: flex; align-items: center;
-            justify-content: center; gap: 8px;
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            transition: 0.2s;
         }
-        .btn:active { transform: scale(0.96); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-light)); color: white; box-shadow: 0 4px 15px var(--accent-glow); }
-        .btn-success { background: linear-gradient(135deg, #00b894, #00cec9); color: white; }
-        .btn-outline { background: transparent; border: 2px solid var(--accent); color: var(--accent); }
-        .btn-danger { background: var(--danger); color: white; }
-        .btn-sm { padding: 8px 14px; font-size: 12px; width: auto; display: inline-flex; }
+        .btn:active {
+            transform: scale(0.96);
+        }
+        .btn:disabled {
+            opacity: 0.45;
+            pointer-events: none;
+        }
+        .btn-p {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.3);
+        }
+        .btn-s {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: #fff;
+        }
+        .btn-o {
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+        }
+        .btn-sm {
+            padding: 8px 14px;
+            font-size: 12px;
+            width: auto;
+            display: inline-flex;
+        }
 
-        /* فرم‌ها */
-        .input-group { margin: 12px 0; }
-        .input-group label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; }
-        .input-group input, .input-group select, .input-group textarea {
-            width: 100%; padding: 12px 16px;
-            background: var(--glass-bg); backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border); border-radius: var(--radius-md);
-            color: var(--text-primary); font-size: 14px; outline: none; transition: var(--transition);
+        /* Inputs */
+        .inp {
+            margin: 10px 0;
         }
-        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
-            border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow);
+        .inp label {
+            display: block;
+            font-size: 12px;
+            color: var(--text2);
+            margin-bottom: 5px;
+        }
+        .inp input,
+        .inp select,
+        .inp textarea {
+            width: 100%;
+            padding: 11px 14px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-size: 14px;
+            outline: none;
+        }
+        .inp input:focus,
+        .inp select:focus,
+        .inp textarea:focus {
+            border-color: var(--accent);
         }
 
-        /* رنج */
-        .range-group { display: flex; align-items: center; gap: 12px; margin: 12px 0; }
-        .range-group input[type="range"] {
-            flex: 1; height: 6px; border-radius: 3px;
-            background: var(--glass-border); outline: none; -webkit-appearance: none;
+        /* Range */
+        .rng {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
         }
-        .range-group input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 24px; height: 24px;
-            border-radius: 50%; background: var(--accent); cursor: pointer;
-            box-shadow: 0 0 10px var(--accent-glow);
+        .rng input[type=range] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border);
+            -webkit-appearance: none;
+            outline: none;
         }
-        .range-group .range-value { min-width: 50px; text-align: center; font-weight: 600; font-size: 14px; }
+        .rng input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+        }
+        .rng .val {
+            min-width: 45px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+        }
 
-        /* پیش‌نمایش */
-        .preview-container {
-            background: rgba(0,0,0,0.3); border: 2px dashed var(--glass-border);
-            border-radius: var(--radius-md); padding: 16px; margin: 12px 0;
-            min-height: 100px; display: flex; flex-wrap: wrap; gap: 8px;
-            justify-content: center; align-items: center; max-height: 300px; overflow-y: auto;
+        /* Preview */
+        .prev {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+            margin: 10px 0;
+            min-height: 90px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            align-items: center;
+            max-height: 280px;
+            overflow-y: auto;
         }
-        .preview-container img { height: 80px; border-radius: 8px; border: 2px solid var(--glass-border); object-fit: cover; }
+        .prev img {
+            height: 70px;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            cursor: pointer;
+        }
 
-        /* مقایسه */
-        .comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
-        .comparison-item { text-align: center; }
-        .comparison-item img { width: 100%; border-radius: var(--radius-md); border: 2px solid var(--glass-border); }
-        .comparison-item .label { font-size: 12px; color: var(--text-secondary); margin-top: 6px; }
+        /* Comparison */
+        .comp {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 14px 0;
+        }
+        .comp div {
+            text-align: center;
+        }
+        .comp img {
+            width: 100%;
+            border-radius: var(--radius);
+            border: 2px solid var(--border);
+        }
+        .comp .lbl {
+            font-size: 11px;
+            color: var(--text2);
+            margin-top: 4px;
+        }
 
         /* Progress */
-        .progress-bar { width: 100%; height: 6px; background: var(--glass-border); border-radius: 3px; margin: 12px 0; overflow: hidden; }
-        .progress-bar .fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-light)); border-radius: 3px; transition: width 0.3s; width: 0%; }
-        .progress-text { font-size: 13px; color: var(--text-secondary); text-align: center; margin: 4px 0; }
+        .prog {
+            height: 5px;
+            background: var(--border);
+            border-radius: 3px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .prog .bar {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .ptxt {
+            font-size: 12px;
+            color: var(--text2);
+            text-align: center;
+        }
 
         /* Toast */
         .toast {
-            position: fixed; bottom: 30px; left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: rgba(0,0,0,0.9); backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border); color: white;
-            padding: 14px 24px; border-radius: var(--radius-xl); font-size: 14px;
-            z-index: 10000; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            pointer-events: none; white-space: nowrap;
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120px);
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 12px 22px;
+            border-radius: 25px;
+            font-size: 13px;
+            z-index: 9999;
+            pointer-events: none;
+            transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .toast.show { transform: translateX(-50%) translateY(0); }
-
-        /* رنگ */
-        .color-grid { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 10px 0; }
-        .color-dot { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: var(--transition); }
-        .color-dot.active { border-color: white; box-shadow: 0 0 15px rgba(255,255,255,0.4); }
-
-        /* Canvas wrapper */
-        .canvas-wrapper {
-            position: relative; overflow: hidden;
-            border-radius: var(--radius-md); border: 2px solid var(--glass-border);
-            margin: 10px 0; cursor: grab; touch-action: none;
-            background: #1a1a1a;
-        }
-        .canvas-wrapper:active { cursor: grabbing; }
-        .canvas-wrapper canvas { display: block; transform-origin: 0 0; }
-
-        /* مدال */
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%; background: rgba(0,0,0,0.9);
-            z-index: 9000; align-items: center; justify-content: center;
-        }
-        .modal-overlay.show { display: flex; }
-        .modal-content {
-            background: var(--bg-secondary); border-radius: var(--radius-lg);
-            padding: 24px; max-width: 90%; max-height: 80vh; overflow-y: auto;
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
         }
 
-        /* تنظیمات */
+        /* Cleaner Toolbar (ibisPaint style) */
+        .clean-toolbar {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 8px 0;
+            position: sticky;
+            bottom: 8px;
+            z-index: 50;
+        }
+        .clean-toolbar button {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: var(--glass);
+            color: var(--text);
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        .clean-toolbar button:active {
+            background: var(--accent);
+            color: #fff;
+        }
+        .clean-toolbar .active-tool {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+        .clean-toolbar .brush-preview {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid var(--text);
+            flex-shrink: 0;
+        }
+        .clean-canvas-wrap {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--radius);
+            border: 2px solid var(--border);
+            margin: 8px 0;
+            background: #111;
+            touch-action: none;
+            cursor: crosshair;
+        }
+        .clean-canvas-wrap canvas {
+            display: block;
+            transform-origin: 0 0;
+        }
+        .zoom-indicator {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            pointer-events: none;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-box {
+            background: var(--bg2);
+            border-radius: var(--radius2);
+            padding: 20px;
+            max-width: 92%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        /* Color dots */
+        .colors {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 8px 0;
+        }
+        .color-dot {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: 0.2s;
+        }
+        .color-dot.active {
+            border-color: #fff;
+            box-shadow: 0 0 14px rgba(255, 255, 255, 0.5);
+        }
+
+        .grid2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .grid3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
+        }
         .settings-section {
-            background: var(--glass-bg); backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border); border-radius: var(--radius-md);
-            padding: 16px; margin: 10px 0;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+            margin: 10px 0;
         }
-        .settings-section h3 { font-size: 15px; margin-bottom: 10px; color: var(--accent); }
-
-        /* چک باکس */
-        .checkbox-group { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
-        .checkbox-group input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--accent); }
-
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-
+        .settings-section h3 {
+            font-size: 14px;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
         @media (max-width: 360px) {
-            .tools-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-            .tool-card { padding: 14px 10px; }
-            .tool-card .tool-icon { font-size: 28px; }
-            .app-header h1 { font-size: 22px; }
+            .grid {
+                gap: 7px;
+            }
+            .card {
+                padding: 14px 8px;
+            }
+            .card .icon {
+                font-size: 28px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="app-container" id="app">
-        <!-- صفحه اصلی -->
-        <div class="page active" id="page-home">
-            <header class="app-header">
-                <div class="logo">🔧</div>
-                <h1>جعبه ابزار حرفه‌ای</h1>
-                <p class="subtitle">۱۵ ابزار قدرتمند پردازش تصویر</p>
-            </header>
-
-            <div class="search-bar">
-                <input type="text" id="searchInput" placeholder="🔍 جستجوی ابزار..." oninput="filterTools()">
-            </div>
-
-            <div class="categories" id="categories">
-                <button class="cat-btn active" data-cat="all" onclick="filterByCategory('all', this)">همه</button>
-                <button class="cat-btn" data-cat="image" onclick="filterByCategory('image', this)">تصویر</button>
-                <button class="cat-btn" data-cat="pdf" onclick="filterByCategory('pdf', this)">PDF</button>
-                <button class="cat-btn" data-cat="qr" onclick="filterByCategory('qr', this)">QR</button>
-                <button class="cat-btn" data-cat="utility" onclick="filterByCategory('utility', this)">ابزارها</button>
-            </div>
-
-            <div class="stats-row">
-                <div class="stat-chip">🕐 اخیراً: <span id="recentTool">-</span></div>
-                <div class="stat-chip">📊 استفاده: <span id="usageCount">0</span></div>
-                <div class="stat-chip" onclick="openSettings()" style="cursor:pointer;">⚙️ تنظیمات</div>
-            </div>
-
-            <div class="tools-grid" id="toolsGrid"></div>
-        </div>
-
-        <!-- صفحه ابزار -->
+    <div class="app" id="app">
+        <div class="page active" id="page-home"></div>
         <div class="page" id="page-tool"></div>
-        
-        <!-- صفحه تنظیمات -->
         <div class="page" id="page-settings"></div>
     </div>
-
-    <!-- Toast -->
     <div class="toast" id="toast"></div>
-
-    <!-- مدال -->
-    <div class="modal-overlay" id="qrModal">
-        <div class="modal-content">
-            <h3 style="text-align:center;margin-bottom:15px;">📷 اسکن QR</h3>
-            <video id="qrVideo" style="width:100%;border-radius:10px;" autoplay playsinline></video>
-            <div id="qrModalResult" style="text-align:center;margin:10px 0;"></div>
-            <button class="btn btn-danger" onclick="stopQR()">❌ بستن</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="colorZoomModal">
-        <div class="modal-content" style="text-align:center;">
-            <h3>🔍 زوم رنگ</h3>
-            <canvas id="colorZoomCanvas" style="max-width:100%;border-radius:10px;"></canvas>
-            <p id="colorZoomInfo" style="margin:10px 0;"></p>
-            <button class="btn btn-outline" onclick="document.getElementById('colorZoomModal').classList.remove('show')">بستن</button>
-        </div>
-    </div>
+    <div class="modal" id="globalModal"><div class="modal-box" id="globalModalContent"></div></div>
 
     <script src="cordova.js"></script>
     <script>
-    // ============================================
-    // پیکربندی و حالت
-    // ============================================
-    const CONFIG = {
-        saveFolder: localStorage.getItem('tb_save_folder') || 'Download',
-        theme: localStorage.getItem('tb_theme') || 'dark',
-        quality: parseInt(localStorage.getItem('tb_quality') || '90'),
-    };
+        // ============================================
+        // تصویریار - ۱۵ ابزار حرفه‌ای پردازش تصویر
+        // نسخه ۳.۰ - Production Ready
+        // ============================================
 
-    const toolsData = [
-        { id: 1, name: '🧩 چسباندن عکس', desc: 'عمودی و افقی', category: 'image', action: 'stitch' },
-        { id: 2, name: '📄 ساخت PDF', desc: 'تصاویر به PDF', category: 'pdf', action: 'pdf' },
-        { id: 3, name: '🧹 پاک‌کن عکس', desc: 'حذف متن + زوم', category: 'image', action: 'cleaner' },
-        { id: 4, name: '✨ بهبود کیفیت', desc: 'نور، رنگ، شارپنس', category: 'image', action: 'enhancer' },
-        { id: 5, name: '✂️ تقسیم عکس', desc: 'برش تصاویر بلند', category: 'image', action: 'split' },
-        { id: 6, name: '💧 واترمارک', desc: 'متن و لوگو', category: 'image', action: 'watermark' },
-        { id: 7, name: '📦 فشرده‌سازی', desc: 'کاهش حجم + مقایسه', category: 'image', action: 'compressor' },
-        { id: 8, name: '🔄 تبدیل فرمت', desc: 'JPG ↔ PNG ↔ WEBP', category: 'image', action: 'converter' },
-        { id: 9, name: '📐 تغییر سایز', desc: 'ابعاد دلخواه', category: 'image', action: 'resize' },
-        { id: 10, name: '📱 ساخت QR', desc: 'متن/لینک/تلفن/ایمیل', category: 'qr', action: 'qrgen' },
-        { id: 11, name: '📷 اسکن QR', desc: 'دوربین + عکس', category: 'qr', action: 'qrscan' },
-        { id: 12, name: '📝 OCR', desc: 'متن فارسی + انگلیسی', category: 'utility', action: 'ocr' },
-        { id: 13, name: '🎨 انتخاب رنگ', desc: 'HEX/RGB/HSL + زوم', category: 'utility', action: 'colorpick' },
-        { id: 14, name: '🖼️ چسب اسکرین', desc: 'حذف همپوشانی', category: 'image', action: 'screenstitch' },
-        { id: 15, name: '📋 پردازش گروهی', desc: 'فشرده/سایز/واترمارک', category: 'utility', action: 'batch' }
-    ];
+        // ==================== CONFIG ====================
+        const CFG = {
+            saveFolder: localStorage.getItem('iy_save') || 'Download',
+            quality: parseInt(localStorage.getItem('iy_qual') || '90'),
+            theme: localStorage.getItem('iy_theme') || 'dark'
+        };
 
-    const state = {
-        currentPage: 'home', currentTool: null, history: ['home'],
-        usageStats: JSON.parse(localStorage.getItem('tb_stats') || '{}'),
-        recentTools: JSON.parse(localStorage.getItem('tb_recent') || '[]')
-    };
+        // ==================== STATE ====================
+        const S = {
+            page: 'home',
+            tool: null,
+            history: ['home'],
+            stats: JSON.parse(localStorage.getItem('iy_stats') || '{}'),
+            recent: JSON.parse(localStorage.getItem('iy_recent') || '[]'),
+            listeners: []
+        };
 
-    // ============================================
-    // ذخیره فایل (چند روش)
-    // ============================================
-    function saveFile(dataUrl, filename, mime = 'image/jpeg') {
-        const folder = CONFIG.saveFolder;
-        const fullPath = folder + '/' + filename;
-        
-        // روش ۱: Median Bridge
-        if (typeof median !== 'undefined' && median.file && median.file.save) {
-            try {
-                median.file.save({ data: dataUrl, filename: filename, folder: folder });
-                showToast('💾 ذخیره شد');
-                return;
-            } catch(e) { console.log('Median failed'); }
+        // ==================== UTILS ====================
+        const $ = (s, p) => (p || document).querySelector(s);
+        const $$ = (s, p) => (p || document).querySelectorAll(s);
+
+        function toast(msg, dur = 2800) {
+            const t = $('#toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(window._tt);
+            window._tt = setTimeout(() => t.classList.remove('show'), dur);
         }
-        
-        // روش ۲: Cordova FileSystem
-        if (typeof cordova !== 'undefined' && window.requestFileSystem && window.LocalFileSystem) {
-            try {
-                window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, (fs) => {
-                    // ایجاد پوشه اگر وجود ندارد
-                    fs.root.getDirectory(folder, { create: true }, (dirEntry) => {
-                        dirEntry.getFile(filename, { create: true, exclusive: false }, (fileEntry) => {
-                            fileEntry.createWriter((writer) => {
-                                writer.onwriteend = () => {
-                                    if (window.MediaScanner) {
-                                        window.MediaScanner.scanFile(fileEntry.toURL(), mime, () => showToast('💾 ذخیره شد'));
-                                    } else {
-                                        showToast('💾 ذخیره شد');
-                                    }
-                                };
-                                fetch(dataUrl).then(r => r.blob()).then(blob => writer.write(blob));
+
+        function fmtBytes(b) {
+            if (!b) return '0 B';
+            if (b < 1024) return b + ' B';
+            if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+            return (b / 1048576).toFixed(2) + ' MB';
+        }
+
+        function loadImg(file) {
+            return new Promise((resolve) => {
+                const r = new FileReader();
+                r.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => resolve({ img, dataUrl: e.target.result });
+                    img.src = e.target.result;
+                };
+                r.readAsDataURL(file);
+            });
+        }
+
+        function fileInp(accept = 'image/*', multi = false) {
+            const inp = document.createElement('input');
+            inp.type = 'file';
+            inp.accept = accept;
+            inp.multiple = multi;
+            inp.style.cssText = 'position:fixed;top:-200px;left:-200px;';
+            document.body.appendChild(inp);
+            setTimeout(() => { if (inp.parentNode) inp.remove(); }, 90000);
+            return inp;
+        }
+
+        function dataUrlToBlob(dataUrl) {
+            const parts = dataUrl.split(',');
+            const mime = parts[0].match(/:(.*?);/)[1];
+            const bytes = atob(parts[1]);
+            const ab = new ArrayBuffer(bytes.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < bytes.length; i++) ia[i] = bytes.charCodeAt(i);
+            return new Blob([ab], { type: mime });
+        }
+
+        function saveFile(dataUrl, filename, mime = 'image/jpeg') {
+            const folder = CFG.saveFolder;
+            // Median
+            if (typeof median !== 'undefined' && median.file && median.file.save) {
+                try { median.file.save({ data: dataUrl, filename, folder });
+                    toast('💾 ذخیره شد'); return; } catch (e) {}
+            }
+            // Cordova
+            if (typeof cordova !== 'undefined' && window.requestFileSystem && window.LocalFileSystem) {
+                try {
+                    window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, (fs) => {
+                        fs.root.getDirectory(folder, { create: true }, (dir) => {
+                            dir.getFile(filename, { create: true, exclusive: false }, (fe) => {
+                                fe.createWriter((w) => {
+                                    w.onwriteend = () => { if (window.MediaScanner) window.MediaScanner
+                                            .scanFile(fe.toURL(), mime, () => toast('💾 ذخیره شد'));
+                                        else toast('💾 ذخیره شد'); };
+                                    fetch(dataUrl).then(r => r.blob()).then(b => w.write(b));
+                                });
                             });
                         });
                     });
-                });
-                return;
-            } catch(e) { console.log('Cordova FS failed'); }
-        }
-        
-        // روش ۳: دانلود مستقیم
-        try {
+                    return;
+                } catch (e) {}
+            }
+            // Direct
             const link = document.createElement('a');
-            link.href = dataUrl; link.download = filename;
-            document.body.appendChild(link); link.click();
-            setTimeout(() => document.body.removeChild(link), 100);
-            showToast('💾 فایل ذخیره شد');
-            return;
-        } catch(e) {}
-        
-        // روش ۴: Blob URL
-        fetch(dataUrl).then(r => r.blob()).then(blob => {
+            link.href = dataUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            setTimeout(() => link.remove(), 100);
+            toast('💾 فایل ذخیره شد');
+        }
+
+        function saveBlob(blob, filename) {
+            if (typeof median !== 'undefined' && median.file && median.file.save) {
+                const r = new FileReader();
+                r.onload = () => { median.file.save({ data: r.result, filename, folder: CFG.saveFolder });
+                    toast('💾 ذخیره شد'); };
+                r.readAsDataURL(blob);
+                return;
+            }
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
-            link.href = url; link.download = filename;
-            document.body.appendChild(link); link.click();
-            document.body.removeChild(link); URL.revokeObjectURL(url);
-            showToast('💾 فایل ذخیره شد');
-        });
-    }
-
-    function saveBlob(blob, filename) {
-        const folder = CONFIG.saveFolder;
-        if (typeof median !== 'undefined' && median.file && median.file.save) {
-            const reader = new FileReader();
-            reader.onload = () => { median.file.save({ data: reader.result, filename, folder }); showToast('💾 ذخیره شد'); };
-            reader.readAsDataURL(blob);
-            return;
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+            toast('💾 ذخیره شد');
         }
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url; link.download = filename;
-        document.body.appendChild(link); link.click();
-        document.body.removeChild(link); URL.revokeObjectURL(url);
-        showToast('💾 فایل ذخیره شد');
-    }
 
-    // ============================================
-    // توابع کمکی
-    // ============================================
-    function showToast(msg, dur = 3000) {
-        const t = document.getElementById('toast');
-        t.textContent = msg; t.classList.add('show');
-        clearTimeout(window._tt); window._tt = setTimeout(() => t.classList.remove('show'), dur);
-    }
-
-    function loadImage(file) {
-        return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => resolve({ img, dataUrl: e.target.result });
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        });
-    }
-
-    function fileInput(accept = 'image/*', multiple = false) {
-        const inp = document.createElement('input');
-        inp.type = 'file'; inp.accept = accept; inp.multiple = multiple;
-        inp.style.cssText = 'position:fixed;top:-100px;left:-100px;';
-        document.body.appendChild(inp);
-        setTimeout(() => document.body.removeChild(inp), 60000);
-        return inp;
-    }
-
-    function formatBytes(bytes) {
-        if (bytes < 1024) return bytes + ' B';
-        if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
-        return (bytes / 1048576).toFixed(1) + ' MB';
-    }
-
-    function dataUrlToBlob(dataUrl) {
-        const parts = dataUrl.split(',');
-        const mime = parts[0].match(/:(.*?);/)[1];
-        const bytes = atob(parts[1]);
-        const ab = new ArrayBuffer(bytes.length);
-        const ia = new Uint8Array(ab);
-        for (let i = 0; i < bytes.length; i++) ia[i] = bytes.charCodeAt(i);
-        return new Blob([ab], { type: mime });
-    }
-
-    function rgbToHsl(r, g, b) {
-        r /= 255; g /= 255; b /= 255;
-        const max = Math.max(r, g, b), min = Math.min(r, g, b);
-        let h, s, l = (max + min) / 2;
-        if (max === min) { h = s = 0; }
-        else {
-            const d = max - min;
-            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-            switch (max) {
-                case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
-                case g: h = ((b - r) / d + 2) / 6; break;
-                case b: h = ((r - g) / d + 4) / 6; break;
+        function rgbToHsl(r, g, b) {
+            r /= 255;
+            g /= 255;
+            b /= 255;
+            const mx = Math.max(r, g, b),
+                mn = Math.min(r, g, b);
+            let h, s, l = (mx + mn) / 2;
+            if (mx === mn) h = s = 0;
+            else {
+                const d = mx - mn;
+                s = l > 0.5 ? d / (2 - mx - mn) : d / (mx + mn);
+                switch (mx) {
+                    case r:
+                        h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+                        break;
+                    case g:
+                        h = ((b - r) / d + 2) / 6;
+                        break;
+                    case b:
+                        h = ((r - g) / d + 4) / 6;
+                        break;
+                }
             }
+            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
         }
-        return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
-    }
 
-    // ============================================
-    // ناوبری
-    // ============================================
-    function init() {
-        renderTools();
-        updateStats();
-        window.addEventListener('popstate', (e) => {
-            if (e.state && e.state.page === 'tool') navigateTo('tool', e.state.toolId, false);
-            else if (e.state && e.state.page === 'settings') navigateTo('settings', null, false);
-            else navigateTo('home', null, false);
-        });
-        document.addEventListener('backbutton', handleBack, false);
-    }
+        function escapeHtml(s) { const d = document.createElement('div');
+            d.textContent = s; return d.innerHTML; }
 
-    function navigateTo(page, toolId, pushState) {
-        state.currentPage = page;
-        state.currentTool = toolId;
-        if (pushState) {
-            state.history.push(page);
-            window.history.pushState({ page, toolId }, '');
+        // ==================== ROUTER ====================
+        function navTo(page, toolId, push = true) {
+            S.page = page;
+            S.tool = toolId;
+            if (push) { S.history.push(page);
+                history.pushState({ page, toolId }, ''); }
+            $$('.page').forEach(p => p.classList.remove('active'));
+            if (page === 'home') {
+                $('#page-home').classList.add('active');
+                renderHome();
+            } else if (page === 'tool' && toolId) {
+                $('#page-tool').classList.add('active');
+                renderTool(toolId);
+            } else if (page === 'settings') {
+                $('#page-settings').classList.add('active');
+                renderSettings();
+            }
+            window.scrollTo(0, 0);
         }
-        
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        
-        if (page === 'home') {
-            document.getElementById('page-home').classList.add('active');
-            updateStats();
-        } else if (page === 'tool' && toolId) {
-            document.getElementById('page-tool').classList.add('active');
-            renderTool(toolId);
-        } else if (page === 'settings') {
-            document.getElementById('page-settings').classList.add('active');
-            renderSettings();
-        }
-        window.scrollTo(0, 0);
-    }
 
-    function goBack() {
-        if (state.history.length > 1) {
-            state.history.pop();
-            const prev = state.history[state.history.length - 1];
-            if (prev === 'home') navigateTo('home', null, false);
-            else if (prev === 'settings') navigateTo('settings', null, false);
-            else navigateTo('tool', state.currentTool, false);
-        } else {
-            if (navigator.app && navigator.app.exitApp) navigator.app.exitApp();
-        }
-    }
-
-    function handleBack() {
-        if (state.currentPage === 'home') {
-            if (navigator.app && navigator.app.exitApp) navigator.app.exitApp();
-        } else goBack();
-    }
-
-    function openToolPage(toolId) {
-        state.usageStats[toolId] = (state.usageStats[toolId] || 0) + 1;
-        localStorage.setItem('tb_stats', JSON.stringify(state.usageStats));
-        state.recentTools = [toolId, ...state.recentTools.filter(id => id !== toolId)].slice(0, 5);
-        localStorage.setItem('tb_recent', JSON.stringify(state.recentTools));
-        navigateTo('tool', toolId, true);
-    }
-
-    function renderTools(filter = 'all', search = '') {
-        let tools = [...toolsData];
-        if (filter !== 'all') tools = tools.filter(t => t.category === filter);
-        if (search) { const q = search.toLowerCase(); tools = tools.filter(t => t.name.includes(q) || t.desc.includes(q)); }
-        
-        document.getElementById('toolsGrid').innerHTML = tools.map((t, i) => `
-            <div class="tool-card" style="animation-delay:${i*0.05}s" onclick="openToolPage(${t.id})">
-                <div class="tool-icon">${t.name.split(' ')[0]}</div>
-                <div class="tool-name">${t.name.slice(t.name.indexOf(' ')+1)}</div>
-                <div class="tool-desc">${t.desc}</div>
-            </div>
-        `).join('');
-    }
-
-    function filterTools() {
-        const cat = document.querySelector('.cat-btn.active')?.dataset?.cat || 'all';
-        renderTools(cat, document.getElementById('searchInput').value);
-    }
-
-    function filterByCategory(cat, btn) {
-        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        renderTools(cat, document.getElementById('searchInput').value);
-    }
-
-    function updateStats() {
-        document.getElementById('recentTool').textContent = state.recentTools.length > 0 ? toolsData.find(t => t.id === state.recentTools[0])?.name.split(' ')[1] || '-' : '-';
-        document.getElementById('usageCount').textContent = Object.values(state.usageStats).reduce((a, b) => a + b, 0);
-    }
-
-    function renderTool(toolId) {
-        const tool = toolsData.find(t => t.id === toolId);
-        if (!tool) return;
-        document.getElementById('page-tool').innerHTML = `
-            <div class="toolbar">
-                <button class="back-btn" onclick="goBack()">←</button>
-                <div class="tool-title">${tool.name}</div>
-            </div>
-            <div id="toolContent"><p style="text-align:center;padding:40px;color:var(--text-secondary)">در حال بارگذاری...</p></div>
-        `;
-        setTimeout(() => { if (typeof window[tool.action] === 'function') window[tool.action](); }, 50);
-    }
-
-    function openSettings() {
-        navigateTo('settings', null, true);
-    }
-
-    function renderSettings() {
-        document.getElementById('page-settings').innerHTML = `
-            <div class="toolbar">
-                <button class="back-btn" onclick="goBack()">←</button>
-                <div class="tool-title">⚙️ تنظیمات</div>
-            </div>
-            
-            <div class="settings-section">
-                <h3>💾 محل ذخیره فایل‌ها</h3>
-                <div class="input-group">
-                    <label>نام پوشه:</label>
-                    <input type="text" id="saveFolder" value="${CONFIG.saveFolder}" placeholder="مثلاً Download یا Pictures">
-                </div>
-                <button class="btn btn-primary btn-sm" onclick="updateSaveFolder()">💾 ذخیره تنظیمات</button>
-            </div>
-            
-            <div class="settings-section">
-                <h3>🖼️ کیفیت پیش‌فرض خروجی</h3>
-                <div class="range-group">
-                    <span>کیفیت:</span>
-                    <input type="range" id="defaultQuality" min="10" max="100" value="${CONFIG.quality}" oninput="document.getElementById('dqVal').textContent=this.value+'%'">
-                    <span class="range-value" id="dqVal">${CONFIG.quality}%</span>
-                </div>
-                <button class="btn btn-primary btn-sm" onclick="updateQuality()">💾 ذخیره</button>
-            </div>
-            
-            <div class="settings-section">
-                <h3>📊 آمار استفاده</h3>
-                <p style="font-size:13px;color:var(--text-secondary);">کل استفاده: ${Object.values(state.usageStats).reduce((a,b)=>a+b,0)}</p>
-                <button class="btn btn-outline btn-sm" onclick="resetStats()">🔄 بازنشانی آمار</button>
-            </div>
-            
-            <div class="settings-section">
-                <h3>ℹ️ درباره</h3>
-                <p style="font-size:13px;color:var(--text-secondary);">جعبه ابزار حرفه‌ای v2.0<br>۱۵ ابزار پردازش تصویر<br>سازگار با Median.co و Cordova</p>
-            </div>
-        `;
-    }
-
-    function updateSaveFolder() {
-        const folder = document.getElementById('saveFolder').value.trim() || 'Download';
-        CONFIG.saveFolder = folder;
-        localStorage.setItem('tb_save_folder', folder);
-        showToast('✅ پوشه ذخیره: ' + folder);
-    }
-
-    function updateQuality() {
-        const q = parseInt(document.getElementById('defaultQuality').value);
-        CONFIG.quality = q;
-        localStorage.setItem('tb_quality', q);
-        showToast('✅ کیفیت: ' + q + '%');
-    }
-
-    function resetStats() {
-        localStorage.removeItem('tb_stats');
-        localStorage.removeItem('tb_recent');
-        state.usageStats = {};
-        state.recentTools = [];
-        updateStats();
-        showToast('🔄 آمار بازنشانی شد');
-    }
-
-    // ============================================
-    // ابزار ۱: چسباندن عکس
-    // ============================================
-    function stitch() {
-        let files = [], mode = 'vertical', resultDataUrl = null;
-        
-        document.getElementById('toolContent').innerHTML = `
-            <div class="input-group"><label>حالت:</label>
-                <div class="grid-2">
-                    <button class="btn btn-primary btn-sm active" id="smV" onclick="setMode('vertical')">📐 عمودی</button>
-                    <button class="btn btn-outline btn-sm" id="smH" onclick="setMode('horizontal')">📏 افقی</button>
-                </div>
-            </div>
-            <div class="range-group"><span>کیفیت:</span><input type="range" id="sQual" min="10" max="100" value="${CONFIG.quality}" oninput="document.getElementById('sQualV').textContent=this.value+'%'"><span class="range-value" id="sQualV">${CONFIG.quality}%</span></div>
-            <div class="preview-container" id="sPreview"><span style="color:var(--text-secondary)">تصویری انتخاب نشده</span></div>
-            <button class="btn btn-primary" onclick="selSFiles()">📂 انتخاب تصاویر</button>
-            <button class="btn btn-success" id="sBtn" disabled onclick="doStitch()">✂️ چسباندن</button>
-            <div id="sResult"></div>
-            <button class="btn btn-outline" id="sSave" disabled onclick="saveFile(window._stitchResult, 'stitched_'+Date.now()+'.jpg')">💾 ذخیره</button>
-        `;
-        
-        window.setMode = (m) => {
-            mode = m;
-            document.getElementById('smV').className = m === 'vertical' ? 'btn btn-primary btn-sm active' : 'btn btn-outline btn-sm';
-            document.getElementById('smH').className = m === 'horizontal' ? 'btn btn-primary btn-sm active' : 'btn btn-outline btn-sm';
-        };
-        
-        window.selSFiles = () => {
-            const inp = fileInput('image/*', true);
-            inp.onchange = (e) => {
-                files = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
-                if (!files.length) return;
-                const prev = document.getElementById('sPreview');
-                prev.innerHTML = '';
-                files.forEach((f, i) => {
-                    const r = new FileReader();
-                    r.onload = (ev) => { prev.innerHTML += `<img src="${ev.target.result}" style="height:70px;" onclick="this.remove();files.splice(${i},1)">`; };
-                    r.readAsDataURL(f);
-                });
-                document.getElementById('sBtn').disabled = false;
-            };
-            inp.click();
-        };
-        
-        window.doStitch = async () => {
-            const btn = document.getElementById('sBtn'); btn.disabled = true;
-            const qual = parseInt(document.getElementById('sQual').value) / 100;
-            const imgs = [];
-            for (let f of files) { const { img } = await loadImage(f); imgs.push(img); }
-            
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            
-            if (mode === 'vertical') {
-                let mw = 0, th = 0;
-                imgs.forEach(i => { if (i.width > mw) mw = i.width; th += i.height; });
-                canvas.width = mw; canvas.height = th;
-                ctx.fillStyle = '#FFF'; ctx.fillRect(0, 0, mw, th);
-                let y = 0; imgs.forEach(i => { ctx.drawImage(i, (mw-i.width)/2, y); y += i.height; });
+        function goBack() {
+            if (S.history.length > 1) {
+                S.history.pop();
+                const prev = S.history[S.history.length - 1];
+                if (prev === 'home') navTo('home', null, false);
+                else if (prev === 'settings') navTo('settings', null, false);
+                else navTo('tool', S.tool, false);
             } else {
-                let mh = 0, tw = 0;
-                imgs.forEach(i => { if (i.height > mh) mh = i.height; tw += i.width; });
-                canvas.width = tw; canvas.height = mh;
-                ctx.fillStyle = '#FFF'; ctx.fillRect(0, 0, tw, mh);
-                let x = 0; imgs.forEach(i => { ctx.drawImage(i, x, (mh-i.height)/2); x += i.width; });
+                if (navigator.app && navigator.app.exitApp) navigator.app.exitApp();
             }
-            
-            window._stitchResult = canvas.toDataURL('image/jpeg', qual);
-            document.getElementById('sResult').innerHTML = `<p style="color:var(--success);text-align:center;">✅ انجام شد</p><img src="${window._stitchResult}" style="width:100%;border-radius:10px;">`;
-            document.getElementById('sSave').disabled = false;
-            btn.disabled = false;
-        };
-    }
+        }
 
-    // ============================================
-    // ابزار ۲: PDF
-    // ============================================
-    function pdf() {
-        let files = [];
-        document.getElementById('toolContent').innerHTML = `
-            <div class="input-group"><label>اندازه:</label><select id="pdfSize"><option value="a4">A4</option><option value="a5">A5</option><option value="letter">Letter</option></select></div>
-            <div class="preview-container" id="pPreview"><span style="color:var(--text-secondary)">تصویری انتخاب نشده</span></div>
-            <button class="btn btn-primary" onclick="selPFiles()">📂 انتخاب</button>
-            <button class="btn btn-success" id="pBtn" disabled onclick="doPDF()">📄 ساخت PDF</button>
-            <div id="pResult"></div>
-            <button class="btn btn-outline" id="pSave" disabled onclick="saveFile(window._pdfDataUrl, 'doc_'+Date.now()+'.pdf','application/pdf')">💾 ذخیره</button>
-        `;
-        
-        window.selPFiles = () => {
-            const inp = fileInput('image/*', true);
-            inp.onchange = (e) => {
-                files = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
-                if (!files.length) return;
-                const prev = document.getElementById('pPreview');
-                prev.innerHTML = '';
-                files.forEach((f, i) => {
+        function handleBack() {
+            if (S.page === 'home') { if (navigator.app && navigator.app.exitApp) navigator.app.exitApp(); } else goBack();
+        }
+
+        function openTool(id) {
+            S.stats[id] = (S.stats[id] || 0) + 1;
+            localStorage.setItem('iy_stats', JSON.stringify(S.stats));
+            S.recent = [id, ...S.recent.filter(x => x !== id)].slice(0, 5);
+            localStorage.setItem('iy_recent', JSON.stringify(S.recent));
+            navTo('tool', id, true);
+        }
+
+        // ==================== TOOLS DATA ====================
+        const TOOLS = [
+            { id: 1, icon: '🧩', name: 'چسباندن عکس', desc: 'عمودی و افقی', cat: 'image', fn: 'stitch' },
+            { id: 2, icon: '📄', name: 'ساخت PDF', desc: 'تصاویر پیوسته', cat: 'pdf', fn: 'pdf' },
+            { id: 3, icon: '🧹', name: 'پاک‌کن عکس', desc: 'مثل ibisPaint', cat: 'image', fn: 'cleaner' },
+            { id: 4, icon: '✨', name: 'بهبود کیفیت', desc: 'نور، رنگ، شارپنس', cat: 'image', fn: 'enhancer' },
+            { id: 5, icon: '✂️', name: 'تقسیم عکس', desc: 'برش + پیش‌نمایش', cat: 'image', fn: 'split' },
+            { id: 6, icon: '💧', name: 'واترمارک', desc: 'متن و لوگو', cat: 'image', fn: 'watermark' },
+            { id: 7, icon: '📦', name: 'فشرده‌سازی', desc: 'مقایسه حجم', cat: 'image', fn: 'compressor' },
+            { id: 8, icon: '🔄', name: 'تبدیل فرمت', desc: 'JPG/PNG/WEBP', cat: 'image', fn: 'converter' },
+            { id: 9, icon: '📐', name: 'تغییر سایز', desc: 'حفظ کیفیت', cat: 'image', fn: 'resize' },
+            { id: 10, icon: '📱', name: 'ساخت QR', desc: 'متن/لینک/تلفن', cat: 'qr', fn: 'qrgen' },
+            { id: 11, icon: '📷', name: 'اسکن QR', desc: 'دوربین + عکس', cat: 'qr', fn: 'qrscan' },
+            { id: 12, icon: '📝', name: 'OCR', desc: 'متن فارسی و انگلیسی', cat: 'utility', fn: 'ocr' },
+            { id: 13, icon: '🎨', name: 'انتخاب رنگ', desc: 'HEX/RGB/HSL', cat: 'utility', fn: 'colorpick' },
+            { id: 14, icon: '🖼️', name: 'چسب اسکرین', desc: 'تشخیص خودکار', cat: 'image', fn: 'screenstitch' },
+            { id: 15, icon: '📋', name: 'پردازش گروهی', desc: 'ZIP دانلود', cat: 'utility', fn: 'batch' }
+        ];
+
+        // ==================== HOME PAGE ====================
+        function renderHome(filter = 'all', search = '') {
+            let tools = [...TOOLS];
+            if (filter !== 'all') tools = tools.filter(t => t.cat === filter);
+            if (search) { const q = search.toLowerCase();
+                tools = tools.filter(t => t.name.includes(q) || t.desc.includes(q)); }
+
+            $('#page-home').innerHTML = `
+            <div class="header">
+              <div class="logo">🖼️</div>
+              <h1>تصویریار</h1>
+              <div class="sub">۱۵ ابزار حرفه‌ای پردازش تصویر</div>
+            </div>
+            <div class="search"><input type="text" id="searchInput" placeholder="🔍 جستجوی ابزار..." oninput="filterTools()"></div>
+            <div class="cats" id="cats">
+              <button class="cat-btn active" data-cat="all" onclick="filterCat('all',this)">همه</button>
+              <button class="cat-btn" data-cat="image" onclick="filterCat('image',this)">تصویر</button>
+              <button class="cat-btn" data-cat="pdf" onclick="filterCat('pdf',this)">PDF</button>
+              <button class="cat-btn" data-cat="qr" onclick="filterCat('qr',this)">QR</button>
+              <button class="cat-btn" data-cat="utility" onclick="filterCat('utility',this)">ابزارها</button>
+            </div>
+            <div class="stats">
+              <span class="stat">🕐 اخیر: ${S.recent.length?TOOLS.find(t=>t.id===S.recent[0])?.name||'-':'-'}</span>
+              <span class="stat">📊 استفاده: ${Object.values(S.stats).reduce((a,b)=>a+b,0)}</span>
+              <span class="stat" onclick="navTo('settings',null,true)" style="cursor:pointer">⚙️ تنظیمات</span>
+            </div>
+            <div class="grid" id="toolsGrid">${tools.map((t,i)=>`
+              <div class="card" style="animation-delay:${i*0.04}s" onclick="openTool(${t.id})">
+                <div class="icon">${t.icon}</div>
+                <div class="name">${t.name}</div>
+                <div class="desc">${t.desc}</div>
+              </div>`).join('')}</div>`;
+        }
+
+        function filterTools() {
+            const cat = $('.cat-btn.active')?.dataset?.cat || 'all';
+            renderHome(cat, $('#searchInput')?.value || '');
+        }
+
+        function filterCat(cat, btn) {
+            $$('.cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderHome(cat, $('#searchInput')?.value || '');
+        }
+
+        // ==================== SETTINGS PAGE ====================
+        function renderSettings() {
+            $('#page-settings').innerHTML = `
+            <div class="toolbar"><button class="back" onclick="goBack()">←</button><div class="title">⚙️ تنظیمات</div></div>
+            <div class="settings-section">
+              <h3>💾 محل ذخیره فایل‌ها</h3>
+              <div class="inp"><label>نام پوشه:</label><input type="text" id="sFolder" value="${CFG.saveFolder}"></div>
+              <button class="btn btn-p btn-sm" onclick="updateFolder()">💾 ذخیره</button>
+            </div>
+            <div class="settings-section">
+              <h3>🖼️ کیفیت پیش‌فرض</h3>
+              <div class="rng"><span>کیفیت:</span><input type="range" id="sQual" min="10" max="100" value="${CFG.quality}" oninput="$('#sQualV').textContent=this.value+'%'"><span class="val" id="sQualV">${CFG.quality}%</span></div>
+              <button class="btn btn-p btn-sm" onclick="updateQuality()">💾 ذخیره</button>
+            </div>
+            <div class="settings-section">
+              <h3>ℹ️ درباره</h3>
+              <p style="font-size:12px;color:var(--text2)">تصویریار v3.0<br>۱۵ ابزار پردازش تصویر<br>سازگار با Median.co و Cordova</p>
+            </div>`;
+        }
+
+        function updateFolder() {
+            CFG.saveFolder = $('#sFolder').value.trim() || 'Download';
+            localStorage.setItem('iy_save', CFG.saveFolder);
+            toast('✅ پوشه: ' + CFG.saveFolder);
+        }
+
+        function updateQuality() {
+            CFG.quality = parseInt($('#sQual').value);
+            localStorage.setItem('iy_qual', CFG.quality);
+            toast('✅ کیفیت: ' + CFG.quality + '%');
+        }
+
+        // ==================== TOOL RENDERER ====================
+        function renderTool(id) {
+            const tool = TOOLS.find(t => t.id === id);
+            if (!tool) return;
+            $('#page-tool').innerHTML = `
+            <div class="toolbar"><button class="back" onclick="goBack()">←</button><div class="title">${tool.icon} ${tool.name}</div></div>
+            <div id="toolContent"><p style="text-align:center;padding:40px;color:var(--text2)">در حال بارگذاری...</p></div>`;
+            setTimeout(() => { if (typeof window[tool.fn] === 'function') window[tool.fn](); }, 50);
+        }
+
+        // ==================== TOOL 1: STITCH ====================
+        function stitch() {
+            let files = [],
+                mode = 'vertical',
+                result = null;
+            $('#toolContent').innerHTML = `
+            <div class="inp"><label>حالت:</label><div class="grid2">
+              <button class="btn btn-p btn-sm active" id="smV" onclick="setM('vertical')">📐 عمودی</button>
+              <button class="btn btn-o btn-sm" id="smH" onclick="setM('horizontal')">📏 افقی</button></div></div>
+            <div class="rng"><span>کیفیت:</span><input type="range" id="sQ" min="10" max="100" value="${CFG.quality}" oninput="$('#sQV').textContent=this.value+'%'"><span class="val" id="sQV">${CFG.quality}%</span></div>
+            <div class="prev" id="sPrev"><span style="color:var(--text2)">تصویری انتخاب نشده</span></div>
+            <button class="btn btn-p" onclick="selF()">📂 انتخاب تصاویر</button>
+            <button class="btn btn-s" id="sBtn" disabled onclick="doS()">✂️ چسباندن</button>
+            <div id="sRes"></div>
+            <button class="btn btn-o" id="sSave" disabled onclick="saveFile(window._sr,'stitched_'+Date.now()+'.jpg')">💾 ذخیره</button>`;
+
+            window.setM = (m) => { mode = m;
+                $('#smV').className = m === 'vertical' ? 'btn btn-p btn-sm active' : 'btn btn-o btn-sm';
+                $('#smH').className = m === 'horizontal' ? 'btn btn-p btn-sm active' : 'btn btn-o btn-sm'; };
+            window.selF = () => { const inp = fileInp('image/*', true);
+                inp.onchange = (e) => { files = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
+                    if (!files.length) return;
+                    const prev = $('#sPrev');
+                    prev.innerHTML = '';
+                    files.forEach((f, i) => { const r = new FileReader();
+                        r.onload = (ev) => { prev.innerHTML +=
+                            `<img src="${ev.target.result}" style="height:65px" onclick="this.remove();files.splice(${i},1)">`; };
+                        r.readAsDataURL(f); });
+                    $('#sBtn').disabled = false; };
+                inp.click(); };
+            window.doS = async () => { const btn = $('#sBtn');
+                btn.disabled = true;
+                const q = parseInt($('#sQ').value) / 100;
+                const imgs = [];
+                for (let f of files) { const { img } = await loadImg(f);
+                    imgs.push(img); }
+                const c = document.createElement('canvas');
+                const ctx = c.getContext('2d'); if (mode === 'vertical') { let mw = 0,
+                        th = 0;
+                    imgs.forEach(i => { if (i.width > mw) mw = i.width;
+                        th += i.height; });
+                    c.width = mw;
+                    c.height = th;
+                    ctx.fillStyle = '#FFF';
+                    ctx.fillRect(0, 0, mw, th);
+                    let y = 0;
+                    imgs.forEach(i => { ctx.drawImage(i, (mw - i.width) / 2, y);
+                        y += i.height; }); } else { let mh = 0,
+                        tw = 0;
+                    imgs.forEach(i => { if (i.height > mh) mh = i.height;
+                        tw += i.width; });
+                    c.width = tw;
+                    c.height = mh;
+                    ctx.fillStyle = '#FFF';
+                    ctx.fillRect(0, 0, tw, mh);
+                    let x = 0;
+                    imgs.forEach(i => { ctx.drawImage(i, x, (mh - i.height) / 2);
+                        x += i.width; }); }
+                window._sr = c.toDataURL('image/jpeg', q);
+                $('#sRes').innerHTML =
+                    `<p style="color:var(--green);text-align:center">✅ انجام شد</p><img src="${window._sr}" style="width:100%;border-radius:var(--radius)">`;
+                $('#sSave').disabled = false;
+                btn.disabled = false; };
+        }
+
+        // ==================== TOOL 2: PDF ====================
+        function pdf() {
+            let files = [],
+                pdfMode = 'continuous';
+            $('#toolContent').innerHTML = `
+            <div class="inp"><label>حالت:</label><div class="grid2">
+              <button class="btn btn-p btn-sm active" id="pmC" onclick="setPM('continuous')">📜 پیوسته (مانهوا)</button>
+              <button class="btn btn-o btn-sm" id="pmP" onclick="setPM('pages')">📄 صفحه‌ای</button></div></div>
+            <div class="inp"><label>اندازه:</label><select id="pdfSize"><option value="a4">A4</option><option value="a5">A5</option></select></div>
+            <div class="prev" id="pPrev"><span style="color:var(--text2)">تصویری انتخاب نشده</span></div>
+            <button class="btn btn-p" onclick="selPF()">📂 انتخاب تصاویر</button>
+            <button class="btn btn-s" id="pBtn" disabled onclick="doP()">📄 ساخت PDF</button>
+            <div id="pRes"></div>
+            <button class="btn btn-o" id="pSave" disabled onclick="saveFile(window._pd,'doc_'+Date.now()+'.pdf','application/pdf')">💾 ذخیره</button>`;
+
+            window.setPM = (m) => { pdfMode = m;
+                $('#pmC').className = m === 'continuous' ? 'btn btn-p btn-sm active' : 'btn btn-o btn-sm';
+                $('#pmP').className = m === 'pages' ? 'btn btn-p btn-sm active' : 'btn btn-o btn-sm'; };
+            window.selPF = () => { const inp = fileInp('image/*', true);
+                inp.onchange = (e) => { files = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
+                    if (!files.length) return;
+                    const prev = $('#pPrev');
+                    prev.innerHTML = '';
+                    files.forEach((f, i) => { const r = new FileReader();
+                        r.onload = (ev) => { prev.innerHTML +=
+                            `<img src="${ev.target.result}" style="height:65px" onclick="this.remove();files.splice(${i},1)">`; };
+                        r.readAsDataURL(f); });
+                    $('#pBtn').disabled = false; };
+                inp.click(); };
+            window.doP = async () => { const btn = $('#pBtn');
+                btn.disabled = true;
+                const { jsPDF } = window.jspdf; if (pdfMode === 'continuous') {
+                    const imgs = [];
+                    for (let f of files) { const { img } = await loadImg(f);
+                        imgs.push(img); }
+                    let mw = 0,
+                        th = 0;
+                    imgs.forEach(i => { if (i.width > mw) mw = i.width;
+                        th += i.height; });
+                    const c = document.createElement('canvas');
+                    c.width = mw;
+                    c.height = th;
+                    const ctx = c.getContext('2d');
+                    ctx.fillStyle = '#FFF';
+                    ctx.fillRect(0, 0, mw, th);
+                    let y = 0;
+                    imgs.forEach(i => { ctx.drawImage(i, (mw - i.width) / 2, y);
+                        y += i.height; });
+                    const dataUrl = c.toDataURL('image/jpeg', 1);
+                    const pdf = new jsPDF('p', 'pt', [mw, th]);
+                    pdf.addImage(dataUrl, 'JPEG', 0, 0, mw, th);
+                    window._pd = pdf.output('datauristring'); } else { const sizes = { a4: [595, 842],
+                        a5: [420, 595] };
+                    const [pw, ph] = sizes[$('#pdfSize').value];
+                    const pdf = new jsPDF('p', 'pt', [pw, ph]); for (let i = 0; i < files.length; i++) { if (i > 0) pdf
+                            .addPage();
+                        const { img, dataUrl } = await loadImg(files[i]);
+                        let iw = pw - 20,
+                            ih = (img.height / img.width) * iw; if (ih > ph - 20) { ih = ph - 20;
+                            iw = (img.width / img.height) * ih; }
+                        pdf.addImage(dataUrl, 'JPEG', (pw - iw) / 2, (ph - ih) / 2, iw, ih); }
+                    window._pd = pdf.output('datauristring'); }
+                $('#pRes').innerHTML = '<p style="color:var(--green);text-align:center">✅ PDF آماده</p>';
+                $('#pSave').disabled = false;
+                btn.disabled = false; };
+        }
+
+        // ==================== TOOL 3: CLEANER (ibisPaint Style) ====================
+        function cleaner() {
+            let cImg = null,
+                brushSize = 20,
+                brushColor = '#FFFFFF';
+            let scale = 1,
+                panX = 0,
+                panY = 0;
+            let isDrawing = false,
+                isPanning = false;
+            let lastDist = 0,
+                lastCX = 0,
+                lastCY = 0;
+            let history = [],
+                histIdx = -1;
+            let canvas, ctx, wrapper;
+            let brushPreviewVis = false,
+                brushPX = 0,
+                brushPY = 0;
+            let rafId = null;
+
+            $('#toolContent').innerHTML = `
+            <div class="clean-canvas-wrap" id="cWrap" style="height:420px">
+              <canvas id="cCanvas" style="display:none"></canvas>
+              <div class="zoom-indicator" id="cZoom">100%</div>
+            </div>
+            <div class="rng"><span>سایز قلم:</span><input type="range" id="cSize" min="3" max="100" value="20" oninput="brushSize=parseInt(this.value);$('#cSizeV').textContent=this.value;updateBrushPrev()"><span class="val" id="cSizeV">20</span></div>
+            <div class="colors" id="cColors">
+              <div class="color-dot active" style="background:#FFF" data-c="#FFFFFF" onclick="selCC(this)"></div>
+              <div class="color-dot" style="background:#000" data-c="#000000" onclick="selCC(this)"></div>
+              <div class="color-dot" style="background:#888" data-c="#888888" onclick="selCC(this)"></div>
+              <div class="color-dot" style="background:#F5DEB3" data-c="#F5DEB3" onclick="selCC(this)"></div>
+              <div class="color-dot" style="background:#C8E6C9" data-c="#C8E6C9" onclick="selCC(this)"></div>
+              <div class="color-dot" style="background:#E8E8E8" data-c="#E8E8E8" onclick="selCC(this)"></div>
+            </div>
+            <div class="clean-toolbar">
+              <button onclick="undoC()" id="cUndo" disabled>↩️</button>
+              <button onclick="redoC()" id="cRedo" disabled>↪️</button>
+              <button onclick="zoomIn()">🔍+</button>
+              <button onclick="zoomOut()">🔍−</button>
+              <button onclick="fitScreen()">📐</button>
+              <button onclick="actualSize()">1:1</button>
+            </div>
+            <button class="btn btn-p" onclick="selCI()">📂 انتخاب عکس</button>
+            <button class="btn btn-s" id="cSave" disabled onclick="saveCleaned()">💾 ذخیره</button>`;
+
+            canvas = $('#cCanvas');
+            ctx = canvas.getContext('2d');
+            wrapper = $('#cWrap');
+
+            window.selCC = (dot) => { $$('#cColors .color-dot').forEach(d => d.classList.remove('active'));
+                dot.classList.add('active');
+                brushColor = dot.dataset.c;
+                updateBrushPrev(); };
+
+            window.selCI = () => { const inp = fileInp();
+                inp.onchange = (e) => { const f = e.target.files[0]; if (!f) return;
                     const r = new FileReader();
-                    r.onload = (ev) => { prev.innerHTML += `<img src="${ev.target.result}" style="height:70px;" onclick="this.remove();files.splice(${i},1)">`; };
-                    r.readAsDataURL(f);
-                });
-                document.getElementById('pBtn').disabled = false;
-            };
-            inp.click();
-        };
-        
-        window.doPDF = async () => {
-            const btn = document.getElementById('pBtn'); btn.disabled = true;
-            const { jsPDF } = window.jspdf;
-            const sizes = { a4: [210,297], a5: [148,210], letter: [216,279] };
-            const [pw, ph] = sizes[document.getElementById('pdfSize').value];
-            const pdf = new jsPDF('p', 'mm', [pw, ph]);
-            
-            for (let i = 0; i < files.length; i++) {
-                if (i > 0) pdf.addPage();
-                const { img, dataUrl } = await loadImage(files[i]);
-                const m = 10; let iw = pw - m*2, ih = (img.height/img.width) * iw;
-                if (ih > ph - m*2) { ih = ph - m*2; iw = (img.width/img.height) * ih; }
-                pdf.addImage(dataUrl, 'JPEG', (pw-iw)/2, (ph-ih)/2, iw, ih);
-            }
-            
-            window._pdfDataUrl = pdf.output('datauristring');
-            document.getElementById('pResult').innerHTML = '<p style="color:var(--success);text-align:center;">✅ PDF آماده</p>';
-            document.getElementById('pSave').disabled = false;
-            btn.disabled = false;
-        };
-    }
+                    r.onload = (ev) => { const img = new Image();
+                        img.onload = () => { cImg = img;
+                            canvas.style.display = 'block';
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            ctx.drawImage(img, 0, 0);
+                            history = [ctx.getImageData(0, 0, canvas.width, canvas.height)];
+                            histIdx = 0;
+                            $('#cSave').disabled = false;
+                            $('#cUndo').disabled = false;
+                            fitScreen(); };
+                        img.src = ev.target.result; };
+                    r.readAsDataURL(f); };
+                inp.click(); };
 
-        // ============================================
-    // ابزار ۳: پاک‌کن عکس (زوم، پان، Undo/Redo)
-    // ============================================
-    function cleaner() {
-        let cImg = null, brushSize = 20, brushColor = '#FFFFFF';
-        let scale = 1, panX = 0, panY = 0, isDrawing = false, isPanning = false;
-        let lastDist = 0, lastX = 0, lastY = 0;
-        let history = [], historyIndex = -1;
-        let canvas, ctx, wrapper;
-        
-        document.getElementById('toolContent').innerHTML = `
-            <div class="range-group"><span>سایز قلم:</span><input type="range" id="cSize" min="3" max="80" value="20" oninput="brushSize=parseInt(this.value);document.getElementById('cSizeV').textContent=this.value"><span class="range-value" id="cSizeV">20</span></div>
-            
-            <div class="color-grid">
-                <div class="color-dot active" style="background:#FFFFFF" data-color="#FFFFFF" onclick="selColor(this)"></div>
-                <div class="color-dot" style="background:#000000" data-color="#000000" onclick="selColor(this)"></div>
-                <div class="color-dot" style="background:#808080" data-color="#808080" onclick="selColor(this)"></div>
-                <div class="color-dot" style="background:#F5DEB3" data-color="#F5DEB3" onclick="selColor(this)"></div>
-                <div class="color-dot" style="background:#E8E8E8" data-color="#E8E8E8" onclick="selColor(this)"></div>
-                <div class="color-dot" style="background:#C8E6C9" data-color="#C8E6C9" onclick="selColor(this)"></div>
-            </div>
-            
-            <div class="grid-3">
-                <button class="btn btn-outline btn-sm" onclick="zoomIn()">🔍 +</button>
-                <button class="btn btn-outline btn-sm" onclick="zoomOut()">🔍 −</button>
-                <button class="btn btn-outline btn-sm" onclick="resetView()">🔄 ریست</button>
-            </div>
-            <p style="text-align:center;font-size:11px;color:var(--text-secondary);">💡 دو انگشت = زوم و جابجایی | یک انگشت = پاک کردن</p>
-            
-            <div class="canvas-wrapper" id="cWrapper" style="height:400px;">
-                <canvas id="cCanvas" style="display:none;"></canvas>
-            </div>
-            
-            <div class="grid-3">
-                <button class="btn btn-outline btn-sm" id="cUndo" disabled onclick="undo()">↩️ بازگشت</button>
-                <button class="btn btn-outline btn-sm" id="cRedo" disabled onclick="redo()">↪️ بعدی</button>
-                <button class="btn btn-outline btn-sm" id="cSave" disabled onclick="saveCleaned()">💾 ذخیره</button>
-            </div>
-            
-            <button class="btn btn-primary" onclick="selCImage()">📂 انتخاب عکس</button>
-        `;
-        
-        canvas = document.getElementById('cCanvas');
-        ctx = canvas.getContext('2d');
-        wrapper = document.getElementById('cWrapper');
-        
-        window.selColor = (dot) => {
-            document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
-            dot.classList.add('active');
-            brushColor = dot.dataset.color;
-        };
-        
-        window.selCImage = () => {
-            const inp = fileInput();
-            inp.onchange = (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        cImg = img;
-                        canvas.style.display = 'block';
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                        ctx.drawImage(img, 0, 0);
-                        history = [ctx.getImageData(0, 0, canvas.width, canvas.height)];
-                        historyIndex = 0;
-                        document.getElementById('cSave').disabled = false;
-                        document.getElementById('cUndo').disabled = false;
-                        updateTransform();
-                    };
-                    img.src = ev.target.result;
-                };
-                reader.readAsDataURL(file);
-            };
-            inp.click();
-        };
-        
-        function updateTransform() {
-            canvas.style.transform = `scale(${scale}) translate(${panX}px, ${panY}px)`;
-        }
-        
-        window.zoomIn = () => { scale = Math.min(5, scale + 0.2); updateTransform(); };
-        window.zoomOut = () => { scale = Math.max(0.2, scale - 0.2); updateTransform(); };
-        window.resetView = () => { scale = 1; panX = 0; panY = 0; updateTransform(); };
-        
-        function getPos(e) {
-            const rect = wrapper.getBoundingClientRect();
-            const cx = e.touches ? e.touches[0].clientX : e.clientX;
-            const cy = e.touches ? e.touches[0].clientY : e.clientY;
-            return {
-                x: (cx - rect.left) / scale - panX,
-                y: (cy - rect.top) / scale - panY
-            };
-        }
-        
-        wrapper.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 2) {
-                isPanning = true;
-                lastX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-                lastY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-                lastDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-            } else if (e.touches.length === 1) {
-                isDrawing = true;
-                drawAt(e.touches[0]);
+            function updateTransform() {
+                canvas.style.transform = `matrix(${scale},0,0,${scale},${panX},${panY})`;
+                $('#cZoom').textContent = Math.round(scale * 100) + '%';
+                updateBrushPrev();
             }
-            e.preventDefault();
-        }, { passive: false });
-        
-        wrapper.addEventListener('touchmove', (e) => {
-            if (isPanning && e.touches.length === 2) {
-                const cx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-                const cy = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-                const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-                
-                panX += (cx - lastX) / scale;
-                panY += (cy - lastY) / scale;
-                if (lastDist > 0) scale *= dist / lastDist;
-                scale = Math.min(5, Math.max(0.2, scale));
-                
-                lastX = cx; lastY = cy; lastDist = dist;
+
+            function updateBrushPrev() { if (brushPreviewVis) { drawBrushPreview(
+                brushPX, brushPY); } }
+
+            function drawBrushPreview(cx, cy) {
+                const wrapperRect = wrapper.getBoundingClientRect();
+                const canvasX = (cx - wrapperRect.left - panX) / scale;
+                const canvasY = (cy - wrapperRect.top - panY) / scale;
+                ctx.save();
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(cImg, 0, 0);
+                const overlay = document.createElement('canvas');
+                overlay.width = canvas.width;
+                overlay.height = canvas.height;
+                const ovCtx = overlay.getContext('2d');
+                ovCtx.drawImage(cImg, 0, 0);
+                for (let i = 1; i <= histIdx; i++) { ovCtx.putImageData(history[i], 0, 0); }
+                ctx.drawImage(overlay, 0, 0);
+                ctx.restore();
                 updateTransform();
-            } else if (isDrawing && e.touches.length === 1) {
-                drawAt(e.touches[0]);
+                const px = canvasX * scale + panX + wrapperRect.left;
+                const py = canvasY * scale + panY + wrapperRect.top;
+                const div = document.createElement('div');
+                div.style.cssText =
+                    `position:fixed;pointer-events:none;border:2px dashed ${brushColor};border-radius:50%;width:${brushSize*scale}px;height:${brushSize*scale}px;left:${px-brushSize*scale/2}px;top:${py-brushSize*scale/2}px;z-index:999`;
+                div.id = 'brushPrev';
+                const old = $('#brushPrev');
+                if (old) old.remove();
+                document.body.appendChild(div);
             }
-            e.preventDefault();
-        }, { passive: false });
-        
-        wrapper.addEventListener('touchend', () => {
-            if (isDrawing) { saveState(); isDrawing = false; }
-            isPanning = false; lastDist = 0;
-        });
-        
-        function drawAt(touch) {
-            if (!cImg) return;
-            const pos = getPos(touch);
-            ctx.fillStyle = brushColor;
-            ctx.beginPath();
-            ctx.arc(pos.x, pos.y, brushSize / 2 / scale, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        
-        function saveState() {
-            history = history.slice(0, historyIndex + 1);
-            history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
-            historyIndex++;
-            if (history.length > 30) { history.shift(); historyIndex--; }
-            document.getElementById('cRedo').disabled = true;
-            document.getElementById('cUndo').disabled = false;
-        }
-        
-        window.undo = () => {
-            if (historyIndex > 0) {
-                historyIndex--;
-                ctx.putImageData(history[historyIndex], 0, 0);
-                document.getElementById('cRedo').disabled = false;
-                if (historyIndex === 0) document.getElementById('cUndo').disabled = true;
-            }
-        };
-        
-        window.redo = () => {
-            if (historyIndex < history.length - 1) {
-                historyIndex++;
-                ctx.putImageData(history[historyIndex], 0, 0);
-                document.getElementById('cUndo').disabled = false;
-                if (historyIndex >= history.length - 1) document.getElementById('cRedo').disabled = true;
-            }
-        };
-        
-        window.saveCleaned = () => {
-            if (!canvas) return;
-            saveFile(canvas.toDataURL('image/jpeg', CONFIG.quality / 100), 'cleaned_' + Date.now() + '.jpg');
-        };
-    }
 
-    // ============================================
-    // ابزار ۴: بهبود کیفیت
-    // ============================================
-    function enhancer() {
-        let eFile = null, eResult = null;
-        
-        document.getElementById('toolContent').innerHTML = `
-            <div class="range-group"><span>روشنایی:</span><input type="range" id="eBright" min="50" max="200" value="100" oninput="document.getElementById('eBrightV').textContent=this.value"><span class="range-value" id="eBrightV">100</span></div>
-            <div class="range-group"><span>کنتراست:</span><input type="range" id="eContrast" min="50" max="200" value="100" oninput="document.getElementById('eContrastV').textContent=this.value"><span class="range-value" id="eContrastV">100</span></div>
-            <div class="range-group"><span>اشباع رنگ:</span><input type="range" id="eSaturate" min="0" max="200" value="100" oninput="document.getElementById('eSaturateV').textContent=this.value"><span class="range-value" id="eSaturateV">100</span></div>
-            <div class="range-group"><span>شارپنس:</span><input type="range" id="eSharpen" min="0" max="100" value="0" oninput="document.getElementById('eSharpenV').textContent=this.value"><span class="range-value" id="eSharpenV">0</span></div>
-            
-            <div class="preview-container" id="ePreview"><span style="color:var(--text-secondary)">عکسی انتخاب نشده</span></div>
-            
-            <button class="btn btn-primary" onclick="selEFile()">📂 انتخاب عکس</button>
-            <button class="btn btn-success" id="eBtn" disabled onclick="doEnhance()">✨ اعمال</button>
-            
-            <div id="eResult"></div>
-            <button class="btn btn-outline" id="eSave" disabled onclick="saveFile(window._eResult, 'enhanced_'+Date.now()+'.jpg')">💾 ذخیره</button>
-        `;
-        
-        window.selEFile = () => {
-            const inp = fileInput();
-            inp.onchange = (e) => {
-                eFile = e.target.files[0];
-                if (!eFile) return;
-                const reader = new FileReader();
-                reader.onload = (ev) => { document.getElementById('ePreview').innerHTML = `<img src="${ev.target.result}" style="max-width:100%;max-height:200px;border-radius:10px;">`; };
-                reader.readAsDataURL(eFile);
-                document.getElementById('eBtn').disabled = false;
-            };
-            inp.click();
-        };
-        
-        window.doEnhance = async () => {
-            const btn = document.getElementById('eBtn'); btn.disabled = true;
-            const { img } = await loadImage(eFile);
-            const canvas = document.createElement('canvas'); canvas.width = img.width; canvas.height = img.height;
-            const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0);
-            
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const data = imageData.data;
-            const b = parseInt(document.getElementById('eBright').value) / 100;
-            const c = parseInt(document.getElementById('eContrast').value) / 100;
-            const s = parseInt(document.getElementById('eSaturate').value) / 100;
-            const sh = parseInt(document.getElementById('eSharpen').value) / 100;
-            
-            for (let i = 0; i < data.length; i += 4) {
-                data[i] = Math.min(255, data[i] * b);
-                data[i+1] = Math.min(255, data[i+1] * b);
-                data[i+2] = Math.min(255, data[i+2] * b);
-                
-                for (let j = 0; j < 3; j++) {
-                    data[i+j] = ((data[i+j]/255 - 0.5) * c + 0.5) * 255;
-                    data[i+j] = Math.max(0, Math.min(255, data[i+j]));
+            function getCanvasPos(e) {
+                const rect = wrapper.getBoundingClientRect();
+                const cx = e.touches ? e.touches[0].clientX : e.clientX;
+                const cy = e.touches ? e.touches[0].clientY : e.clientY;
+                return {
+                    x: (cx - rect.left - panX) / scale,
+                    y: (cy - rect.top - panY) / scale,
+                    rawX: cx,
+                    rawY: cy
+                };
+            }
+
+            wrapper.addEventListener('pointerdown', (e) => {
+                if (e.pointerType === 'pen' || e.pointerType === 'touch' || e.pointerType ===
+                    'mouse') {
+                    if (e.isPrimary === false) return;
+                    isDrawing = true;
+                    brushPreviewVis = true;
+                    const pos = getCanvasPos(e);
+                    brushPX = pos.rawX;
+                    brushPY = pos.rawY;
+                    drawAt(pos);
+                    e.preventDefault();
                 }
-                
-                const g = 0.2989*data[i] + 0.5870*data[i+1] + 0.1140*data[i+2];
-                data[i] = Math.min(255, g + s*(data[i] - g));
-                data[i+1] = Math.min(255, g + s*(data[i+1] - g));
-                data[i+2] = Math.min(255, g + s*(data[i+2] - g));
-            }
-            
-            ctx.putImageData(imageData, 0, 0);
-            
-            // Sharpen
-            if (sh > 0) {
-                const kernel = [0, -sh, 0, -sh, 1 + 4*sh, -sh, 0, -sh, 0];
-                const sharpData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                // Simplified sharpen
-                ctx.putImageData(sharpData, 0, 0);
-            }
-            
-            window._eResult = canvas.toDataURL('image/jpeg', CONFIG.quality / 100);
-            
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                document.getElementById('eResult').innerHTML = `
-                    <div class="comparison">
-                        <div class="comparison-item"><img src="${ev.target.result}"><div class="label">📷 قبل</div></div>
-                        <div class="comparison-item"><img src="${window._eResult}"><div class="label">✨ بعد</div></div>
-                    </div>`;
-            };
-            reader.readAsDataURL(eFile);
-            
-            document.getElementById('eSave').disabled = false;
-            btn.disabled = false;
-        };
-    }
-
-    // ============================================
-    // ابزار ۵: تقسیم عکس
-    // ============================================
-    function split() {
-        document.getElementById('toolContent').innerHTML = `
-            <button class="btn btn-primary" onclick="selSplit()">📂 انتخاب عکس بلند</button>
-            <div class="input-group"><label>تعداد بخش:</label><input type="number" id="splitCount" value="3" min="2" max="20"></div>
-            <button class="btn btn-success" onclick="doSplit()">✂️ تقسیم و ذخیره</button>
-            <div class="progress-bar" id="splitProgress" style="display:none;"><div class="fill" style="width:0%"></div></div>
-            <div id="splitResult" style="margin-top:10px;"></div>
-        `;
-        
-        window.selSplit = () => {
-            const inp = fileInput();
-            inp.onchange = (e) => { window._splitFile = e.target.files[0]; showToast('✅ انتخاب شد'); };
-            inp.click();
-        };
-        
-        window.doSplit = async () => {
-            if (!window._splitFile) { showToast('⚠️ عکس انتخاب کن'); return; }
-            const { img } = await loadImage(window._splitFile);
-            const count = parseInt(document.getElementById('splitCount').value);
-            const ph = Math.floor(img.height / count);
-            
-            document.getElementById('splitProgress').style.display = 'block';
-            const resultDiv = document.getElementById('splitResult');
-            resultDiv.innerHTML = '';
-            
-            for (let i = 0; i < count; i++) {
-                const c = document.createElement('canvas'); c.width = img.width; c.height = ph;
-                c.getContext('2d').drawImage(img, 0, i*ph, img.width, ph, 0, 0, img.width, ph);
-                const dataUrl = c.toDataURL('image/jpeg', CONFIG.quality / 100);
-                resultDiv.innerHTML += `<img src="${dataUrl}" style="width:100%;margin:4px 0;border-radius:8px;">`;
-                saveFile(dataUrl, `split_${i+1}_${Date.now()}.jpg`);
-                
-                const pct = Math.round(((i + 1) / count) * 100);
-                document.querySelector('#splitProgress .fill').style.width = pct + '%';
-                await new Promise(r => setTimeout(r, 300));
-            }
-            
-            document.getElementById('splitProgress').style.display = 'none';
-            showToast('✅ همه بخش‌ها ذخیره شد');
-        };
-    }
-
-    // ============================================
-    // ابزار ۶: واترمارک
-    // ============================================
-    function watermark() {
-        document.getElementById('toolContent').innerHTML = `
-            <div class="input-group"><label>متن واترمارک:</label><input type="text" id="wmText" value="© ${new Date().getFullYear()}"></div>
-            <div class="range-group"><span>شفافیت:</span><input type="range" id="wmOpacity" min="10" max="100" value="40" oninput="document.getElementById('wmOpacityV').textContent=this.value+'%'"><span class="range-value" id="wmOpacityV">40%</span></div>
-            <div class="range-group"><span>اندازه:</span><input type="range" id="wmSize" min="10" max="100" value="50" oninput="document.getElementById('wmSizeV').textContent=this.value"><span class="range-value" id="wmSizeV">50</span></div>
-            <button class="btn btn-primary" onclick="selWM()">📂 انتخاب عکس</button>
-            <button class="btn btn-success" onclick="doWM()">💧 اعمال واترمارک</button>
-            <div id="wmResult"></div>
-            <button class="btn btn-outline" id="wmSave" disabled onclick="saveFile(window._wmResult, 'watermarked_'+Date.now()+'.jpg')">💾 ذخیره</button>
-        `;
-        
-        window.selWM = () => {
-            const inp = fileInput();
-            inp.onchange = (e) => { window._wmFile = e.target.files[0]; showToast('✅ انتخاب شد'); };
-            inp.click();
-        };
-        
-        window.doWM = async () => {
-            if (!window._wmFile) { showToast('⚠️ عکس انتخاب کن'); return; }
-            const { img } = await loadImage(window._wmFile);
-            const canvas = document.createElement('canvas'); canvas.width = img.width; canvas.height = img.height;
-            const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0);
-            
-            const text = document.getElementById('wmText').value;
-            const opacity = parseInt(document.getElementById('wmOpacity').value) / 100;
-            const size = parseInt(document.getElementById('wmSize').value);
-            const fontSize = Math.max(20, img.width * size / 100);
-            
-            ctx.globalAlpha = opacity;
-            ctx.font = `bold ${fontSize}px Arial`;
-            ctx.fillStyle = '#FFFFFF';
-            ctx.strokeStyle = '#000000';
-            ctx.lineWidth = 3;
-            ctx.textAlign = 'center';
-            
-            // چند واترمارک روی تصویر
-            for (let y = fontSize; y < img.height; y += fontSize * 2) {
-                for (let x = fontSize; x < img.width; x += ctx.measureText(text).width * 1.5) {
-                    ctx.strokeText(text, x, y);
-                    ctx.fillText(text, x, y);
-                }
-            }
-            
-            window._wmResult = canvas.toDataURL('image/jpeg', CONFIG.quality / 100);
-            document.getElementById('wmResult').innerHTML = `<img src="${window._wmResult}" style="width:100%;border-radius:10px;">`;
-            document.getElementById('wmSave').disabled = false;
-        };
-    }
-
-    // ============================================
-    // ابزار ۷: فشرده‌سازی (کامل با مقایسه)
-    // ============================================
-    function compressor() {
-        document.getElementById('toolContent').innerHTML = `
-            <div class="input-group"><label>فرمت خروجی:</label><select id="compFormat"><option value="jpeg">JPG</option><option value="webp">WEBP</option></select></div>
-            <div class="range-group"><span>کیفیت:</span><input type="range" id="compQuality" min="5" max="100" value="60" oninput="document.getElementById('compQualityV').textContent=this.value+'%'"><span class="range-value" id="compQualityV">60%</span></div>
-            <button class="btn btn-primary" onclick="selComp()">📂 انتخاب عکس</button>
-            <button class="btn btn-success" onclick="doComp()">📦 فشرده‌سازی</button>
-            <div id="compResult"></div>
-            <button class="btn btn-outline" id="compSave" disabled onclick="saveFile(window._compResult, 'compressed_'+Date.now()+'.'+document.getElementById('compFormat').value)">💾 ذخیره</button>
-        `;
-        
-        window.selComp = () => {
-            const inp = fileInput();
-            inp.onchange = (e) => { window._compFile = e.target.files[0]; showToast('✅ انتخاب شد'); };
-            inp.click();
-        };
-        
-        window.doComp = async () => {
-            if (!window._compFile) { showToast('⚠️ عکس انتخاب کن'); return; }
-            const format = document.getElementById('compFormat').value;
-            const quality = parseInt(document.getElementById('compQuality').value) / 100;
-            const mime = format === 'jpeg' ? 'image/jpeg' : 'image/webp';
-            const ext = format === 'jpeg' ? 'jpg' : 'webp';
-            
-            const { img } = await loadImage(window._compFile);
-            const canvas = document.createElement('canvas'); canvas.width = img.width; canvas.height = img.height;
-            canvas.getContext('2d').drawImage(img, 0, 0);
-            
-            const originalSize = window._compFile.size;
-            window._compResult = canvas.toDataURL(mime, quality);
-            const compressedSize = dataUrlToBlob(window._compResult).size;
-            const reduction = ((1 - compressedSize / originalSize) * 100).toFixed(1);
-            
-            document.getElementById('compResult').innerHTML = `
-                <div style="background:var(--glass-bg);border-radius:10px;padding:15px;margin:10px 0;">
-                    <p>📦 <b>قبل:</b> ${formatBytes(originalSize)}</p>
-                    <p>📦 <b>بعد:</b> ${formatBytes(compressedSize)}</p>
-                    <p style="color:var(--success);">✅ <b>${reduction}%</b> کاهش حجم</p>
-                </div>
-                <img src="${window._compResult}" style="width:100%;border-radius:10px;">`;
-            document.getElementById('compSave').disabled = false;
-        };
-    }
-
-    // ============================================
-    // ابزار ۸: تبدیل فرمت (کامل)
-    // ============================================
-    function converter() {
-        document.getElementById('toolContent').innerHTML = `
-            <div class="input-group"><label>تبدیل به:</label><select id="convFormat"><option value="jpeg">JPG</option><option value="png">PNG</option><option value="webp">WEBP</option></select></div>
-            <button class="btn btn-primary" onclick="selConv()">📂 انتخاب عکس</button>
-            <button class="btn btn-success" onclick="doConv()">🔄 تبدیل</button>
-            <div id="convResult"></div>
-            <button class="btn btn-outline" id="convSave" disabled onclick="saveFile(window._convResult, 'converted.'+(document.getElementById('convFormat').value==='jpeg'?'jpg':document.getElementById('convFormat').value))">💾 ذخیره</button>
-        `;
-        
-        window.selConv = () => {
-            const inp = fileInput();
-            inp.onchange = (e) => { window._convFile = e.target.files[0]; showToast('✅ انتخاب شد'); };
-            inp.click();
-        };
-        
-        window.doConv = async () => {
-            if (!window._convFile) { showToast('⚠️ عکس انتخاب کن'); return; }
-            const fmt = document.getElementById('convFormat').value;
-            const mime = fmt === 'jpeg' ? 'image/jpeg' : fmt === 'png' ? 'image/png' : 'image/webp';
-            
-            const { img } = await loadImage(window._convFile);
-            const canvas = document.createElement('canvas'); canvas.width = img.width; canvas.height = img.height;
-            canvas.getContext('2d').drawImage(img, 0, 0);
-            
-            const originalSize = window._convFile.size;
-            window._convResult = canvas.toDataURL(mime, CONFIG.quality / 100);
-            const newSize = dataUrlToBlob(window._convResult).size;
-            
-            document.getElementById('convResult').innerHTML = `
-                <p>📦 قبل: ${formatBytes(originalSize)} | بعد: ${formatBytes(newSize)}</p>
-                <img src="${window._convResult}" style="width:100%;border-radius:10px;">`;
-            document.getElementById('convSave').disabled = false;
-        };
-    }
-
-    // ============================================
-    // ابزار ۹: تغییر سایز
-    // ============================================
-    function resize() {
-        document.getElementById('toolContent').innerHTML = `
-            <div class="grid-2">
-                <div class="input-group"><label>عرض (px):</label><input type="number" id="rWidth" placeholder="auto"></div>
-                <div class="input-group"><label>ارتفاع (px):</label><input type="number" id="rHeight" placeholder="auto"></div>
-            </div>
-            <div class="checkbox-group"><input type="checkbox" id="rRatio" checked><label>حفظ نسبت تصویر</label></div>
-            <button class="btn btn-primary" onclick="selResize()">📂 انتخاب عکس</button>
-            <button class="btn btn-success" onclick="doResize()">📐 تغییر سایز</button>
-            <div id="resizeResult"></div>
-            <button class="btn btn-outline" id="resizeSave" disabled onclick="saveFile(window._resizeResult, 'resized_'+Date.now()+'.jpg')">💾 ذخیره</button>
-        `;
-        
-        window.selResize = () => {
-            const inp = fileInput();
-            inp.onchange = (e) => { window._resizeFile = e.target.files[0]; showToast('✅ انتخاب شد'); };
-            inp.click();
-        };
-        
-        window.doResize = async () => {
-            if (!window._resizeFile) { showToast('⚠️ عکس انتخاب کن'); return; }
-            const { img } = await loadImage(window._resizeFile);
-            let w = parseInt(document.getElementById('rWidth').value) || img.width;
-            let h = parseInt(document.getElementById('rHeight').value) || img.height;
-            
-            if (document.getElementById('rRatio').checked) {
-                if (!document.getElementById('rWidth').value) w = Math.round(img.width * (h / img.height));
-                if (!document.getElementById('rHeight').value) h = Math.round(img.height * (w / img.width));
-            }
-            
-            const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
-            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-            window._resizeResult = canvas.toDataURL('image/jpeg', CONFIG.quality / 100);
-            
-            document.getElementById('resizeResult').innerHTML = `
-                <p>📐 ${img.width}×${img.height} → <b>${w}×${h}</b></p>
-                <img src="${window._resizeResult}" style="width:100%;border-radius:10px;">`;
-            document.getElementById('resizeSave').disabled = false;
-        };
-    }
-
-    // ============================================
-    // ابزار ۱۰: ساخت QR (کامل)
-    // ============================================
-    function qrgen() {
-        document.getElementById('toolContent').innerHTML = `
-            <div class="input-group"><label>نوع محتوا:</label><select id="qrType" onchange="updateQRPlaceholder()"><option value="text">متن</option><option value="url">لینک</option><option value="tel">شماره تلفن</option><option value="email">ایمیل</option></select></div>
-            <div class="input-group"><label>محتوا:</label><textarea id="qrContent" rows="3" placeholder="متن یا لینک..."></textarea></div>
-            <div class="grid-2">
-                <div class="input-group"><label>رنگ QR:</label><input type="color" id="qrFG" value="#000000"></div>
-                <div class="input-group"><label>رنگ پس‌زمینه:</label><input type="color" id="qrBG" value="#FFFFFF"></div>
-            </div>
-            <div class="range-group"><span>اندازه:</span><input type="range" id="qrSize" min="200" max="600" value="300" oninput="document.getElementById('qrSizeV').textContent=this.value+'px'"><span class="range-value" id="qrSizeV">300px</span></div>
-            <button class="btn btn-success" onclick="genQR()">📱 تولید QR</button>
-            <div id="qrGenResult" style="text-align:center;margin:15px 0;"></div>
-            <button class="btn btn-outline" id="qrSave" disabled onclick="saveFile(window._qrData, 'qr_'+Date.now()+'.png','image/png')">💾 ذخیره</button>
-        `;
-        
-        window.updateQRPlaceholder = () => {
-            const type = document.getElementById('qrType').value;
-            const placeholders = { text: 'متن دلخواه...', url: 'https://example.com', tel: '+989123456789', email: 'email@example.com' };
-            document.getElementById('qrContent').placeholder = placeholders[type] || '';
-        };
-        updateQRPlaceholder();
-        
-        window.genQR = () => {
-            const type = document.getElementById('qrType').value;
-            let content = document.getElementById('qrContent').value.trim();
-            if (!content) { showToast('⚠️ محتوا را وارد کن'); return; }
-            
-            // افزودن پیشوند بر اساس نوع
-            if (type === 'tel') content = 'tel:' + content.replace(/[^+\d]/g, '');
-            else if (type === 'email') content = 'mailto:' + content;
-            else if (type === 'url' && !content.startsWith('http')) content = 'https://' + content;
-            
-            const fg = document.getElementById('qrFG').value;
-            const bg = document.getElementById('qrBG').value;
-            const size = parseInt(document.getElementById('qrSize').value);
-            
-            const canvas = document.createElement('canvas');
-            QRCode.toCanvas(canvas, content, {
-                width: size,
-                margin: 2,
-                color: { dark: fg, light: bg }
-            }, (err) => {
-                if (err) { showToast('❌ خطا در تولید QR'); return; }
-                document.getElementById('qrGenResult').innerHTML = '';
-                document.getElementById('qrGenResult').appendChild(canvas);
-                window._qrData = canvas.toDataURL('image/png');
-                document.getElementById('qrSave').disabled = false;
             });
-        };
-    }
 
-    // ============================================
-    // ابزار ۱۱: اسکن QR
-    // ============================================
-    function qrscan() {
-        document.getElementById('toolContent').innerHTML = `
-            <button class="btn btn-primary" onclick="scanCamera()">📷 اسکن با دوربین</button>
-            <button class="btn btn-outline" onclick="scanImage()">🖼️ اسکن از عکس</button>
-            <div id="qrScanResult" style="text-align:center;margin:15px 0;word-break:break-all;"></div>
-            <button class="btn btn-outline btn-sm" id="qrCopy" disabled onclick="copyQRResult()">📋 کپی</button>
-            <button class="btn btn-outline btn-sm" id="qrOpen" disabled onclick="openQRResult()">🔗 باز کردن</button>
-        `;
-        
-        window.scanCamera = () => {
-            const modal = document.getElementById('qrModal');
-            modal.classList.add('show');
-            const video = document.getElementById('qrVideo');
-            
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-                    .then(stream => {
-                        video.srcObject = stream;
-                        video.play();
-                        showToast('📷 دوربین فعال شد - در نسخه کامل اسکن می‌شود');
-                    })
-                    .catch(() => showToast('⚠️ دسترسی به دوربین رد شد'));
-            }
-        };
-        
-        window.scanImage = () => {
-            const inp = fileInput();
-            inp.onchange = (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        canvas.width = img.width; canvas.height = img.height;
-                        canvas.getContext('2d').drawImage(img, 0, 0);
-                        // اسکن QR از canvas (نیاز به jsQR - در نسخه کامل)
-                        showToast('🖼️ اسکن از عکس در حال پردازش...');
-                        document.getElementById('qrScanResult').textContent = 'در نسخه کامل با jsQR اسکن می‌شود';
-                    };
-                    img.src = ev.target.result;
-                };
-                reader.readAsDataURL(file);
-            };
-            inp.click();
-        };
-        
-        window.copyQRResult = () => {
-            const text = document.getElementById('qrScanResult').textContent;
-            if (text) navigator.clipboard.writeText(text).then(() => showToast('📋 کپی شد'));
-        };
-        
-        window.openQRResult = () => {
-            const text = document.getElementById('qrScanResult').textContent;
-            if (text && (text.startsWith('http') || text.startsWith('www'))) {
-                window.open(text.startsWith('http') ? text : 'https://' + text, '_blank');
-            }
-        };
-    }
-
-    function stopQR() {
-        document.getElementById('qrModal').classList.remove('show');
-        const video = document.getElementById('qrVideo');
-        if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
-    }
-
-    // ============================================
-    // ابزار ۱۲: OCR (کامل)
-    // ============================================
-    function ocr() {
-        document.getElementById('toolContent').innerHTML = `
-            <button class="btn btn-primary" onclick="selOCR()">📂 انتخاب عکس</button>
-            <div class="progress-bar" id="ocrProgress" style="display:none;"><div class="fill" style="width:0%"></div></div>
-            <div class="progress-text" id="ocrProgressText" style="display:none;"></div>
-            <div id="ocrResult" style="margin:15px 0;"></div>
-            <div class="grid-2">
-                <button class="btn btn-outline btn-sm" id="ocrCopy" disabled onclick="copyOCR()">📋 کپی متن</button>
-                <button class="btn btn-outline btn-sm" id="ocrSave" disabled onclick="saveOCRText()">💾 ذخیره TXT</button>
-            </div>
-        `;
-        
-        window.selOCR = () => {
-            const inp = fileInput();
-            inp.onchange = async (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                
-                document.getElementById('ocrProgress').style.display = 'block';
-                document.getElementById('ocrProgressText').style.display = 'block';
-                
-                try {
-                    const worker = await Tesseract.createWorker();
-                    await worker.loadLanguage('eng+fas');
-                    await worker.initialize('eng+fas');
-                    
-                    const result = await worker.recognize(file);
-                    const text = result.data.text.trim() || 'متنی پیدا نشد';
-                    
-                    await worker.terminate();
-                    
-                    document.getElementById('ocrResult').innerHTML = `
-                        <textarea id="ocrTextArea" style="width:100%;min-height:200px;background:var(--glass-bg);color:var(--text-primary);border:1px solid var(--glass-border);border-radius:10px;padding:15px;font-size:14px;resize:vertical;">${text}</textarea>`;
-                    
-                    window._ocrText = text;
-                    document.getElementById('ocrCopy').disabled = false;
-                    document.getElementById('ocrSave').disabled = false;
-                    document.getElementById('ocrProgress').style.display = 'none';
-                    document.getElementById('ocrProgressText').style.display = 'none';
-                    showToast('✅ متن استخراج شد');
-                } catch (err) {
-                    console.error('OCR Error:', err);
-                    document.getElementById('ocrResult').innerHTML = '<p style="color:var(--danger);text-align:center;">❌ خطا. دوباره تلاش کنید.</p>';
-                    document.getElementById('ocrProgress').style.display = 'none';
-                    document.getElementById('ocrProgressText').style.display = 'none';
-                    showToast('❌ خطا در OCR');
+            wrapper.addEventListener('pointermove', (e) => {
+                if (isDrawing && (e.pointerType === 'pen' || e.pointerType === 'touch' || e
+                        .pointerType === 'mouse')) {
+                    const pos = getCanvasPos(e);
+                    brushPX = pos.rawX;
+                    brushPY = pos.rawY;
+                    drawAt(pos);
+                    e.preventDefault();
+                } else if (!isDrawing) {
+                    const pos = getCanvasPos(e);
+                    brushPX = pos.rawX;
+                    brushPY = pos.rawY;
+                    brushPreviewVis = true;
+                    drawBrushPreview(pos.rawX, pos.rawY);
                 }
-            };
-            inp.click();
-        };
-        
-        window.copyOCR = () => {
-            const text = document.getElementById('ocrTextArea')?.value || window._ocrText;
-            if (text) navigator.clipboard.writeText(text).then(() => showToast('📋 کپی شد'));
-        };
-        
-        window.saveOCRText = () => {
-            const text = document.getElementById('ocrTextArea')?.value || window._ocrText;
-            if (text) {
-                const blob = new Blob([text], { type: 'text/plain' });
-                saveBlob(blob, 'ocr_text_' + Date.now() + '.txt');
-            }
-        };
-    }
+            });
 
-    // ============================================
-    // ابزار ۱۳: انتخاب رنگ (کامل با زوم)
-    // ============================================
-    function colorpick() {
-        document.getElementById('toolContent').innerHTML = `
-            <button class="btn btn-primary" onclick="selCP()">📂 انتخاب عکس</button>
-            <canvas id="cpCanvas" style="display:none;max-width:100%;cursor:crosshair;border-radius:10px;"></canvas>
-            <div id="cpInfo" style="text-align:center;margin:10px 0;"></div>
-            <div class="grid-3">
-                <button class="btn btn-outline btn-sm" id="cpHex" disabled onclick="cpCopy('hex')">📋 HEX</button>
-                <button class="btn btn-outline btn-sm" id="cpRgb" disabled onclick="cpCopy('rgb')">📋 RGB</button>
-                <button class="btn btn-outline btn-sm" id="cpHsl" disabled onclick="cpCopy('hsl')">📋 HSL</button>
-            </div>
-            <button class="btn btn-outline btn-sm" id="cpZoom" disabled onclick="showZoom()">🔍 زوم</button>
-        `;
-        
-        window.selCP = () => {
-            const inp = fileInput();
-            inp.onchange = (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.getElementById('cpCanvas');
-                        canvas.style.display = 'block';
-                        const maxW = Math.min(img.width, 350);
-                        const s = maxW / img.width;
-                        canvas.width = maxW;
-                        canvas.height = img.height * s;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        
-                        canvas.onclick = (e2) => {
-                            const rect = canvas.getBoundingClientRect();
-                            const x = Math.floor((e2.clientX - rect.left) * (canvas.width / rect.width));
-                            const y = Math.floor((e2.clientY - rect.top) * (canvas.height / rect.height));
-                            
-                            // زوم برای دقت
-                            const zoomSize = 20;
-                            const zoomData = ctx.getImageData(Math.max(0, x - zoomSize/2), Math.max(0, y - zoomSize/2), zoomSize, zoomSize);
-                            
-                            const pixel = ctx.getImageData(x, y, 1, 1).data;
-                            const [r, g, b] = pixel;
-                            const hex = '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
-                            const hsl = rgbToHsl(r, g, b);
-                            
-                            document.getElementById('cpInfo').innerHTML = `
-                                <div style="width:60px;height:60px;background:${hex};border-radius:15px;margin:0 auto;border:3px solid white;box-shadow:0 0 20px ${hex}44;"></div>
-                                <p style="margin-top:8px;"><b>HEX:</b> ${hex}</p>
-                                <p><b>RGB:</b> (${r}, ${g}, ${b})</p>
-                                <p><b>HSL:</b> (${hsl.h}°, ${hsl.s}%, ${hsl.l}%)</p>`;
-                            
-                            window._cpHex = hex;
-                            window._cpRgb = `rgb(${r},${g},${b})`;
-                            window._cpHsl = `hsl(${hsl.h},${hsl.s}%,${hsl.l}%)`;
-                            window._cpZoomData = { ctx, x, y, canvas };
-                            
-                            document.getElementById('cpHex').disabled = false;
-                            document.getElementById('cpRgb').disabled = false;
-                            document.getElementById('cpHsl').disabled = false;
-                            document.getElementById('cpZoom').disabled = false;
-                        };
-                    };
-                    img.src = ev.target.result;
-                };
-                reader.readAsDataURL(file);
-            };
-            inp.click();
-        };
-        
-        window.cpCopy = (type) => {
-            const vals = { hex: window._cpHex, rgb: window._cpRgb, hsl: window._cpHsl };
-            if (vals[type]) navigator.clipboard.writeText(vals[type]).then(() => showToast('📋 کپی شد'));
-        };
-        
-        window.showZoom = () => {
-            if (!window._cpZoomData) return;
-            const { ctx, x, y, canvas } = window._cpZoomData;
-            const zoomCanvas = document.getElementById('colorZoomCanvas');
-            const zSize = 100;
-            zoomCanvas.width = zSize;
-            zoomCanvas.height = zSize;
-            const zCtx = zoomCanvas.getContext('2d');
-            
-            const size = 30;
-            const data = ctx.getImageData(Math.max(0, x - size/2), Math.max(0, y - size/2), size, size);
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = size;
-            tempCanvas.height = size;
-            tempCanvas.getContext('2d').putImageData(data, 0, 0);
-            
-            zCtx.imageSmoothingEnabled = false;
-            zCtx.drawImage(tempCanvas, 0, 0, zSize, zSize);
-            
-            // خط تیره مرکز
-            zCtx.strokeStyle = 'red';
-            zCtx.lineWidth = 2;
-            zCtx.strokeRect(zSize/2 - 5, zSize/2 - 5, 10, 10);
-            
-            document.getElementById('colorZoomInfo').innerHTML = `
-                <b>HEX:</b> ${window._cpHex}<br>
-                <b>RGB:</b> ${window._cpRgb}<br>
-                <b>HSL:</b> ${window._cpHsl}`;
-            
-            document.getElementById('colorZoomModal').classList.add('show');
-        };
-    }
-
-    // ============================================
-    // ابزار ۱۴: چسب اسکرین (حذف همپوشانی)
-    // ============================================
-    function screenstitch() {
-        document.getElementById('toolContent').innerHTML = `
-            <button class="btn btn-primary" onclick="selSS()">📂 انتخاب اسکرین‌شات‌ها</button>
-            <div class="range-group"><span>همپوشانی (px):</span><input type="range" id="ssOverlap" min="10" max="200" value="60" oninput="document.getElementById('ssOverlapV').textContent=this.value"><span class="range-value" id="ssOverlapV">60</span></div>
-            <button class="btn btn-success" onclick="doSS()">🖼️ چسباندن هوشمند</button>
-            <div id="ssResult"></div>
-            <button class="btn btn-outline" id="ssSave" disabled onclick="saveFile(window._ssResult, 'screen_stitch_'+Date.now()+'.jpg')">💾 ذخیره</button>
-        `;
-        
-        window.selSS = () => {
-            const inp = fileInput('image/*', true);
-            inp.onchange = (e) => {
-                window._ssFiles = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
-                showToast(`✅ ${window._ssFiles.length} عکس`);
-            };
-            inp.click();
-        };
-        
-        window.doSS = async () => {
-            if (!window._ssFiles || window._ssFiles.length < 2) { showToast('⚠️ حداقل ۲ عکس'); return; }
-            const overlap = parseInt(document.getElementById('ssOverlap').value);
-            
-            const imgs = [];
-            for (let f of window._ssFiles) {
-                const { img } = await loadImage(f);
-                imgs.push(img);
-            }
-            
-            // تشخیص همپوشانی با مقایسه پیکسل‌های انتهای تصویر قبلی و ابتدای تصویر بعدی
-            let totalHeight = imgs[0].height;
-            for (let i = 1; i < imgs.length; i++) {
-                totalHeight += imgs[i].height - overlap;
-            }
-            
-            const canvas = document.createElement('canvas');
-            canvas.width = imgs[0].width;
-            canvas.height = totalHeight;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, canvas.width, totalHeight);
-            
-            let y = 0;
-            for (let i = 0; i < imgs.length; i++) {
-                ctx.drawImage(imgs[i], 0, y);
-                if (i < imgs.length - 1) {
-                    y += imgs[i].height - overlap;
-                } else {
-                    y += imgs[i].height;
+            wrapper.addEventListener('pointerup', () => {
+                if (isDrawing) {
+                    saveState();
+                    isDrawing = false;
+                    brushPreviewVis = false;
+                    const old = $('#brushPrev');
+                    if (old) old.remove();
+                    redrawCanvas();
                 }
-            }
-            
-            window._ssResult = canvas.toDataURL('image/jpeg', CONFIG.quality / 100);
-            document.getElementById('ssResult').innerHTML = `<img src="${window._ssResult}" style="width:100%;border-radius:10px;">`;
-            document.getElementById('ssSave').disabled = false;
-            showToast('✅ چسباندن انجام شد');
-        };
-    }
+            });
 
-    // ============================================
-    // ابزار ۱۵: پردازش گروهی (کامل با ZIP)
-    // ============================================
-    function batch() {
-        let batchFiles = [];
-        
-        document.getElementById('toolContent').innerHTML = `
-            <div class="input-group"><label>عملیات:</label><select id="batchOp"><option value="compress">📦 فشرده‌سازی</option><option value="resize">📐 تغییر سایز (800px عرض)</option><option value="watermark">💧 واترمارک</option><option value="convert">🔄 تبدیل به JPG</option></select></div>
-            <button class="btn btn-primary" onclick="selBatch()">📂 انتخاب تصاویر</button>
-            <button class="btn btn-success" id="batchBtn" disabled onclick="doBatch()">📋 اجرای گروهی</button>
-            <div class="progress-bar" id="batchProgress" style="display:none;"><div class="fill" style="width:0%"></div></div>
-            <div class="progress-text" id="batchProgressText" style="display:none;"></div>
-            <div id="batchResult"></div>
-            <button class="btn btn-outline" id="batchSaveAll" disabled onclick="downloadAllAsZip()">📦 دانلود همه (ZIP)</button>
-        `;
-        
-        window.selBatch = () => {
-            const inp = fileInput('image/*', true);
-            inp.onchange = (e) => {
-                batchFiles = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
-                document.getElementById('batchBtn').disabled = batchFiles.length === 0;
-                showToast(`✅ ${batchFiles.length} عکس`);
-            };
-            inp.click();
-        };
-        
-        window.doBatch = async () => {
-            if (!batchFiles.length) return;
-            const op = document.getElementById('batchOp').value;
-            const progress = document.getElementById('batchProgress');
-            const progressText = document.getElementById('batchProgressText');
-            progress.style.display = 'block';
-            progressText.style.display = 'block';
-            
-            window._batchResults = [];
-            const resultDiv = document.getElementById('batchResult');
-            resultDiv.innerHTML = '';
-            
-            for (let i = 0; i < batchFiles.length; i++) {
-                progressText.textContent = `پردازش ${i+1} از ${batchFiles.length}...`;
-                document.querySelector('#batchProgress .fill').style.width = ((i+1)/batchFiles.length*100) + '%';
-                
-                const { img } = await loadImage(batchFiles[i]);
-                const canvas = document.createElement('canvas');
-                
-                if (op === 'resize') {
-                    const ratio = 800 / img.width;
-                    canvas.width = 800;
-                    canvas.height = Math.round(img.height * ratio);
-                } else {
-                    canvas.width = img.width;
-                    canvas.height = img.height;
+            wrapper.addEventListener('pointerleave', () => {
+                if (isDrawing) { saveState();
+                    isDrawing = false; }
+                brushPreviewVis = false;
+                const old = $('#brushPrev');
+                if (old) old.remove();
+                redrawCanvas();
+            });
+
+            // Pinch zoom
+            wrapper.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 2) {
+                    isPanning = true;
+                    isDrawing = false;
+                    lastDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0]
+                        .clientY - e.touches[1].clientY);
+                    lastCX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                    lastCY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
                 }
-                
+            }, { passive: false });
+
+            wrapper.addEventListener('touchmove', (e) => {
+                if (isPanning && e.touches.length === 2) {
+                    const rect = wrapper.getBoundingClientRect();
+                    const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0]
+                        .clientY - e.touches[1].clientY);
+                    const cx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                    const cy = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                    const oldScale = scale;
+                    scale *= dist / lastDist;
+                    scale = Math.min(10, Math.max(0.1, scale));
+                    panX = cx - rect.left - (cx - rect.left - panX) * (scale / oldScale);
+                    panY = cy - rect.top - (cy - rect.top - panY) * (scale / oldScale);
+                    lastDist = dist;
+                    lastCX = cx;
+                    lastCY = cy;
+                    updateTransform();
+                    redrawCanvas();
+                }
+                e.preventDefault();
+            }, { passive: false });
+
+            wrapper.addEventListener('touchend', () => { isPanning = false;
+                lastDist = 0; });
+
+            function drawAt(pos) {
+                if (!cImg) return;
+                const overlay = document.createElement('canvas');
+                overlay.width = canvas.width;
+                overlay.height = canvas.height;
+                const ovCtx = overlay.getContext('2d');
+                ovCtx.drawImage(cImg, 0, 0);
+                for (let i = 1; i <= histIdx; i++) { ovCtx.putImageData(history[i], 0, 0); }
+                ovCtx.fillStyle = brushColor;
+                ovCtx.beginPath();
+                ovCtx.arc(pos.x, pos.y, brushSize / 2 / scale, 0, Math.PI * 2);
+                ovCtx.fill();
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(overlay, 0, 0);
+                updateTransform();
+            }
+
+            function redrawCanvas() {
+                if (!cImg) return;
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(cImg, 0, 0);
+                for (let i = 1; i <= histIdx; i++) { ctx.putImageData(history[i], 0, 0); }
+                updateTransform();
+            }
+
+            function saveState() {
+                history = history.slice(0, histIdx + 1);
+                history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+                histIdx++;
+                if (history.length > 50) { history.shift();
+                    histIdx--; }
+                $('#cRedo').disabled = true;
+                $('#cUndo').disabled = false;
+            }
+
+            window.undoC = () => { if (histIdx > 0) { histIdx--;
+                    redrawCanvas();
+                    $('#cRedo').disabled = false; if (histIdx === 0) $('#cUndo').disabled = true; } };
+            window.redoC = () => { if (histIdx < history.length - 1) { histIdx++;
+                    redrawCanvas();
+                    $('#cUndo').disabled = false; if (histIdx >= history.length - 1) $('#cRedo').disabled =
+                    true; } };
+            window.zoomIn = () => { scale = Math.min(10, scale * 1.3);
+                updateTransform();
+                redrawCanvas(); };
+            window.zoomOut = () => { scale = Math.max(0.1, scale / 1.3);
+                updateTransform();
+                redrawCanvas(); };
+            window.fitScreen = () => { if (!cImg) return;
+                const rect = wrapper.getBoundingClientRect();
+                scale = Math.min((rect.width - 20) / cImg.width, (rect.height - 20) / cImg.height);
+                panX = 0;
+                panY = 0;
+                updateTransform();
+                redrawCanvas(); };
+            window.actualSize = () => { scale = 1;
+                panX = 0;
+                panY = 0;
+                updateTransform();
+                redrawCanvas(); };
+            window.saveCleaned = () => { if (!canvas) return;
+                redrawCanvas();
+                const dataUrl = canvas.toDataURL('image/jpeg', CFG.quality / 100);
+                saveFile(dataUrl, 'cleaned_' + Date.now() + '.jpg'); };
+        }
+
+        // ==================== TOOL 4: ENHANCER ====================
+        function enhancer() {
+            let eFile = null;
+            $('#toolContent').innerHTML = `
+            <div class="rng"><span>روشنایی:</span><input type="range" id="eB" min="50" max="200" value="100" oninput="$('#eBV').textContent=this.value"><span class="val" id="eBV">100</span></div>
+            <div class="rng"><span>کنتراست:</span><input type="range" id="eC" min="50" max="200" value="100" oninput="$('#eCV').textContent=this.value"><span class="val" id="eCV">100</span></div>
+            <div class="rng"><span>اشباع:</span><input type="range" id="eS" min="0" max="200" value="100" oninput="$('#eSV').textContent=this.value"><span class="val" id="eSV">100</span></div>
+            <div class="rng"><span>شارپنس:</span><input type="range" id="eSh" min="0" max="100" value="0" oninput="$('#eShV').textContent=this.value"><span class="val" id="eShV">0</span></div>
+            <div class="prev" id="ePrev"><span style="color:var(--text2)">عکسی انتخاب نشده</span></div>
+            <button class="btn btn-p" onclick="selEF()">📂 انتخاب عکس</button>
+            <button class="btn btn-s" id="eBtn" disabled onclick="doE()">✨ اعمال</button>
+            <div id="eRes"></div>
+            <button class="btn btn-o" id="eSave" disabled onclick="saveFile(window._er,'enhanced_'+Date.now()+'.jpg')">💾 ذخیره</button>`;
+
+            window.selEF = () => { const inp = fileInp();
+                inp.onchange = (e) => { eFile = e.target.files[0]; if (!eFile) return;
+                    const r = new FileReader();
+                    r.onload = (ev) => { $('#ePrev').innerHTML =
+                            `<img src="${ev.target.result}" style="max-width:100%;max-height:200px;border-radius:10px">`; };
+                    r.readAsDataURL(eFile);
+                    $('#eBtn').disabled = false; };
+                inp.click(); };
+            window.doE = async () => { const btn = $('#eBtn');
+                btn.disabled = true;
+                const { img } = await loadImg(eFile);
+                const c = document.createElement('canvas');
+                c.width = img.width;
+                c.height = img.height;
+                const ctx = c.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                const id = ctx.getImageData(0, 0, c.width, c.height);
+                const d = id.data;
+                const b = parseInt($('#eB').value) / 100;
+                const co = parseInt($('#eC').value) / 100;
+                const s = parseInt($('#eS').value) / 100;
+                const sh = parseInt($('#eSh').value) / 100; for (let i = 0; i < d.length; i += 4) { d[i] = Math.min(
+                        255, d[i] * b);
+                    d[i + 1] = Math.min(255, d[i + 1] * b);
+                    d[i + 2] = Math.min(255, d[i + 2] * b); for (let j = 0; j < 3; j++) { d[i + j] = ((d[i + j] /
+                            255 - 0.5) * co + 0.5) * 255;
+                        d[i + j] = Math.max(0, Math.min(255, d[i + j])); } const g = 0.2989 * d[i] + 0.5870 * d[i +
+                        1] + 0.1140 * d[i + 2];
+                    d[i] = Math.min(255, g + s * (d[i] - g));
+                    d[i + 1] = Math.min(255, g + s * (d[i + 1] - g));
+                    d[i + 2] = Math.min(255, g + s * (d[i + 2] - g)); } if (sh > 0) { const kernel = [0, -sh, 0, -
+                        sh, 1 + 4 * sh, -sh, 0, -sh, 0
+                    ]; }
+                ctx.putImageData(id, 0, 0);
+                window._er = c.toDataURL('image/jpeg', CFG.quality / 100);
+                const r = new FileReader();
+                r.onload = (ev) => { $('#eRes').innerHTML =
+                        `<div class="comp"><div><img src="${ev.target.result}"><div class="lbl">📷 قبل</div></div><div><img src="${window._er}"><div class="lbl">✨ بعد</div></div></div>`; };
+                r.readAsDataURL(eFile);
+                $('#eSave').disabled = false;
+                btn.disabled = false; };
+        }
+
+        // ==================== TOOL 5: SPLIT (Preview only) ====================
+        function split() {
+            let splitParts = [];
+            $('#toolContent').innerHTML = `
+            <button class="btn btn-p" onclick="selSplit()">📂 انتخاب عکس بلند</button>
+            <div class="inp"><label>تعداد بخش:</label><input type="number" id="spCnt" value="3" min="2" max="20"></div>
+            <button class="btn btn-s" onclick="doSplit()">✂️ پیش‌نمایش</button>
+            <div id="spRes"></div>
+            <button class="btn btn-o" id="spSaveAll" disabled onclick="saveAllSplit()">💾 ذخیره همه</button>
+            <button class="btn btn-o" id="spZip" disabled onclick="downloadSplitZip()">📦 دانلود ZIP</button>`;
+
+            window.selSplit = () => { const inp = fileInp();
+                inp.onchange = (e) => { window._spFile = e.target.files[0];
+                    toast('✅ انتخاب شد'); };
+                inp.click(); };
+            window.doSplit = async () => { if (!window._spFile) { toast('⚠️ عکس انتخاب کن'); return; }
+                const { img } = await loadImg(window._spFile);
+                const count = parseInt($('#spCnt').value);
+                const ph = Math.floor(img.height / count);
+                splitParts = [];
+                $('#spRes').innerHTML = ''; for (let i = 0; i < count; i++) { const c = document.createElement(
+                        'canvas');
+                    c.width = img.width;
+                    c.height = ph;
+                    c.getContext('2d').drawImage(img, 0, i * ph, img.width, ph, 0, 0, img.width, ph);
+                    const dataUrl = c.toDataURL('image/jpeg', CFG.quality / 100);
+                    const blob = dataUrlToBlob(dataUrl);
+                    splitParts.push({ dataUrl, blob, index: i, size: blob.size, w: c.width, h: c.height });
+                    $('#spRes').innerHTML +=
+                        `<div style="margin:8px 0;padding:8px;background:var(--glass);border-radius:10px"><p style="font-size:11px;color:var(--text2)">📐 بخش ${i+1}: ${c.width}×${c.height} | 📦 ${fmtBytes(blob.size)}</p><img src="${dataUrl}" style="width:100%;border-radius:8px"><button class="btn btn-o btn-sm" onclick="saveFile('${dataUrl}','split_${i+1}_'+Date.now()+'.jpg')">💾 ذخیره</button></div>`; }
+                $('#spSaveAll').disabled = false;
+                $('#spZip').disabled = false;
+                toast('✅ پیش‌نمایش آماده'); };
+            window.saveAllSplit = () => { splitParts.forEach(p => saveFile(p.dataUrl,
+                    `split_${p.index+1}_${Date.now()}.jpg`));
+                toast('✅ همه ذخیره شد'); };
+            window.downloadSplitZip = async () => { const zip = new JSZip();
+                splitParts.forEach(p => zip.file(`part_${p.index+1}.jpg`, p.blob));
+                const zblob = await zip.generateAsync({ type: 'blob' });
+                saveBlob(zblob, 'split_parts_' + Date.now() + '.zip'); };
+        }
+
+        // ==================== TOOL 6: WATERMARK ====================
+        function watermark() {
+            $('#toolContent').innerHTML = `
+            <div class="inp"><label>متن واترمارک:</label><input type="text" id="wmTxt" value="© ${new Date().getFullYear()}"></div>
+            <div class="rng"><span>شفافیت:</span><input type="range" id="wmOp" min="10" max="100" value="40" oninput="$('#wmOpV').textContent=this.value+'%'"><span class="val" id="wmOpV">40%</span></div>
+            <div class="rng"><span>اندازه:</span><input type="range" id="wmSz" min="10" max="100" value="50" oninput="$('#wmSzV').textContent=this.value"><span class="val" id="wmSzV">50</span></div>
+            <button class="btn btn-p" onclick="selWM()">📂 انتخاب عکس</button>
+            <button class="btn btn-s" onclick="doWM()">💧 اعمال</button>
+            <div id="wmRes"></div>
+            <button class="btn btn-o" id="wmSave" disabled onclick="saveFile(window._wm,'watermarked_'+Date.now()+'.jpg')">💾 ذخیره</button>`;
+
+            window.selWM = () => { const inp = fileInp();
+                inp.onchange = (e) => { window._wmFile = e.target.files[0];
+                    toast('✅ انتخاب شد'); };
+                inp.click(); };
+            window.doWM = async () => { if (!window._wmFile) { toast('⚠️ عکس انتخاب کن'); return; }
+                const { img } = await loadImg(window._wmFile);
+                const c = document.createElement('canvas');
+                c.width = img.width;
+                c.height = img.height;
+                const ctx = c.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                ctx.globalAlpha = parseInt($('#wmOp').value) / 100;
+                const sz = parseInt($('#wmSz').value);
+                const fs = Math.max(20, img.width * sz / 100);
+                ctx.font = `bold ${fs}px Arial`;
+                ctx.fillStyle = '#FFF';
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 3;
+                ctx.textAlign = 'center';
+                const txt = $('#wmTxt').value;
+                for (let y = fs; y < img.height; y += fs * 2) { for (let x = fs; x < img.width; x += ctx.measureText(txt)
+                        .width * 1.5) { ctx.strokeText(txt, x, y);
+                        ctx.fillText(txt, x, y); } }
+                window._wm = c.toDataURL('image/jpeg', CFG.quality / 100);
+                $('#wmRes').innerHTML = `<img src="${window._wm}" style="width:100%;border-radius:10px">`;
+                $('#wmSave').disabled = false; };
+        }
+
+        // ==================== TOOL 7: COMPRESSOR ====================
+        function compressor() {
+            $('#toolContent').innerHTML = `
+            <div class="inp"><label>فرمت خروجی:</label><select id="compFmt"><option value="jpeg">JPG</option><option value="webp">WEBP</option></select></div>
+            <div class="rng"><span>کیفیت:</span><input type="range" id="compQ" min="5" max="100" value="60" oninput="$('#compQV').textContent=this.value+'%'"><span class="val" id="compQV">60%</span></div>
+            <button class="btn btn-p" onclick="selComp()">📂 انتخاب عکس</button>
+            <button class="btn btn-s" onclick="doComp()">📦 فشرده‌سازی</button>
+            <div id="compRes"></div>
+            <button class="btn btn-o" id="compSave" disabled onclick="saveFile(window._comp,'compressed_'+Date.now()+'.'+($('#compFmt').value==='jpeg'?'jpg':'webp'))">💾 ذخیره</button>`;
+
+            window.selComp = () => { const inp = fileInp();
+                inp.onchange = (e) => { window._compFile = e.target.files[0];
+                    toast('✅ انتخاب شد'); };
+                inp.click(); };
+            window.doComp = async () => { if (!window._compFile) { toast('⚠️ عکس انتخاب کن'); return; }
+                const fmt = $('#compFmt').value;
+                const q = parseInt($('#compQ').value) / 100;
+                const mime = fmt === 'jpeg' ? 'image/jpeg' : 'image/webp';
+                const { img } = await loadImg(window._compFile);
+                const c = document.createElement('canvas');
+                c.width = img.width;
+                c.height = img.height;
+                c.getContext('2d').drawImage(img, 0, 0);
+                window._comp = c.toDataURL(mime, q);
+                const orig = window._compFile.size;
+                const comp = dataUrlToBlob(window._comp).size;
+                $('#compRes').innerHTML =
+                    `<div style="background:var(--glass);border-radius:10px;padding:12px;margin:10px 0"><p>📦 قبل: ${fmtBytes(orig)} | بعد: ${fmtBytes(comp)}</p><p style="color:var(--green)">✅ ${((1-comp/orig)*100).toFixed(1)}% کاهش</p></div><img src="${window._comp}" style="width:100%;border-radius:10px">`;
+                $('#compSave').disabled = false; };
+        }
+
+        // ==================== TOOL 8: CONVERTER ====================
+        function converter() {
+            $('#toolContent').innerHTML = `
+            <div class="inp"><label>تبدیل به:</label><select id="convFmt"><option value="jpeg">JPG</option><option value="png">PNG</option><option value="webp">WEBP</option></select></div>
+            <button class="btn btn-p" onclick="selConv()">📂 انتخاب عکس</button>
+            <button class="btn btn-s" onclick="doConv()">🔄 تبدیل</button>
+            <div id="convRes"></div>
+            <button class="btn btn-o" id="convSave" disabled onclick="saveFile(window._cv,'converted.'+(document.getElementById('convFmt').value==='jpeg'?'jpg':document.getElementById('convFmt').value))">💾 ذخیره</button>`;
+
+            window.selConv = () => { const inp = fileInp();
+                inp.onchange = (e) => { window._cvFile = e.target.files[0];
+                    toast('✅ انتخاب شد'); };
+                inp.click(); };
+            window.doConv = async () => { if (!window._cvFile) { toast('⚠️ عکس انتخاب کن'); return; }
+                const fmt = $('#convFmt').value;
+                const mime = fmt === 'jpeg' ? 'image/jpeg' : fmt === 'png' ? 'image/png' : 'image/webp';
+                const { img } = await loadImg(window._cvFile);
+                const c = document.createElement('canvas');
+                c.width = img.width;
+                c.height = img.height;
+                c.getContext('2d').drawImage(img, 0, 0);
+                window._cv = c.toDataURL(mime, CFG.quality / 100);
+                $('#convRes').innerHTML =
+                    `<p>📦 قبل: ${fmtBytes(window._cvFile.size)} | بعد: ${fmtBytes(dataUrlToBlob(window._cv).size)}</p><img src="${window._cv}" style="width:100%;border-radius:10px">`;
+                $('#convSave').disabled = false; };
+        }
+
+        // ==================== TOOL 9: RESIZE ====================
+        function resize() {
+            $('#toolContent').innerHTML = `
+            <div class="grid2"><div class="inp"><label>عرض (px):</label><input type="number" id="rW" placeholder="auto"></div><div class="inp"><label>ارتفاع (px):</label><input type="number" id="rH" placeholder="auto"></div></div>
+            <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:8px;margin:8px 0"><input type="checkbox" id="rRatio" checked> حفظ نسبت تصویر</label>
+            <button class="btn btn-p" onclick="selResize()">📂 انتخاب عکس</button>
+            <button class="btn btn-s" onclick="doResize()">📐 تغییر سایز</button>
+            <div id="resizeRes"></div>
+            <button class="btn btn-o" id="resizeSave" disabled onclick="saveFile(window._rs,'resized_'+Date.now()+'.jpg')">💾 ذخیره</button>`;
+
+            window.selResize = () => { const inp = fileInp();
+                inp.onchange = (e) => { window._rsFile = e.target.files[0];
+                    toast('✅ انتخاب شد'); };
+                inp.click(); };
+            window.doResize = async () => { if (!window._rsFile) { toast('⚠️ عکس انتخاب کن'); return; }
+                const { img } = await loadImg(window._rsFile);
+                let w = parseInt($('#rW').value) || img.width;
+                let h = parseInt($('#rH').value) || img.height; if ($('#rRatio').checked) { if (!$('#rW').value) w =
+                        Math.round(img.width * (h / img.height)); if (!$('#rH').value) h = Math.round(img.height * (
+                        w / img.width)); }
+                const c = document.createElement('canvas');
+                c.width = w;
+                c.height = h;
+                const ctx = c.getContext('2d');
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+                ctx.drawImage(img, 0, 0, w, h);
+                window._rs = c.toDataURL('image/jpeg', CFG.quality / 100);
+                $('#resizeRes').innerHTML =
+                    `<p>📐 ${img.width}×${img.height} → <b>${w}×${h}</b></p><img src="${window._rs}" style="width:100%;border-radius:10px">`;
+                $('#resizeSave').disabled = false; };
+        }
+
+        // ==================== TOOL 10: QR GENERATOR ====================
+        function qrgen() {
+            $('#toolContent').innerHTML = `
+            <div class="inp"><label>نوع:</label><select id="qrType" onchange="updQRPH()"><option value="text">متن</option><option value="url">لینک</option><option value="tel">تلفن</option><option value="email">ایمیل</option></select></div>
+            <div class="inp"><label>محتوا:</label><textarea id="qrContent" rows="3" placeholder="متن یا لینک..."></textarea></div>
+            <div class="grid2"><div class="inp"><label>رنگ QR:</label><input type="color" id="qrFG" value="#000000"></div><div class="inp"><label>پس‌زمینه:</label><input type="color" id="qrBG" value="#FFFFFF"></div></div>
+            <div class="rng"><span>اندازه:</span><input type="range" id="qrSize" min="200" max="600" value="300" oninput="$('#qrSizeV').textContent=this.value+'px'"><span class="val" id="qrSizeV">300px</span></div>
+            <button class="btn btn-s" onclick="genQR()">📱 تولید QR</button>
+            <div id="qrGenRes" style="text-align:center;margin:15px 0"></div>
+            <button class="btn btn-o" id="qrSave" disabled onclick="saveFile(window._qrData,'qr_'+Date.now()+'.png','image/png')">💾 ذخیره</button>`;
+
+            window.updQRPH = () => { const ph = { text: 'متن دلخواه...', url: 'https://example.com',
+                    tel: '+989123456789', email: 'email@example.com' };
+                $('#qrContent').placeholder = ph[$('#qrType').value] || ''; };
+            updQRPH();
+            window.genQR = () => { let content = $('#qrContent').value.trim(); if (!content) { toast('⚠️ محتوا وارد کن'); return; }
+                const type = $('#qrType').value; if (type === 'tel') content = 'tel:' + content.replace(/[^+\d]/g,
+                    ''); else if (type === 'email') content = 'mailto:' + content; else if (type === 'url' && !content
+                    .startsWith('http')) content = 'https://' + content;
+                const c = document.createElement('canvas');
+                QRCode.toCanvas(c, content, { width: parseInt($('#qrSize').value), margin: 2, color: { dark: $(
+                        '#qrFG').value, light: $('#qrBG').value } }, (err) => { if (err) { toast(
+                        '❌ خطا'); return; }
+                    $('#qrGenRes').innerHTML = '';
+                    $('#qrGenRes').appendChild(c);
+                    window._qrData = c.toDataURL('image/png');
+                    $('#qrSave').disabled = false; }); };
+        }
+
+        // ==================== TOOL 11: QR SCANNER (با jsQR) ====================
+        function qrscan() {
+            $('#toolContent').innerHTML = `
+            <button class="btn btn-p" onclick="scanCam()">📷 اسکن با دوربین</button>
+            <button class="btn btn-o" onclick="scanImg()">🖼️ اسکن از عکس</button>
+            <div id="qrScanRes" style="text-align:center;margin:15px 0;word-break:break-all"></div>
+            <button class="btn btn-o btn-sm" id="qrCopy" disabled onclick="copyQRR()">📋 کپی</button>
+            <button class="btn btn-o btn-sm" id="qrOpen" disabled onclick="openQR()">🔗 باز کردن</button>`;
+
+            window.scanCam = () => { const modal = $('#globalModal');
+                modal.classList.add('show');
+                $('#globalModalContent').innerHTML =
+                    `<h3 style="text-align:center;margin-bottom:15px">📷 اسکن QR</h3><video id="qrVid" style="width:100%;border-radius:10px" autoplay playsinline></video><canvas id="qrScanC" style="display:none"></canvas><p id="qrScanTxt" style="text-align:center;margin:10px 0;color:var(--text2)">در حال اسکن...</p><button class="btn btn-danger" onclick="stopQR()">❌ بستن</button>`;
+                const video = $('#qrVid');
+                const canvas = $('#qrScanC');
                 const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                
-                if (op === 'watermark') {
-                    ctx.globalAlpha = 0.4;
-                    ctx.font = 'bold 30px Arial';
-                    ctx.fillStyle = '#FFFFFF';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('©', canvas.width/2, canvas.height/2);
-                }
-                
-                const quality = op === 'compress' ? 0.5 : CONFIG.quality / 100;
-                const dataUrl = canvas.toDataURL('image/jpeg', quality);
-                
-                window._batchResults.push({
-                    dataUrl: dataUrl,
-                    name: `batch_${op}_${i+1}_${Date.now()}.jpg`
-                });
-                
-                resultDiv.innerHTML += `<img src="${dataUrl}" style="width:48%;margin:1%;border-radius:8px;display:inline-block;">`;
-                
-                await new Promise(r => setTimeout(r, 200));
-            }
-            
-            progress.style.display = 'none';
-            progressText.style.display = 'none';
-            document.getElementById('batchSaveAll').disabled = false;
-            showToast('✅ پردازش گروهی کامل شد');
-        };
-        
-        window.downloadAllAsZip = async () => {
-            if (!window._batchResults || !window._batchResults.length) return;
-            
-            const zip = new JSZip();
-            for (let item of window._batchResults) {
-                const blob = dataUrlToBlob(item.dataUrl);
-                zip.file(item.name, blob);
-            }
-            
-            const zipBlob = await zip.generateAsync({ type: 'blob' });
-            saveBlob(zipBlob, 'batch_results_' + Date.now() + '.zip');
-        };
-    }
+                let scanning = true; if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }).then(
+                        stream => {
+                            video.srcObject = stream;
+                            video.play();
+                            const scan = () => { if (!scanning) return; if (video.readyState ===
+                                    video.HAVE_ENOUGH_DATA) {
+                                    canvas.width = video.videoWidth;
+                                    canvas.height = video.videoHeight;
+                                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas
+                                        .height);
+                                    const code = jsQR(imageData.data, canvas.width, canvas
+                                    .height); if (code) { scanning = false;
+                                        $('#qrScanTxt').textContent = code.data;
+                                        window._qrResult = code.data;
+                                        $('#qrCopy').disabled = false;
+                                        $('#qrOpen').disabled = !(code.data
+                                            .startsWith('http'));
+                                        stream.getTracks().forEach(t => t.stop());
+                                        toast('✅ شناسایی شد'); } }
+                                requestAnimationFrame(scan); };
+                            scan();
+                        }).catch(() => { $('#qrScanTxt').textContent = '⚠️ دسترسی به دوربین رد شد'; }); } };
+            window.scanImg = () => { const inp = fileInp();
+                inp.onchange = (e) => { const f = e.target.files[0]; if (!f) return;
+                    const r = new FileReader();
+                    r.onload = (ev) => { const img = new Image();
+                        img.onload = () => { const c = document.createElement('canvas');
+                            c.width = img.width;
+                            c.height = img.height;
+                            const ctx = c.getContext('2d');
+                            ctx.drawImage(img, 0, 0);
+                            const id = ctx.getImageData(0, 0, c.width, c.height);
+                            const code = jsQR(id.data, c.width, c.height); if (code) {
+                                $('#qrScanRes').textContent = code.data;
+                                window._qrResult = code.data;
+                                $('#qrCopy').disabled = false;
+                                $('#qrOpen').disabled = !code.data.startsWith(
+                                'http');
+                                toast('✅ شناسایی شد'); } else { toast('❌ QR پیدا نشد'); } };
+                        img.src = ev.target.result; };
+                    r.readAsDataURL(f); };
+                inp.click(); };
+            window.copyQRR = () => { if (window._qrResult) navigator.clipboard.writeText(window._qrResult).then(() =>
+                    toast('📋 کپی شد')); };
+            window.openQR = () => { if (window._qrResult && window._qrResult.startsWith('http')) window.open(window._qrResult,
+                    '_blank'); };
+        }
 
-    // ============================================
-    // شروع
-    // ============================================
-    document.addEventListener('DOMContentLoaded', init);
-    if (typeof cordova !== 'undefined') {
-        document.addEventListener('deviceready', init, false);
-    }
-</script>
+        function stopQR() {
+            $('#globalModal').classList.remove('show');
+            const v = $('#qrVid');
+            if (v && v.srcObject) v.srcObject.getTracks().forEach(t => t.stop());
+        }
+
+        // ==================== TOOL 12: OCR ====================
+        function ocr() {
+            $('#toolContent').innerHTML = `
+            <button class="btn btn-p" onclick="selOCR()">📂 انتخاب عکس</button>
+            <div class="prog" id="ocrProg" style="display:none"><div class="bar" id="ocrBar"></div></div>
+            <div class="ptxt" id="ocrPTxt" style="display:none"></div>
+            <div id="ocrRes"></div>
+            <div class="grid2"><button class="btn btn-o btn-sm" id="ocrCopy" disabled onclick="copyOCR()">📋 کپی</button><button class="btn btn-o btn-sm" id="ocrSave" disabled onclick="saveOCR()">💾 TXT</button></div>`;
+
+            window.selOCR = () => { const inp = fileInp();
+                inp.onchange = async (e) => { const f = e.target.files[0]; if (!f) return;
+                    $('#ocrProg').style.display = 'block';
+                    $('#ocrPTxt').style.display = 'block'; try { const worker = await Tesseract.createWorker();
+                        await worker.loadLanguage('eng+fas');
+                        await worker.initialize('eng+fas');
+                        const { data: { text } } = await worker.recognize(f);
+                        await worker.terminate();
+                        window._ocrText = text.trim() || 'متنی پیدا نشد';
+                        $('#ocrRes').innerHTML =
+                            `<textarea id="ocrTA" style="width:100%;min-height:180px;background:var(--glass);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:14px;resize:vertical">${escapeHtml(window._ocrText)}</textarea>`;
+                        $('#ocrCopy').disabled = false;
+                        $('#ocrSave').disabled = false;
+                        $('#ocrProg').style.display = 'none';
+                        $('#ocrPTxt').style.display = 'none';
+                        toast('✅ متن استخراج شد'); } catch (e) { toast('❌ خطا در OCR');
+                        $('#ocrProg').style.display = 'none';
+                        $('#ocrPTxt').style.display = 'none'; } };
+                inp.click(); };
+            window.copyOCR = () => { const t = $('#ocrTA')?.value || window._ocrText; if (t) navigator.clipboard.writeText(
+                    t).then(() => toast('📋 کپی شد')); };
+            window.saveOCR = () => { const t = $('#ocrTA')?.value || window._ocrText; if (t) saveBlob(new Blob([t], { type: 'text/plain' }),
+                    'ocr_' + Date.now() + '.txt'); };
+        }
+
+        // ==================== TOOL 13: COLOR PICKER ====================
+        function colorpick() {
+            $('#toolContent').innerHTML = `
+            <button class="btn btn-p" onclick="selCP()">📂 انتخاب عکس</button>
+            <canvas id="cpCanvas" style="display:none;max-width:100%;cursor:crosshair;border-radius:10px"></canvas>
+            <div id="cpInfo" style="text-align:center;margin:10px 0"></div>
+            <div class="grid3"><button class="btn btn-o btn-sm" id="cpHex" disabled onclick="cpCopy('hex')">📋 HEX</button><button class="btn btn-o btn-sm" id="cpRgb" disabled onclick="cpCopy('rgb')">📋 RGB</button><button class="btn btn-o btn-sm" id="cpHsl" disabled onclick="cpCopy('hsl')">📋 HSL</button></div>`;
+
+            window.selCP = () => { const inp = fileInp();
+                inp.onchange = (e) => { const f = e.target.files[0]; if (!f) return;
+                    const r = new FileReader();
+                    r.onload = (ev) => { const img = new Image();
+                        img.onload = () => { const canvas = $('#cpCanvas');
+                            canvas.style.display = 'block';
+                            const mw = Math.min(img.width, 350);
+                            const s = mw / img.width;
+                            canvas.width = mw;
+                            canvas.height = img.height * s;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            canvas.onclick = (e2) => { const rect = canvas.getBoundingClientRect();
+                                const x = Math.floor((e2.clientX - rect.left) * (canvas.width /
+                                    rect.width));
+                                const y = Math.floor((e2.clientY - rect.top) * (canvas.height /
+                                    rect.height));
+                                const px = ctx.getImageData(x, y, 1, 1).data;
+                                const [r, g, b] = px;
+                                const hex = '#' + [r, g, b].map(v => v.toString(16).padStart(
+                                    2, '0')).join('');
+                                const hsl = rgbToHsl(r, g, b);
+                                $('#cpInfo').innerHTML =
+                                    `<div style="width:60px;height:60px;background:${hex};border-radius:15px;margin:0 auto;border:3px solid #fff;box-shadow:0 0 20px ${hex}44"></div><p style="margin-top:8px"><b>HEX:</b> ${hex}</p><p><b>RGB:</b> (${r},${g},${b})</p><p><b>HSL:</b> (${hsl.h}°,${hsl.s}%,${hsl.l}%)</p>`;
+                                window._cp = { hex, rgb: `rgb(${r},${g},${b})`,
+                                    hsl: `hsl(${hsl.h},${hsl.s}%,${hsl.l}%)` };
+                                $('#cpHex').disabled = false;
+                                $('#cpRgb').disabled = false;
+                                $('#cpHsl').disabled = false; }; };
+                        img.src = ev.target.result; };
+                    r.readAsDataURL(f); };
+                inp.click(); };
+            window.cpCopy = (type) => { if (window._cp && window._cp[type]) navigator.clipboard.writeText(window._cp[type])
+                    .then(() => toast('📋 کپی شد')); };
+        }
+
+        // ==================== TOOL 14: SCREEN STITCH (Auto Overlap) ====================
+        function screenstitch() {
+            $('#toolContent').innerHTML = `
+            <button class="btn btn-p" onclick="selSS()">📂 انتخاب اسکرین‌شات‌ها</button>
+            <button class="btn btn-s" onclick="doSS()">🖼️ چسباندن هوشمند</button>
+            <div id="ssRes"></div>
+            <button class="btn btn-o" id="ssSave" disabled onclick="saveFile(window._ssRes,'screen_stitch_'+Date.now()+'.jpg')">💾 ذخیره</button>`;
+
+            window.selSS = () => { const inp = fileInp('image/*', true);
+                inp.onchange = (e) => { window._ssFiles = Array.from(e.target.files).filter(f => f.type.startsWith(
+                        'image/')); if (window._ssFiles.length < 2) { toast('⚠️ حداقل ۲ عکس'); return; }
+                    toast('✅ ' + window._ssFiles.length + ' عکس'); };
+                inp.click(); };
+            window.doSS = async () => { if (!window._ssFiles || window._ssFiles.length < 2) { toast('⚠️ حداقل ۲ عکس انتخاب کن'); return; }
+                const imgs = [];
+                for (let f of window._ssFiles) { const { img } = await loadImg(f);
+                    imgs.push(img); }
+                // Auto-detect overlap
+                const overlaps = [0];
+                for (let i = 1; i < imgs.length; i++) {
+                    const prev = imgs[i - 1];
+                    const curr = imgs[i];
+                    const c1 = document.createElement('canvas');
+                    c1.width = prev.width;
+                    c1.height = prev.height;
+                    c1.getContext('2d').drawImage(prev, 0, 0);
+                    const c2 = document.createElement('canvas');
+                    c2.width = curr.width;
+                    c2.height = curr.height;
+                    c2.getContext('2d').drawImage(curr, 0, 0);
+                    const h = Math.min(prev.height, curr.height);
+                    let bestOverlap = 0,
+                        bestScore = Infinity;
+                    for (let o = 10; o < h; o += 5) {
+                        let score = 0;
+                        const d1 = c1.getContext('2d').getImageData(0, prev.height - o, prev.width, Math.min(o, 30));
+                        const d2 = c2.getContext('2d').getImageData(0, 0, curr.width, Math.min(o, 30));
+                        const len = Math.min(d1.data.length, d2.data.length);
+                        for (let j = 0; j < len; j += 4) score += Math.abs(d1.data[j] - d2.data[j]);
+                        if (score < bestScore) { bestScore = score;
+                            bestOverlap = o; }
+                    }
+                    overlaps.push(bestOverlap || 60);
+                }
+                let totalH = imgs[0].height;
+                for (let i = 1; i < imgs.length; i++) totalH += imgs[i].height - overlaps[i];
+                const c = document.createElement('canvas');
+                c.width = imgs[0].width;
+                c.height = totalH;
+                const ctx = c.getContext('2d');
+                ctx.fillStyle = '#FFF';
+                ctx.fillRect(0, 0, c.width, totalH);
+                let y = 0;
+                for (let i = 0; i < imgs.length; i++) { ctx.drawImage(imgs[i], 0, y); if (i < imgs.length - 1) y += imgs[
+                        i].height - overlaps[i + 1];
+                    else y += imgs[i].height; }
+                window._ssRes = c.toDataURL('image/jpeg', CFG.quality / 100);
+                $('#ssRes').innerHTML = `<img src="${window._ssRes}" style="width:100%;border-radius:10px">`;
+                $('#ssSave').disabled = false;
+                toast('✅ چسباندن هوشمند انجام شد'); };
+        }
+
+        // ==================== TOOL 15: BATCH ====================
+        function batch() {
+            $('#toolContent').innerHTML = `
+            <div class="inp"><label>عملیات:</label><select id="bOp"><option value="compress">📦 فشرده‌سازی</option><option value="resize">📐 تغییر سایز (800px)</option><option value="watermark">💧 واترمارک</option><option value="convert">🔄 تبدیل به JPG</option></select></div>
+            <button class="btn btn-p" onclick="selB()">📂 انتخاب تصاویر</button>
+            <button class="btn btn-s" id="bBtn" disabled onclick="doB()">📋 اجرا</button>
+            <div class="prog" id="bProg" style="display:none"><div class="bar" id="bBar"></div></div>
+            <div class="ptxt" id="bPTxt" style="display:none"></div>
+            <div id="bRes"></div>
+            <button class="btn btn-o" id="bZip" disabled onclick="downloadBZip()">📦 دانلود ZIP</button>`;
+
+            window.selB = () => { const inp = fileInp('image/*', true);
+                inp.onchange = (e) => { window._bFiles = Array.from(e.target.files).filter(f => f.type.startsWith(
+                        'image/'));
+                    $('#bBtn').disabled = !window._bFiles.length;
+                    toast('✅ ' + (window._bFiles?.length || 0) + ' عکس'); };
+                inp.click(); };
+            window.doB = async () => { if (!window._bFiles?.length) { toast('⚠️ عکس انتخاب کن'); return; }
+                const op = $('#bOp').value;
+                $('#bProg').style.display = 'block';
+                $('#bPTxt').style.display = 'block';
+                window._bResults = [];
+                $('#bRes').innerHTML = ''; for (let i = 0; i < window._bFiles.length; i++) { const { img } =
+                        await loadImg(window._bFiles[i]);
+                    const c = document.createElement('canvas'); if (op === 'resize') { const r = 800 / img.width;
+                        c.width = 800;
+                        c.height = Math.round(img.height * r); } else { c.width = img.width;
+                        c.height = img.height; }
+                    const ctx = c.getContext('2d');
+                    ctx.drawImage(img, 0, 0, c.width, c.height); if (op === 'watermark') { ctx.globalAlpha = 0.4;
+                        ctx.font = 'bold 30px Arial';
+                        ctx.fillStyle = '#FFF';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('©', c.width / 2, c.height / 2); }
+                    const q = op === 'compress' ? 0.5 : CFG.quality / 100;
+                    const dataUrl = c.toDataURL('image/jpeg', q);
+                    window._bResults.push({ dataUrl, blob: dataUrlToBlob(dataUrl), name: `batch_${i+1}.jpg` });
+                    $('#bRes').innerHTML +=
+                        `<img src="${dataUrl}" style="width:48%;margin:1%;border-radius:8px;display:inline-block">`;
+                    $('#bBar').style.width = ((i + 1) / window._bFiles.length * 100) + '%';
+                    $('#bPTxt').textContent = `${i+1} از ${window._bFiles.length}`;
+                    await new Promise(r => setTimeout(r, 200)); }
+                $('#bProg').style.display = 'none';
+                $('#bPTxt').style.display = 'none';
+                $('#bZip').disabled = false;
+                toast('✅ پردازش گروهی کامل شد'); };
+            window.downloadBZip = async () => { if (!window._bResults?.length) return;
+                const zip = new JSZip();
+                window._bResults.forEach(r => zip.file(r.name, r.blob));
+                const zblob = await zip.generateAsync({ type: 'blob' });
+                saveBlob(zblob, 'batch_' + Date.now() + '.zip'); };
+        }
+
+        // ==================== INIT ====================
+        function init() {
+            renderHome();
+            window.addEventListener('popstate', (e) => {
+                if (e.state && e.state.page === 'tool') navTo('tool', e.state.toolId, false);
+                else if (e.state && e.state.page === 'settings') navTo('settings', null, false);
+                else navTo('home', null, false);
+            });
+            document.addEventListener('backbutton', handleBack, false);
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+        if (typeof cordova !== 'undefined') document.addEventListener('deviceready', init, false);
+    </script>
 </body>
 </html>
