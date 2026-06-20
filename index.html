@@ -1,1874 +1,2340 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
-    <meta name="theme-color" content="#0a0a1a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>تصویریار - ۱۵ ابزار حرفه‌ای پردازش تصویر</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0a14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>تصویریار</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js"></script>
+<style>
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg-deep: #07070f;
+  --bg-dark: #0d0d1a;
+  --bg-card: rgba(255,255,255,0.04);
+  --bg-card-hover: rgba(255,255,255,0.07);
+  --glass: rgba(255,255,255,0.06);
+  --glass-border: rgba(255,255,255,0.10);
+  --accent: #6c63ff;
+  --accent2: #a78bfa;
+  --accent-glow: rgba(108,99,255,0.35);
+  --cyan: #22d3ee;
+  --emerald: #34d399;
+  --rose: #fb7185;
+  --amber: #fbbf24;
+  --text-primary: #f1f0ff;
+  --text-secondary: rgba(241,240,255,0.55);
+  --text-dim: rgba(241,240,255,0.30);
+  --border: rgba(255,255,255,0.08);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-lg: 24px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.5);
+  --font: 'Vazirmatn', system-ui, sans-serif;
+  --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+html, body {
+  height: 100%; overflow: hidden;
+  font-family: var(--font);
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  touch-action: none;
+  user-select: none;
+}
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 2px; }
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js">
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.0/dist/tesseract.min.js">
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js">
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js">
-    </script>
+/* ===== LAYOUT ===== */
+#app { display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
 
-    <style>
-        :root {
-            --bg: #0a0a1a;
-            --bg2: #14142a;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.06);
-            --text: #e0e0f0;
-            --text2: #9999b0;
-            --accent: #6c5ce7;
-            --accent2: #a855f7;
-            --green: #00b894;
-            --red: #ff6b6b;
-            --yellow: #fdcb6e;
-            --radius: 14px;
-            --radius2: 22px;
-        }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Tahoma', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
-        }
-        ::-webkit-scrollbar {
-            width: 0;
-            height: 0;
-        }
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        @keyframes fadeScale {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-        @keyframes pulse {
-            0%,
-            100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.04);
-            }
-        }
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-        .app {
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 8px 10px 30px;
-            min-height: 100vh;
-        }
-        .page {
-            display: none;
-            animation: fadeScale 0.3s ease;
-            padding-bottom: 20px;
-        }
-        .page.active {
-            display: block;
-        }
+/* ===== HEADER ===== */
+#header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px; height: 56px;
+  background: rgba(13,13,26,0.85);
+  backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0; z-index: 100;
+}
+#logo { display: flex; align-items: center; gap: 8px; }
+#logo svg { width: 28px; height: 28px; }
+#logo-text { font-size: 18px; font-weight: 800; background: linear-gradient(135deg, var(--accent2), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+#header-actions { display: flex; gap: 8px; }
+.icon-btn {
+  width: 36px; height: 36px; border-radius: var(--radius-sm);
+  background: var(--glass); border: 1px solid var(--glass-border);
+  color: var(--text-secondary); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition); font-size: 16px;
+}
+.icon-btn:hover { background: var(--bg-card-hover); color: var(--text-primary); }
+.icon-btn:active { transform: scale(0.93); }
 
-        /* Header */
-        .header {
-            background: var(--glass);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border: 1px solid var(--border);
-            border-radius: var(--radius2);
-            padding: 18px;
-            margin: 12px 0;
-            text-align: center;
-        }
-        .header .logo {
-            font-size: 44px;
-            animation: pulse 3s infinite;
-        }
-        .header h1 {
-            font-size: 22px;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 4px 0;
-        }
-        .header .sub {
-            font-size: 12px;
-            color: var(--text2);
-        }
+/* ===== MAIN CONTENT ===== */
+#main { display: flex; flex: 1; overflow: hidden; }
 
-        /* Toolbar */
-        .toolbar {
-            background: var(--glass);
-            backdrop-filter: blur(30px);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 10px 14px;
-            margin: 10px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            position: sticky;
-            top: 8px;
-            z-index: 100;
-        }
-        .toolbar .back {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--accent);
-            border: none;
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .toolbar .title {
-            font-size: 16px;
-            font-weight: 600;
-            flex: 1;
-            text-align: center;
-        }
+/* ===== SIDEBAR (tool list) ===== */
+#sidebar {
+  width: 72px; background: rgba(13,13,26,0.9);
+  backdrop-filter: blur(24px);
+  border-left: 1px solid var(--border);
+  display: flex; flex-direction: column; align-items: center;
+  padding: 8px 0; gap: 4px; overflow-y: auto; flex-shrink: 0;
+}
+.tool-btn {
+  width: 56px; height: 56px; border-radius: var(--radius-sm);
+  background: transparent; border: 1px solid transparent;
+  color: var(--text-dim); cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; transition: var(--transition); padding: 4px;
+}
+.tool-btn:hover { background: var(--glass); color: var(--text-secondary); }
+.tool-btn.active {
+  background: var(--accent-glow); border-color: var(--accent);
+  color: var(--accent2);
+}
+.tool-btn svg { width: 22px; height: 22px; }
+.tool-btn span { font-size: 9px; font-weight: 600; line-height: 1; }
 
-        /* Search & Categories */
-        .search {
-            margin: 10px 0;
-        }
-        .search input {
-            width: 100%;
-            padding: 12px 18px;
-            background: var(--glass);
-            border: 1px solid var(--border);
-            border-radius: 30px;
-            color: var(--text);
-            font-size: 14px;
-            outline: none;
-        }
-        .search input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 20px rgba(108, 92, 231, 0.2);
-        }
-        .cats {
-            display: flex;
-            gap: 7px;
-            margin: 10px 0;
-            overflow-x: auto;
-            padding: 2px 0;
-        }
-        .cats::-webkit-scrollbar {
-            height: 0;
-        }
-        .cat-btn {
-            padding: 8px 16px;
-            border: 1px solid var(--border);
-            background: var(--glass);
-            color: var(--text2);
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 12px;
-            white-space: nowrap;
-            transition: 0.2s;
-        }
-        .cat-btn.active {
-            background: var(--accent);
-            color: #fff;
-            border-color: var(--accent);
-        }
+/* ===== CONTENT AREA ===== */
+#content { flex: 1; overflow: hidden; position: relative; }
 
-        /* Stats */
-        .stats {
-            display: flex;
-            gap: 7px;
-            margin: 10px 0;
-            flex-wrap: wrap;
-        }
-        .stat {
-            background: var(--glass);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 6px 12px;
-            font-size: 11px;
-            color: var(--text2);
-            cursor: pointer;
-        }
+/* ===== PANELS (each tool view) ===== */
+.panel { display: none; flex-direction: column; height: 100%; }
+.panel.active { display: flex; }
 
-        /* Tools Grid */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin: 14px 0;
-        }
-        .card {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 18px 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.2s;
-            animation: fadeUp 0.4s ease backwards;
-        }
-        .card:active {
-            transform: scale(0.95);
-            border-color: var(--accent);
-        }
-        .card .icon {
-            font-size: 34px;
-            margin-bottom: 8px;
-        }
-        .card .name {
-            font-size: 13px;
-            font-weight: 600;
-        }
-        .card .desc {
-            font-size: 11px;
-            color: var(--text2);
-        }
+/* ===== HOME PANEL ===== */
+#home-panel {
+  overflow-y: auto; padding: 16px;
+  background: radial-gradient(ellipse at 20% 0%, rgba(108,99,255,0.12) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 80%, rgba(34,211,238,0.07) 0%, transparent 50%);
+}
+.home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.home-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 12px;
+  cursor: pointer; transition: var(--transition);
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  text-align: center; position: relative; overflow: hidden;
+}
+.home-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, transparent, rgba(108,99,255,0.05));
+  opacity: 0; transition: var(--transition);
+}
+.home-card:hover { border-color: var(--glass-border); background: var(--bg-card-hover); transform: translateY(-2px); }
+.home-card:hover::before { opacity: 1; }
+.home-card:active { transform: scale(0.97); }
+.card-icon {
+  width: 52px; height: 52px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center; font-size: 24px;
+}
+.card-title { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.card-sub { font-size: 11px; color: var(--text-dim); }
 
-        /* Buttons */
-        .btn {
-            width: 100%;
-            padding: 13px;
-            border: none;
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            margin: 5px 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 7px;
-            transition: 0.2s;
-        }
-        .btn:active {
-            transform: scale(0.96);
-        }
-        .btn:disabled {
-            opacity: 0.45;
-            pointer-events: none;
-        }
-        .btn-p {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: #fff;
-            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.3);
-        }
-        .btn-s {
-            background: linear-gradient(135deg, #00b894, #00cec9);
-            color: #fff;
-        }
-        .btn-o {
-            background: transparent;
-            border: 2px solid var(--accent);
-            color: var(--accent);
-        }
-        .btn-sm {
-            padding: 8px 14px;
-            font-size: 12px;
-            width: auto;
-            display: inline-flex;
-        }
+/* ===== TOOL PANEL HEADER ===== */
+.panel-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; border-bottom: 1px solid var(--border);
+  background: rgba(13,13,26,0.7); backdrop-filter: blur(16px);
+  flex-shrink: 0;
+}
+.back-btn {
+  width: 34px; height: 34px; border-radius: 10px;
+  background: var(--glass); border: 1px solid var(--glass-border);
+  color: var(--text-secondary); cursor: pointer; font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition);
+}
+.back-btn:active { transform: scale(0.9); }
+.panel-title { font-size: 16px; font-weight: 700; }
 
-        /* Inputs */
-        .inp {
-            margin: 10px 0;
-        }
-        .inp label {
-            display: block;
-            font-size: 12px;
-            color: var(--text2);
-            margin-bottom: 5px;
-        }
-        .inp input,
-        .inp select,
-        .inp textarea {
-            width: 100%;
-            padding: 11px 14px;
-            background: var(--glass);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            color: var(--text);
-            font-size: 14px;
-            outline: none;
-        }
-        .inp input:focus,
-        .inp select:focus,
-        .inp textarea:focus {
-            border-color: var(--accent);
-        }
+/* ===== UPLOAD ZONE ===== */
+.upload-zone {
+  margin: 16px; border: 2px dashed var(--border); border-radius: var(--radius);
+  padding: 32px 16px; text-align: center; cursor: pointer;
+  transition: var(--transition); position: relative;
+  background: var(--bg-card);
+}
+.upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: var(--accent-glow); }
+.upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.upload-icon { font-size: 40px; margin-bottom: 8px; }
+.upload-text { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.upload-sub { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
 
-        /* Range */
-        .rng {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 10px 0;
-        }
-        .rng input[type=range] {
-            flex: 1;
-            height: 6px;
-            border-radius: 3px;
-            background: var(--border);
-            -webkit-appearance: none;
-            outline: none;
-        }
-        .rng input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: var(--accent);
-            cursor: pointer;
-        }
-        .rng .val {
-            min-width: 45px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 13px;
-        }
+/* ===== BUTTONS ===== */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 18px; border-radius: var(--radius-sm);
+  font-family: var(--font); font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: var(--transition); border: none;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff; box-shadow: 0 4px 20px var(--accent-glow);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 28px var(--accent-glow); }
+.btn-primary:active { transform: scale(0.97); }
+.btn-secondary {
+  background: var(--glass); border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+}
+.btn-secondary:hover { background: var(--bg-card-hover); }
+.btn-danger { background: rgba(251,113,133,0.15); border: 1px solid rgba(251,113,133,0.3); color: var(--rose); }
+.btn-sm { padding: 7px 12px; font-size: 12px; border-radius: 8px; }
+.btn-full { width: 100%; }
 
-        /* Preview */
-        .prev {
-            background: rgba(0, 0, 0, 0.3);
-            border: 2px dashed var(--border);
-            border-radius: var(--radius);
-            padding: 14px;
-            margin: 10px 0;
-            min-height: 90px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            justify-content: center;
-            align-items: center;
-            max-height: 280px;
-            overflow-y: auto;
-        }
-        .prev img {
-            height: 70px;
-            border-radius: 8px;
-            border: 2px solid var(--border);
-            cursor: pointer;
-        }
+/* ===== SLIDER ===== */
+.slider-wrap { display: flex; flex-direction: column; gap: 4px; }
+.slider-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); }
+.slider-label span:last-child { font-weight: 700; color: var(--accent2); }
+input[type=range] {
+  -webkit-appearance: none; width: 100%; height: 4px;
+  background: var(--glass-border); border-radius: 2px; outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--accent2); border: 2px solid var(--bg-dark);
+  box-shadow: 0 0 8px var(--accent-glow); cursor: pointer;
+}
 
-        /* Comparison */
-        .comp {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 14px 0;
-        }
-        .comp div {
-            text-align: center;
-        }
-        .comp img {
-            width: 100%;
-            border-radius: var(--radius);
-            border: 2px solid var(--border);
-        }
-        .comp .lbl {
-            font-size: 11px;
-            color: var(--text2);
-            margin-top: 4px;
-        }
+/* ===== SELECT ===== */
+select {
+  background: var(--glass); border: 1px solid var(--glass-border);
+  color: var(--text-primary); padding: 8px 12px; border-radius: var(--radius-sm);
+  font-family: var(--font); font-size: 13px; width: 100%; outline: none;
+  -webkit-appearance: none; cursor: pointer;
+}
+select:focus { border-color: var(--accent); }
 
-        /* Progress */
-        .prog {
-            height: 5px;
-            background: var(--border);
-            border-radius: 3px;
-            margin: 10px 0;
-            overflow: hidden;
-        }
-        .prog .bar {
-            height: 100%;
-            background: var(--accent);
-            border-radius: 3px;
-            width: 0%;
-            transition: width 0.3s;
-        }
-        .ptxt {
-            font-size: 12px;
-            color: var(--text2);
-            text-align: center;
-        }
+/* ===== INPUT ===== */
+input[type=text], input[type=number], textarea {
+  background: var(--glass); border: 1px solid var(--glass-border);
+  color: var(--text-primary); padding: 8px 12px; border-radius: var(--radius-sm);
+  font-family: var(--font); font-size: 13px; width: 100%; outline: none;
+}
+input[type=text]:focus, input[type=number]:focus, textarea:focus { border-color: var(--accent); }
+textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
 
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%) translateY(120px);
-            background: rgba(0, 0, 0, 0.92);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            color: #fff;
-            padding: 12px 22px;
-            border-radius: 25px;
-            font-size: 13px;
-            z-index: 9999;
-            pointer-events: none;
-            transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-        }
+/* ===== LABEL ===== */
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
 
-        /* Cleaner Toolbar (ibisPaint style) */
-        .clean-toolbar {
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin: 8px 0;
-            position: sticky;
-            bottom: 8px;
-            z-index: 50;
-        }
-        .clean-toolbar button {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            border: 1px solid var(--border);
-            background: var(--glass);
-            color: var(--text);
-            cursor: pointer;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
-        }
-        .clean-toolbar button:active {
-            background: var(--accent);
-            color: #fff;
-        }
-        .clean-toolbar .active-tool {
-            background: var(--accent);
-            color: #fff;
-            border-color: var(--accent);
-        }
-        .clean-toolbar .brush-preview {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            border: 2px solid var(--text);
-            flex-shrink: 0;
-        }
-        .clean-canvas-wrap {
-            position: relative;
-            overflow: hidden;
-            border-radius: var(--radius);
-            border: 2px solid var(--border);
-            margin: 8px 0;
-            background: #111;
-            touch-action: none;
-            cursor: crosshair;
-        }
-        .clean-canvas-wrap canvas {
-            display: block;
-            transform-origin: 0 0;
-        }
-        .zoom-indicator {
-            position: absolute;
-            bottom: 8px;
-            right: 8px;
-            background: rgba(0, 0, 0, 0.7);
-            color: #fff;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            pointer-events: none;
-        }
+/* ===== TABS ===== */
+.tabs { display: flex; gap: 4px; padding: 4px; background: var(--glass); border-radius: var(--radius-sm); }
+.tab {
+  flex: 1; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 700;
+  font-family: var(--font); cursor: pointer; border: none;
+  background: transparent; color: var(--text-dim); transition: var(--transition);
+}
+.tab.active { background: var(--accent); color: #fff; }
 
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 9000;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal.show {
-            display: flex;
-        }
-        .modal-box {
-            background: var(--bg2);
-            border-radius: var(--radius2);
-            padding: 20px;
-            max-width: 92%;
-            max-height: 85vh;
-            overflow-y: auto;
-        }
+/* ===== PROGRESS ===== */
+.progress-bar {
+  width: 100%; height: 6px; background: var(--glass);
+  border-radius: 3px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--accent), var(--cyan));
+  border-radius: 3px; transition: width 0.3s ease;
+}
 
-        /* Color dots */
-        .colors {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin: 8px 0;
-        }
-        .color-dot {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 3px solid transparent;
-            transition: 0.2s;
-        }
-        .color-dot.active {
-            border-color: #fff;
-            box-shadow: 0 0 14px rgba(255, 255, 255, 0.5);
-        }
+/* ===== TOAST ===== */
+#toast-container {
+  position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; gap: 8px; z-index: 9999;
+  pointer-events: none; width: calc(100% - 32px); max-width: 360px;
+}
+.toast {
+  padding: 12px 16px; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 600;
+  backdrop-filter: blur(16px); animation: toastIn 0.3s ease;
+  display: flex; align-items: center; gap: 8px;
+}
+.toast.success { background: rgba(52,211,153,0.2); border: 1px solid rgba(52,211,153,0.3); color: var(--emerald); }
+.toast.error { background: rgba(251,113,133,0.2); border: 1px solid rgba(251,113,133,0.3); color: var(--rose); }
+.toast.info { background: rgba(108,99,255,0.2); border: 1px solid rgba(108,99,255,0.3); color: var(--accent2); }
+@keyframes toastIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
-        .grid2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-        .grid3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 6px;
-        }
-        .settings-section {
-            background: var(--glass);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 14px;
-            margin: 10px 0;
-        }
-        .settings-section h3 {
-            font-size: 14px;
-            color: var(--accent);
-            margin-bottom: 8px;
-        }
-        @media (max-width: 360px) {
-            .grid {
-                gap: 7px;
-            }
-            .card {
-                padding: 14px 8px;
-            }
-            .card .icon {
-                font-size: 28px;
-            }
-        }
-    </style>
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px); z-index: 500;
+  display: flex; align-items: flex-end; justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+.modal-overlay.hidden { display: none; }
+.modal {
+  background: var(--bg-dark); border: 1px solid var(--border);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  width: 100%; max-width: 480px; padding: 20px 16px 32px;
+  animation: slideUp 0.3s ease; max-height: 85vh; overflow-y: auto;
+}
+.modal-handle { width: 40px; height: 4px; background: var(--glass-border); border-radius: 2px; margin: 0 auto 16px; }
+.modal-title { font-size: 16px; font-weight: 800; margin-bottom: 16px; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* ===== LOADER ===== */
+.loader {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; padding: 40px;
+}
+.spinner {
+  width: 40px; height: 40px; border: 3px solid var(--glass-border);
+  border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loader-text { font-size: 13px; color: var(--text-secondary); }
+
+/* ===== CHIP ===== */
+.chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+  background: var(--glass); border: 1px solid var(--glass-border);
+}
+.chip.success { background: rgba(52,211,153,0.1); border-color: rgba(52,211,153,0.25); color: var(--emerald); }
+.chip.error { background: rgba(251,113,133,0.1); border-color: rgba(251,113,133,0.25); color: var(--rose); }
+
+/* ===== DIVIDER ===== */
+.divider { height: 1px; background: var(--border); margin: 12px 0; }
+
+/* ===== INFO ROW ===== */
+.info-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
+.info-row .k { font-size: 12px; color: var(--text-dim); }
+.info-row .v { font-size: 12px; font-weight: 700; color: var(--text-primary); }
+
+/* ===== COLOR PICKER ===== */
+input[type=color] {
+  width: 36px; height: 36px; padding: 2px; border-radius: 8px;
+  border: 2px solid var(--glass-border); cursor: pointer; background: var(--glass);
+}
+
+/* ===== CANVAS WRAPPER ===== */
+.canvas-wrapper {
+  flex: 1; overflow: hidden; position: relative;
+  background: repeating-conic-gradient(rgba(255,255,255,0.03) 0% 25%, transparent 0% 50%) 0 0 / 20px 20px;
+}
+#eraser-canvas { touch-action: none; position: absolute; top: 0; left: 0; }
+
+/* ===== ERASER BOTTOM BAR ===== */
+#eraser-bottom {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px; background: rgba(13,13,26,0.9);
+  backdrop-filter: blur(16px); border-top: 1px solid var(--border); flex-shrink: 0;
+}
+#eraser-bottom .slider-wrap { flex: 1; }
+
+/* ===== ERASER TOP BAR ===== */
+#eraser-top {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; background: rgba(13,13,26,0.85);
+  backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+#eraser-zoom-info {
+  font-size: 11px; font-weight: 700; color: var(--accent2);
+  background: var(--glass); padding: 4px 8px; border-radius: 6px;
+  min-width: 52px; text-align: center;
+}
+
+/* ===== PREVIEW IMAGE ===== */
+.preview-img { max-width: 100%; border-radius: var(--radius-sm); display: block; }
+
+/* ===== RESULT CARD ===== */
+.result-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+}
+.result-card img { width: 100%; display: block; }
+.result-card-actions {
+  display: flex; gap: 8px; padding: 10px;
+}
+
+/* ===== SPLIT GRID ===== */
+#split-grid { display: grid; gap: 10px; padding: 16px; overflow-y: auto; flex: 1; }
+
+/* ===== QR RESULT ===== */
+#qr-result-box {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px; margin: 16px;
+}
+
+/* ===== COLOR PIXEL DISPLAY ===== */
+#pixel-display {
+  width: 80px; height: 80px; border-radius: var(--radius-sm);
+  border: 3px solid var(--glass-border); flex-shrink: 0;
+}
+#pixel-canvas-wrap { position: relative; cursor: crosshair; }
+#pixel-crosshair {
+  position: absolute; pointer-events: none;
+  width: 20px; height: 20px; border: 2px solid #fff;
+  border-radius: 50%; transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 1px #000; display: none;
+}
+
+/* ===== SECTION TITLE ===== */
+.section-title {
+  font-size: 11px; font-weight: 800; color: var(--text-dim);
+  text-transform: uppercase; letter-spacing: 1.2px;
+  margin-bottom: 10px;
+}
+
+/* ===== TOOL CONTENT SCROLL ===== */
+.tool-scroll { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+
+/* ===== BOTTOM NAV ===== */
+#bottom-nav { display: none; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+  #sidebar { display: none; }
+  #bottom-nav {
+    display: flex; height: 60px; background: rgba(13,13,26,0.95);
+    backdrop-filter: blur(24px); border-top: 1px solid var(--border);
+    align-items: center; justify-content: space-around; flex-shrink: 0;
+  }
+  .nav-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 6px 10px; border-radius: 10px; border: none;
+    background: transparent; color: var(--text-dim); cursor: pointer; font-family: var(--font);
+    font-size: 9px; font-weight: 700; transition: var(--transition);
+  }
+  .nav-btn svg { width: 20px; height: 20px; }
+  .nav-btn.active { color: var(--accent2); }
+  .home-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (min-width: 481px) {
+  #bottom-nav { display: none !important; }
+  #sidebar { display: flex !important; }
+}
+
+/* ===== WATERMARK POSITION GRID ===== */
+.position-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+}
+.pos-btn {
+  aspect-ratio: 1; border-radius: 8px; border: 1px solid var(--glass-border);
+  background: var(--glass); cursor: pointer; transition: var(--transition);
+  display: flex; align-items: center; justify-content: center; font-size: 10px;
+  color: var(--text-dim);
+}
+.pos-btn.active { border-color: var(--accent); background: var(--accent-glow); color: var(--accent2); }
+
+/* ===== OCR TEXT BOX ===== */
+#ocr-output {
+  width: 100%; min-height: 120px; background: var(--glass);
+  border: 1px solid var(--glass-border); border-radius: var(--radius-sm);
+  padding: 12px; font-family: var(--font); font-size: 13px;
+  color: var(--text-primary); direction: rtl; line-height: 1.8; resize: vertical;
+}
+
+/* ===== BRUSH CURSOR ===== */
+#brush-cursor {
+  position: absolute; border: 2px solid rgba(255,255,255,0.8);
+  border-radius: 50%; pointer-events: none; z-index: 10; display: none;
+  box-shadow: 0 0 4px rgba(0,0,0,0.5);
+  transform: translate(-50%, -50%);
+}
+
+/* ===== BEFORE/AFTER TOGGLE ===== */
+.before-after-wrap { position: relative; }
+.before-after-wrap canvas, .before-after-wrap img { border-radius: var(--radius-sm); display: block; width: 100%; }
+.before-label, .after-label {
+  position: absolute; top: 8px; font-size: 10px; font-weight: 800;
+  padding: 3px 8px; border-radius: 6px; background: rgba(0,0,0,0.6); color: #fff;
+}
+.before-label { right: 8px; }
+.after-label { left: 8px; }
+
+/* ===== STACK GAP ===== */
+.stack { display: flex; flex-direction: column; gap: 10px; }
+.row { display: flex; gap: 8px; align-items: center; }
+.row > * { flex: 1; }
+</style>
 </head>
 <body>
-    <div class="app" id="app">
-        <div class="page active" id="page-home"></div>
-        <div class="page" id="page-tool"></div>
-        <div class="page" id="page-settings"></div>
+<div id="app">
+  <!-- HEADER -->
+  <header id="header">
+    <div id="logo">
+      <svg viewBox="0 0 36 36" fill="none">
+        <rect width="36" height="36" rx="10" fill="url(#lg1)"/>
+        <path d="M8 26l7-9 5 6 4-5 4 8H8z" fill="rgba(255,255,255,0.9)"/>
+        <circle cx="24" cy="12" r="3" fill="rgba(255,255,255,0.9)"/>
+        <defs><linearGradient id="lg1" x1="0" y1="0" x2="36" y2="36"><stop stop-color="#6c63ff"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs>
+      </svg>
+      <span id="logo-text">تصویریار</span>
     </div>
-    <div class="toast" id="toast"></div>
-    <div class="modal" id="globalModal"><div class="modal-box" id="globalModalContent"></div></div>
+    <div id="header-actions">
+      <button class="icon-btn" title="اطلاعات" onclick="showAbout()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      </button>
+    </div>
+  </header>
 
-    <script src="cordova.js"></script>
-    <script>
-        // ============================================
-        // تصویریار - ۱۵ ابزار حرفه‌ای پردازش تصویر
-        // نسخه ۳.۰ - Production Ready
-        // ============================================
+  <div id="main">
+    <!-- SIDEBAR -->
+    <nav id="sidebar">
+      <button class="tool-btn active" data-panel="home" onclick="showPanel('home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+        <span>خانه</span>
+      </button>
+      <button class="tool-btn" data-panel="eraser" onclick="showPanel('eraser')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20H7L3 16l10-10 7 7-3.5 3.5"/><path d="M6.1 11.9L10 16"/></svg>
+        <span>پاک‌کن</span>
+      </button>
+      <button class="tool-btn" data-panel="enhance" onclick="showPanel('enhance')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M11 8v6M8 11h6"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span>بهبود</span>
+      </button>
+      <button class="tool-btn" data-panel="split" onclick="showPanel('split')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="8" height="18" rx="1"/><rect x="13" y="3" width="8" height="18" rx="1"/></svg>
+        <span>تقسیم</span>
+      </button>
+      <button class="tool-btn" data-panel="stitch" onclick="showPanel('stitch')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="7" rx="1"/><rect x="3" y="14" width="18" height="7" rx="1"/><line x1="12" y1="10" x2="12" y2="14"/></svg>
+        <span>چسباندن</span>
+      </button>
+      <button class="tool-btn" data-panel="pdf" onclick="showPanel('pdf')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        <span>PDF</span>
+      </button>
+      <button class="tool-btn" data-panel="ocr" onclick="showPanel('ocr')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 00-2 2v4"/><path d="M15 3h4a2 2 0 012 2v4"/><path d="M3 15v4a2 2 0 002 2h4"/><path d="M15 21h4a2 2 0 002-2v-4"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="12" y1="9" x2="12" y2="15"/></svg>
+        <span>OCR</span>
+      </button>
+      <button class="tool-btn" data-panel="qr" onclick="showPanel('qr')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="5" height="5"/><rect x="16" y="3" width="5" height="5"/><rect x="3" y="16" width="5" height="5"/><path d="M21 16h-3v3M21 21v0M16 16h.01M14 11h7v2h-4v4"/><path d="M3 11h8"/><line x1="3" y1="14" x2="3" y2="14"/><line x1="7" y1="14" x2="7" y2="14"/></svg>
+        <span>QR</span>
+      </button>
+      <button class="tool-btn" data-panel="resize" onclick="showPanel('resize')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+        <span>سایز</span>
+      </button>
+      <button class="tool-btn" data-panel="watermark" onclick="showPanel('watermark')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4,7 4,4 20,4 20,7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+        <span>واترمارک</span>
+      </button>
+      <button class="tool-btn" data-panel="compress" onclick="showPanel('compress')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="8,17 12,21 16,17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0018 9h-1.26A8 8 0 103 16.29"/></svg>
+        <span>فشرده</span>
+      </button>
+      <button class="tool-btn" data-panel="batch" onclick="showPanel('batch')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.67 19.79 19.79 0 01.22 2.18 2 2 0 012.18 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.91 7.91"/><rect x="9" y="9" width="13" height="13" rx="2"/></svg>
+        <span>گروهی</span>
+      </button>
+      <button class="tool-btn" data-panel="colorpick" onclick="showPanel('colorpick')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        <span>رنگ</span>
+      </button>
+    </nav>
 
-        // ==================== CONFIG ====================
-        const CFG = {
-            saveFolder: localStorage.getItem('iy_save') || 'Download',
-            quality: parseInt(localStorage.getItem('iy_qual') || '90'),
-            theme: localStorage.getItem('iy_theme') || 'dark'
-        };
+    <!-- CONTENT -->
+    <div id="content">
 
-        // ==================== STATE ====================
-        const S = {
-            page: 'home',
-            tool: null,
-            history: ['home'],
-            stats: JSON.parse(localStorage.getItem('iy_stats') || '{}'),
-            recent: JSON.parse(localStorage.getItem('iy_recent') || '[]'),
-            listeners: []
-        };
+      <!-- HOME PANEL -->
+      <div id="home-panel" class="panel active">
+        <div class="home-grid" style="padding:14px;margin-top:4px;">
+          <div class="home-card" onclick="showPanel('eraser')">
+            <div class="card-icon" style="background:linear-gradient(135deg,#6c63ff22,#6c63ff44)">🖌️</div>
+            <div class="card-title">پاک‌کن هوشمند</div>
+            <div class="card-sub">حذف اشیاء</div>
+          </div>
+          <div class="home-card" onclick="showPanel('enhance')">
+            <div class="card-icon" style="background:linear-gradient(135deg,#22d3ee22,#22d3ee44)">✨</div>
+            <div class="card-title">بهبود تصویر</div>
+            <div class="card-sub">شارپن، کنتراست</div>
+          </div>
+          <div class="home-card" onclick="showPanel('split')">
+            <div class="card-icon" style="background:linear-gradient(135deg,#34d39922,#34d39944)">✂️</div>
+            <div class="card-title">تقسیم تصویر</div>
+            <div class="card-sub">برش به قسمت‌ها</div>
+          </div>
+          <div class="home-card" onclick="showPanel('stitch')">
+            <div class="card-icon" style="background:linear-gradient(135deg,#fbbf2422,#fbbf2444)">🔗</div>
+            <div class="card-title">چسباندن</div>
+            <div class="card-sub">اسکرین‌شات بلند</div>
+          </div>
+          <div class="home-card" onclick="showPanel('pdf')">
+            <div class="card-icon" style="background:linear-gradient(135deg,#fb718522,#fb718544)">📄</div>
+            <div class="card-title">ساخت PDF</div>
+            <div class="card-sub">بدون فاصله</div>
+          </div>
+          <div class="home-card" onclick="showPanel('ocr')">
+            <div class="card-icon" style="background:linear-gradient(135deg,#a78bfa22,#a78bfa44)">🔤</div>
+            <div class="card-title">OCR</div>
+            <div class="card-sub">استخراج متن</div>
+          </div>
+          <div class="home-card" onclick="showPanel('qr')">
+            <div class="card-icon" style="background:linear-gradient(135deg,#22d3ee22,#6c63ff33)">📷</div>
+            <div class="card-title">QR Scanner</div>
+            <div class="card-sub">اسکن کد QR</div>
+          </div>
+          <div class="home-card" onclick="showPanel('resize')">
+            <div class="card-icon" style="background:linear-gradient(135deg,#34d39922,#22d3ee33)">📐</div>
+            <div class="card-title">تغییر سایز</div>
+            <div class="card-sub">ابعاد و درصد</div>
+          </div>
+          <div class="home-card" onclick="showPanel('watermark')">
+            <div class="card-icon" style="background:linear-gradient(135deg,#fbbf2422,#fb718533)">💧</div>
+            <div class="card-title">واترمارک</div>
+            <div class="card-sub">متن یا تصویر</div>
+          </div>
+          <div class="home-card" onclick="showPanel('compress')">
+            <div class="card-icon" style="background:linear-gradient(135deg,#6c63ff22,#34d39933)">📦</div>
+            <div class="card-title">فشرده‌سازی</div>
+            <div class="card-sub">کاهش حجم</div>
+          </div>
+          <div class="home-card" onclick="showPanel('batch')">
+            <div class="card-icon" style="background:linear-gradient(135deg,#a78bfa22,#22d3ee33)">⚡</div>
+            <div class="card-title">پردازش گروهی</div>
+            <div class="card-sub">چند تصویر</div>
+          </div>
+          <div class="home-card" onclick="showPanel('colorpick')">
+            <div class="card-icon" style="background:linear-gradient(135deg,#fb718522,#a78bfa33)">🎨</div>
+            <div class="card-title">انتخاب رنگ</div>
+            <div class="card-sub">HEX، RGB، HSL</div>
+          </div>
+        </div>
+      </div>
 
-        // ==================== UTILS ====================
-        const $ = (s, p) => (p || document).querySelector(s);
-        const $$ = (s, p) => (p || document).querySelectorAll(s);
+      <!-- ERASER PANEL -->
+      <div id="eraser-panel" class="panel" style="flex-direction:column;">
+        <div class="panel-header">
+          <button class="back-btn" onclick="showPanel('home')">←</button>
+          <span class="panel-title">پاک‌کن هوشمند</span>
+          <div style="flex:1"></div>
+          <div id="eraser-zoom-info">100%</div>
+        </div>
+        <div id="eraser-top" style="display:none;">
+          <button class="btn btn-secondary btn-sm" onclick="eraserUndo()" title="Undo">↩ واگرد</button>
+          <button class="btn btn-secondary btn-sm" onclick="eraserRedo()" title="Redo">↪ ازسر</button>
+          <div style="flex:1"></div>
+          <button class="btn btn-secondary btn-sm" onclick="eraserReset()">↺ بازنشانی</button>
+        </div>
+        <div class="canvas-wrapper" id="eraser-canvas-wrap">
+          <div id="eraser-upload-zone" class="upload-zone" style="margin:0;border:none;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:0;">
+            <input type="file" accept="image/*" onchange="loadEraserImage(this)">
+            <div class="upload-icon">🖌️</div>
+            <div class="upload-text">تصویر را انتخاب کنید</div>
+            <div class="upload-sub">برای پاک کردن قسمت‌های ناخواسته</div>
+          </div>
+          <canvas id="eraser-canvas" style="display:none;"></canvas>
+          <div id="brush-cursor"></div>
+        </div>
+        <div id="eraser-bottom" style="display:none;">
+          <div class="slider-wrap">
+            <div class="slider-label"><span>اندازه</span><span id="brush-size-val">30</span></div>
+            <input type="range" id="brush-size" min="1" max="200" value="30" oninput="updateBrush()">
+          </div>
+          <div class="slider-wrap">
+            <div class="slider-label"><span>شفافیت</span><span id="brush-opacity-val">100%</span></div>
+            <input type="range" id="brush-opacity" min="1" max="100" value="100" oninput="updateBrush()">
+          </div>
+          <div class="slider-wrap">
+            <div class="slider-label"><span>سختی</span><span id="brush-hard-val">80%</span></div>
+            <input type="range" id="brush-hard" min="0" max="100" value="80" oninput="updateBrush()">
+          </div>
+          <input type="color" id="brush-color" value="#000000" title="رنگ براش" style="display:none;">
+          <button class="btn btn-primary btn-sm" onclick="saveEraserResult()">💾</button>
+        </div>
+      </div>
 
-        function toast(msg, dur = 2800) {
-            const t = $('#toast');
-            t.textContent = msg;
-            t.classList.add('show');
-            clearTimeout(window._tt);
-            window._tt = setTimeout(() => t.classList.remove('show'), dur);
-        }
-
-        function fmtBytes(b) {
-            if (!b) return '0 B';
-            if (b < 1024) return b + ' B';
-            if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
-            return (b / 1048576).toFixed(2) + ' MB';
-        }
-
-        function loadImg(file) {
-            return new Promise((resolve) => {
-                const r = new FileReader();
-                r.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => resolve({ img, dataUrl: e.target.result });
-                    img.src = e.target.result;
-                };
-                r.readAsDataURL(file);
-            });
-        }
-
-        function fileInp(accept = 'image/*', multi = false) {
-            const inp = document.createElement('input');
-            inp.type = 'file';
-            inp.accept = accept;
-            inp.multiple = multi;
-            inp.style.cssText = 'position:fixed;top:-200px;left:-200px;';
-            document.body.appendChild(inp);
-            setTimeout(() => { if (inp.parentNode) inp.remove(); }, 90000);
-            return inp;
-        }
-
-        function dataUrlToBlob(dataUrl) {
-            const parts = dataUrl.split(',');
-            const mime = parts[0].match(/:(.*?);/)[1];
-            const bytes = atob(parts[1]);
-            const ab = new ArrayBuffer(bytes.length);
-            const ia = new Uint8Array(ab);
-            for (let i = 0; i < bytes.length; i++) ia[i] = bytes.charCodeAt(i);
-            return new Blob([ab], { type: mime });
-        }
-
-        function saveFile(dataUrl, filename, mime = 'image/jpeg') {
-            const folder = CFG.saveFolder;
-            // Median
-            if (typeof median !== 'undefined' && median.file && median.file.save) {
-                try { median.file.save({ data: dataUrl, filename, folder });
-                    toast('💾 ذخیره شد'); return; } catch (e) {}
-            }
-            // Cordova
-            if (typeof cordova !== 'undefined' && window.requestFileSystem && window.LocalFileSystem) {
-                try {
-                    window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, (fs) => {
-                        fs.root.getDirectory(folder, { create: true }, (dir) => {
-                            dir.getFile(filename, { create: true, exclusive: false }, (fe) => {
-                                fe.createWriter((w) => {
-                                    w.onwriteend = () => { if (window.MediaScanner) window.MediaScanner
-                                            .scanFile(fe.toURL(), mime, () => toast('💾 ذخیره شد'));
-                                        else toast('💾 ذخیره شد'); };
-                                    fetch(dataUrl).then(r => r.blob()).then(b => w.write(b));
-                                });
-                            });
-                        });
-                    });
-                    return;
-                } catch (e) {}
-            }
-            // Direct
-            const link = document.createElement('a');
-            link.href = dataUrl;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            setTimeout(() => link.remove(), 100);
-            toast('💾 فایل ذخیره شد');
-        }
-
-        function saveBlob(blob, filename) {
-            if (typeof median !== 'undefined' && median.file && median.file.save) {
-                const r = new FileReader();
-                r.onload = () => { median.file.save({ data: r.result, filename, folder: CFG.saveFolder });
-                    toast('💾 ذخیره شد'); };
-                r.readAsDataURL(blob);
-                return;
-            }
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            URL.revokeObjectURL(url);
-            toast('💾 ذخیره شد');
-        }
-
-        function rgbToHsl(r, g, b) {
-            r /= 255;
-            g /= 255;
-            b /= 255;
-            const mx = Math.max(r, g, b),
-                mn = Math.min(r, g, b);
-            let h, s, l = (mx + mn) / 2;
-            if (mx === mn) h = s = 0;
-            else {
-                const d = mx - mn;
-                s = l > 0.5 ? d / (2 - mx - mn) : d / (mx + mn);
-                switch (mx) {
-                    case r:
-                        h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
-                        break;
-                    case g:
-                        h = ((b - r) / d + 2) / 6;
-                        break;
-                    case b:
-                        h = ((r - g) / d + 4) / 6;
-                        break;
-                }
-            }
-            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
-        }
-
-        function escapeHtml(s) { const d = document.createElement('div');
-            d.textContent = s; return d.innerHTML; }
-
-        // ==================== ROUTER ====================
-        function navTo(page, toolId, push = true) {
-            S.page = page;
-            S.tool = toolId;
-            if (push) { S.history.push(page);
-                history.pushState({ page, toolId }, ''); }
-            $$('.page').forEach(p => p.classList.remove('active'));
-            if (page === 'home') {
-                $('#page-home').classList.add('active');
-                renderHome();
-            } else if (page === 'tool' && toolId) {
-                $('#page-tool').classList.add('active');
-                renderTool(toolId);
-            } else if (page === 'settings') {
-                $('#page-settings').classList.add('active');
-                renderSettings();
-            }
-            window.scrollTo(0, 0);
-        }
-
-        function goBack() {
-            if (S.history.length > 1) {
-                S.history.pop();
-                const prev = S.history[S.history.length - 1];
-                if (prev === 'home') navTo('home', null, false);
-                else if (prev === 'settings') navTo('settings', null, false);
-                else navTo('tool', S.tool, false);
-            } else {
-                if (navigator.app && navigator.app.exitApp) navigator.app.exitApp();
-            }
-        }
-
-        function handleBack() {
-            if (S.page === 'home') { if (navigator.app && navigator.app.exitApp) navigator.app.exitApp(); } else goBack();
-        }
-
-        function openTool(id) {
-            S.stats[id] = (S.stats[id] || 0) + 1;
-            localStorage.setItem('iy_stats', JSON.stringify(S.stats));
-            S.recent = [id, ...S.recent.filter(x => x !== id)].slice(0, 5);
-            localStorage.setItem('iy_recent', JSON.stringify(S.recent));
-            navTo('tool', id, true);
-        }
-
-        // ==================== TOOLS DATA ====================
-        const TOOLS = [
-            { id: 1, icon: '🧩', name: 'چسباندن عکس', desc: 'عمودی و افقی', cat: 'image', fn: 'stitch' },
-            { id: 2, icon: '📄', name: 'ساخت PDF', desc: 'تصاویر پیوسته', cat: 'pdf', fn: 'pdf' },
-            { id: 3, icon: '🧹', name: 'پاک‌کن عکس', desc: 'مثل ibisPaint', cat: 'image', fn: 'cleaner' },
-            { id: 4, icon: '✨', name: 'بهبود کیفیت', desc: 'نور، رنگ، شارپنس', cat: 'image', fn: 'enhancer' },
-            { id: 5, icon: '✂️', name: 'تقسیم عکس', desc: 'برش + پیش‌نمایش', cat: 'image', fn: 'split' },
-            { id: 6, icon: '💧', name: 'واترمارک', desc: 'متن و لوگو', cat: 'image', fn: 'watermark' },
-            { id: 7, icon: '📦', name: 'فشرده‌سازی', desc: 'مقایسه حجم', cat: 'image', fn: 'compressor' },
-            { id: 8, icon: '🔄', name: 'تبدیل فرمت', desc: 'JPG/PNG/WEBP', cat: 'image', fn: 'converter' },
-            { id: 9, icon: '📐', name: 'تغییر سایز', desc: 'حفظ کیفیت', cat: 'image', fn: 'resize' },
-            { id: 10, icon: '📱', name: 'ساخت QR', desc: 'متن/لینک/تلفن', cat: 'qr', fn: 'qrgen' },
-            { id: 11, icon: '📷', name: 'اسکن QR', desc: 'دوربین + عکس', cat: 'qr', fn: 'qrscan' },
-            { id: 12, icon: '📝', name: 'OCR', desc: 'متن فارسی و انگلیسی', cat: 'utility', fn: 'ocr' },
-            { id: 13, icon: '🎨', name: 'انتخاب رنگ', desc: 'HEX/RGB/HSL', cat: 'utility', fn: 'colorpick' },
-            { id: 14, icon: '🖼️', name: 'چسب اسکرین', desc: 'تشخیص خودکار', cat: 'image', fn: 'screenstitch' },
-            { id: 15, icon: '📋', name: 'پردازش گروهی', desc: 'ZIP دانلود', cat: 'utility', fn: 'batch' }
-        ];
-
-        // ==================== HOME PAGE ====================
-        function renderHome(filter = 'all', search = '') {
-            let tools = [...TOOLS];
-            if (filter !== 'all') tools = tools.filter(t => t.cat === filter);
-            if (search) { const q = search.toLowerCase();
-                tools = tools.filter(t => t.name.includes(q) || t.desc.includes(q)); }
-
-            $('#page-home').innerHTML = `
-            <div class="header">
-              <div class="logo">🖼️</div>
-              <h1>تصویریار</h1>
-              <div class="sub">۱۵ ابزار حرفه‌ای پردازش تصویر</div>
+      <!-- ENHANCE PANEL -->
+      <div id="enhance-panel" class="panel">
+        <div class="panel-header">
+          <button class="back-btn" onclick="showPanel('home')">←</button>
+          <span class="panel-title">بهبود تصویر</span>
+        </div>
+        <div class="tool-scroll">
+          <div class="upload-zone">
+            <input type="file" accept="image/*" onchange="loadEnhanceImage(this)">
+            <div class="upload-icon">✨</div>
+            <div class="upload-text">بارگذاری تصویر</div>
+          </div>
+          <div id="enhance-preview-wrap" style="display:none;" class="stack">
+            <div class="before-after-wrap">
+              <canvas id="enhance-canvas"></canvas>
+              <span class="after-label">پس از</span>
             </div>
-            <div class="search"><input type="text" id="searchInput" placeholder="🔍 جستجوی ابزار..." oninput="filterTools()"></div>
-            <div class="cats" id="cats">
-              <button class="cat-btn active" data-cat="all" onclick="filterCat('all',this)">همه</button>
-              <button class="cat-btn" data-cat="image" onclick="filterCat('image',this)">تصویر</button>
-              <button class="cat-btn" data-cat="pdf" onclick="filterCat('pdf',this)">PDF</button>
-              <button class="cat-btn" data-cat="qr" onclick="filterCat('qr',this)">QR</button>
-              <button class="cat-btn" data-cat="utility" onclick="filterCat('utility',this)">ابزارها</button>
+            <div class="stack">
+              <div class="slider-wrap">
+                <div class="slider-label"><span>🌟 شارپن</span><span id="val-sharpen">0</span></div>
+                <input type="range" id="sl-sharpen" min="0" max="10" value="0" oninput="applyEnhance()">
+              </div>
+              <div class="slider-wrap">
+                <div class="slider-label"><span>☀️ روشنایی</span><span id="val-bright">0</span></div>
+                <input type="range" id="sl-bright" min="-100" max="100" value="0" oninput="applyEnhance()">
+              </div>
+              <div class="slider-wrap">
+                <div class="slider-label"><span>🌗 کنتراست</span><span id="val-contrast">0</span></div>
+                <input type="range" id="sl-contrast" min="-100" max="100" value="0" oninput="applyEnhance()">
+              </div>
+              <div class="slider-wrap">
+                <div class="slider-label"><span>🎨 اشباع</span><span id="val-sat">0</span></div>
+                <input type="range" id="sl-sat" min="-100" max="100" value="0" oninput="applyEnhance()">
+              </div>
+              <div class="slider-wrap">
+                <div class="slider-label"><span>💎 وضوح</span><span id="val-clarity">0</span></div>
+                <input type="range" id="sl-clarity" min="0" max="10" value="0" oninput="applyEnhance()">
+              </div>
+              <div class="slider-wrap">
+                <div class="slider-label"><span>🔇 کاهش نویز</span><span id="val-denoise">0</span></div>
+                <input type="range" id="sl-denoise" min="0" max="10" value="0" oninput="applyEnhance()">
+              </div>
             </div>
-            <div class="stats">
-              <span class="stat">🕐 اخیر: ${S.recent.length?TOOLS.find(t=>t.id===S.recent[0])?.name||'-':'-'}</span>
-              <span class="stat">📊 استفاده: ${Object.values(S.stats).reduce((a,b)=>a+b,0)}</span>
-              <span class="stat" onclick="navTo('settings',null,true)" style="cursor:pointer">⚙️ تنظیمات</span>
+            <div class="row">
+              <button class="btn btn-secondary" onclick="resetEnhance()">↺ بازنشانی</button>
+              <button class="btn btn-primary" onclick="downloadEnhanced()">💾 دانلود</button>
             </div>
-            <div class="grid" id="toolsGrid">${tools.map((t,i)=>`
-              <div class="card" style="animation-delay:${i*0.04}s" onclick="openTool(${t.id})">
-                <div class="icon">${t.icon}</div>
-                <div class="name">${t.name}</div>
-                <div class="desc">${t.desc}</div>
-              </div>`).join('')}</div>`;
-        }
+          </div>
+        </div>
+      </div>
 
-        function filterTools() {
-            const cat = $('.cat-btn.active')?.dataset?.cat || 'all';
-            renderHome(cat, $('#searchInput')?.value || '');
-        }
-
-        function filterCat(cat, btn) {
-            $$('.cat-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            renderHome(cat, $('#searchInput')?.value || '');
-        }
-
-        // ==================== SETTINGS PAGE ====================
-        function renderSettings() {
-            $('#page-settings').innerHTML = `
-            <div class="toolbar"><button class="back" onclick="goBack()">←</button><div class="title">⚙️ تنظیمات</div></div>
-            <div class="settings-section">
-              <h3>💾 محل ذخیره فایل‌ها</h3>
-              <div class="inp"><label>نام پوشه:</label><input type="text" id="sFolder" value="${CFG.saveFolder}"></div>
-              <button class="btn btn-p btn-sm" onclick="updateFolder()">💾 ذخیره</button>
+      <!-- SPLIT PANEL -->
+      <div id="split-panel" class="panel">
+        <div class="panel-header">
+          <button class="back-btn" onclick="showPanel('home')">←</button>
+          <span class="panel-title">تقسیم تصویر</span>
+        </div>
+        <div class="tool-scroll">
+          <div class="upload-zone">
+            <input type="file" accept="image/*" onchange="loadSplitImage(this)">
+            <div class="upload-icon">✂️</div>
+            <div class="upload-text">بارگذاری تصویر</div>
+          </div>
+          <div id="split-controls" style="display:none;" class="stack">
+            <div class="form-group">
+              <label class="form-label">نوع تقسیم</label>
+              <div class="tabs">
+                <button class="tab active" onclick="setSplitMode('rows',this)">افقی (ردیف)</button>
+                <button class="tab" onclick="setSplitMode('cols',this)">عمودی (ستون)</button>
+                <button class="tab" onclick="setSplitMode('grid',this)">شبکه</button>
+              </div>
             </div>
-            <div class="settings-section">
-              <h3>🖼️ کیفیت پیش‌فرض</h3>
-              <div class="rng"><span>کیفیت:</span><input type="range" id="sQual" min="10" max="100" value="${CFG.quality}" oninput="$('#sQualV').textContent=this.value+'%'"><span class="val" id="sQualV">${CFG.quality}%</span></div>
-              <button class="btn btn-p btn-sm" onclick="updateQuality()">💾 ذخیره</button>
+            <div class="row">
+              <div class="form-group">
+                <label class="form-label" id="split-label1">تعداد ردیف</label>
+                <input type="number" id="split-count1" min="2" max="20" value="3">
+              </div>
+              <div class="form-group" id="split-col-wrap" style="display:none;">
+                <label class="form-label">تعداد ستون</label>
+                <input type="number" id="split-count2" min="2" max="20" value="2">
+              </div>
             </div>
-            <div class="settings-section">
-              <h3>ℹ️ درباره</h3>
-              <p style="font-size:12px;color:var(--text2)">تصویریار v3.0<br>۱۵ ابزار پردازش تصویر<br>سازگار با Median.co و Cordova</p>
-            </div>`;
-        }
-
-        function updateFolder() {
-            CFG.saveFolder = $('#sFolder').value.trim() || 'Download';
-            localStorage.setItem('iy_save', CFG.saveFolder);
-            toast('✅ پوشه: ' + CFG.saveFolder);
-        }
-
-        function updateQuality() {
-            CFG.quality = parseInt($('#sQual').value);
-            localStorage.setItem('iy_qual', CFG.quality);
-            toast('✅ کیفیت: ' + CFG.quality + '%');
-        }
-
-        // ==================== TOOL RENDERER ====================
-        function renderTool(id) {
-            const tool = TOOLS.find(t => t.id === id);
-            if (!tool) return;
-            $('#page-tool').innerHTML = `
-            <div class="toolbar"><button class="back" onclick="goBack()">←</button><div class="title">${tool.icon} ${tool.name}</div></div>
-            <div id="toolContent"><p style="text-align:center;padding:40px;color:var(--text2)">در حال بارگذاری...</p></div>`;
-            setTimeout(() => { if (typeof window[tool.fn] === 'function') window[tool.fn](); }, 50);
-        }
-
-        // ==================== TOOL 1: STITCH ====================
-        function stitch() {
-            let files = [],
-                mode = 'vertical',
-                result = null;
-            $('#toolContent').innerHTML = `
-            <div class="inp"><label>حالت:</label><div class="grid2">
-              <button class="btn btn-p btn-sm active" id="smV" onclick="setM('vertical')">📐 عمودی</button>
-              <button class="btn btn-o btn-sm" id="smH" onclick="setM('horizontal')">📏 افقی</button></div></div>
-            <div class="rng"><span>کیفیت:</span><input type="range" id="sQ" min="10" max="100" value="${CFG.quality}" oninput="$('#sQV').textContent=this.value+'%'"><span class="val" id="sQV">${CFG.quality}%</span></div>
-            <div class="prev" id="sPrev"><span style="color:var(--text2)">تصویری انتخاب نشده</span></div>
-            <button class="btn btn-p" onclick="selF()">📂 انتخاب تصاویر</button>
-            <button class="btn btn-s" id="sBtn" disabled onclick="doS()">✂️ چسباندن</button>
-            <div id="sRes"></div>
-            <button class="btn btn-o" id="sSave" disabled onclick="saveFile(window._sr,'stitched_'+Date.now()+'.jpg')">💾 ذخیره</button>`;
-
-            window.setM = (m) => { mode = m;
-                $('#smV').className = m === 'vertical' ? 'btn btn-p btn-sm active' : 'btn btn-o btn-sm';
-                $('#smH').className = m === 'horizontal' ? 'btn btn-p btn-sm active' : 'btn btn-o btn-sm'; };
-            window.selF = () => { const inp = fileInp('image/*', true);
-                inp.onchange = (e) => { files = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
-                    if (!files.length) return;
-                    const prev = $('#sPrev');
-                    prev.innerHTML = '';
-                    files.forEach((f, i) => { const r = new FileReader();
-                        r.onload = (ev) => { prev.innerHTML +=
-                            `<img src="${ev.target.result}" style="height:65px" onclick="this.remove();files.splice(${i},1)">`; };
-                        r.readAsDataURL(f); });
-                    $('#sBtn').disabled = false; };
-                inp.click(); };
-            window.doS = async () => { const btn = $('#sBtn');
-                btn.disabled = true;
-                const q = parseInt($('#sQ').value) / 100;
-                const imgs = [];
-                for (let f of files) { const { img } = await loadImg(f);
-                    imgs.push(img); }
-                const c = document.createElement('canvas');
-                const ctx = c.getContext('2d'); if (mode === 'vertical') { let mw = 0,
-                        th = 0;
-                    imgs.forEach(i => { if (i.width > mw) mw = i.width;
-                        th += i.height; });
-                    c.width = mw;
-                    c.height = th;
-                    ctx.fillStyle = '#FFF';
-                    ctx.fillRect(0, 0, mw, th);
-                    let y = 0;
-                    imgs.forEach(i => { ctx.drawImage(i, (mw - i.width) / 2, y);
-                        y += i.height; }); } else { let mh = 0,
-                        tw = 0;
-                    imgs.forEach(i => { if (i.height > mh) mh = i.height;
-                        tw += i.width; });
-                    c.width = tw;
-                    c.height = mh;
-                    ctx.fillStyle = '#FFF';
-                    ctx.fillRect(0, 0, tw, mh);
-                    let x = 0;
-                    imgs.forEach(i => { ctx.drawImage(i, x, (mh - i.height) / 2);
-                        x += i.width; }); }
-                window._sr = c.toDataURL('image/jpeg', q);
-                $('#sRes').innerHTML =
-                    `<p style="color:var(--green);text-align:center">✅ انجام شد</p><img src="${window._sr}" style="width:100%;border-radius:var(--radius)">`;
-                $('#sSave').disabled = false;
-                btn.disabled = false; };
-        }
-
-        // ==================== TOOL 2: PDF ====================
-        function pdf() {
-            let files = [],
-                pdfMode = 'continuous';
-            $('#toolContent').innerHTML = `
-            <div class="inp"><label>حالت:</label><div class="grid2">
-              <button class="btn btn-p btn-sm active" id="pmC" onclick="setPM('continuous')">📜 پیوسته (مانهوا)</button>
-              <button class="btn btn-o btn-sm" id="pmP" onclick="setPM('pages')">📄 صفحه‌ای</button></div></div>
-            <div class="inp"><label>اندازه:</label><select id="pdfSize"><option value="a4">A4</option><option value="a5">A5</option></select></div>
-            <div class="prev" id="pPrev"><span style="color:var(--text2)">تصویری انتخاب نشده</span></div>
-            <button class="btn btn-p" onclick="selPF()">📂 انتخاب تصاویر</button>
-            <button class="btn btn-s" id="pBtn" disabled onclick="doP()">📄 ساخت PDF</button>
-            <div id="pRes"></div>
-            <button class="btn btn-o" id="pSave" disabled onclick="saveFile(window._pd,'doc_'+Date.now()+'.pdf','application/pdf')">💾 ذخیره</button>`;
-
-            window.setPM = (m) => { pdfMode = m;
-                $('#pmC').className = m === 'continuous' ? 'btn btn-p btn-sm active' : 'btn btn-o btn-sm';
-                $('#pmP').className = m === 'pages' ? 'btn btn-p btn-sm active' : 'btn btn-o btn-sm'; };
-            window.selPF = () => { const inp = fileInp('image/*', true);
-                inp.onchange = (e) => { files = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
-                    if (!files.length) return;
-                    const prev = $('#pPrev');
-                    prev.innerHTML = '';
-                    files.forEach((f, i) => { const r = new FileReader();
-                        r.onload = (ev) => { prev.innerHTML +=
-                            `<img src="${ev.target.result}" style="height:65px" onclick="this.remove();files.splice(${i},1)">`; };
-                        r.readAsDataURL(f); });
-                    $('#pBtn').disabled = false; };
-                inp.click(); };
-            window.doP = async () => { const btn = $('#pBtn');
-                btn.disabled = true;
-                const { jsPDF } = window.jspdf; if (pdfMode === 'continuous') {
-                    const imgs = [];
-                    for (let f of files) { const { img } = await loadImg(f);
-                        imgs.push(img); }
-                    let mw = 0,
-                        th = 0;
-                    imgs.forEach(i => { if (i.width > mw) mw = i.width;
-                        th += i.height; });
-                    const c = document.createElement('canvas');
-                    c.width = mw;
-                    c.height = th;
-                    const ctx = c.getContext('2d');
-                    ctx.fillStyle = '#FFF';
-                    ctx.fillRect(0, 0, mw, th);
-                    let y = 0;
-                    imgs.forEach(i => { ctx.drawImage(i, (mw - i.width) / 2, y);
-                        y += i.height; });
-                    const dataUrl = c.toDataURL('image/jpeg', 1);
-                    const pdf = new jsPDF('p', 'pt', [mw, th]);
-                    pdf.addImage(dataUrl, 'JPEG', 0, 0, mw, th);
-                    window._pd = pdf.output('datauristring'); } else { const sizes = { a4: [595, 842],
-                        a5: [420, 595] };
-                    const [pw, ph] = sizes[$('#pdfSize').value];
-                    const pdf = new jsPDF('p', 'pt', [pw, ph]); for (let i = 0; i < files.length; i++) { if (i > 0) pdf
-                            .addPage();
-                        const { img, dataUrl } = await loadImg(files[i]);
-                        let iw = pw - 20,
-                            ih = (img.height / img.width) * iw; if (ih > ph - 20) { ih = ph - 20;
-                            iw = (img.width / img.height) * ih; }
-                        pdf.addImage(dataUrl, 'JPEG', (pw - iw) / 2, (ph - ih) / 2, iw, ih); }
-                    window._pd = pdf.output('datauristring'); }
-                $('#pRes').innerHTML = '<p style="color:var(--green);text-align:center">✅ PDF آماده</p>';
-                $('#pSave').disabled = false;
-                btn.disabled = false; };
-        }
-
-        // ==================== TOOL 3: CLEANER (ibisPaint Style) ====================
-        function cleaner() {
-            let cImg = null,
-                brushSize = 20,
-                brushColor = '#FFFFFF';
-            let scale = 1,
-                panX = 0,
-                panY = 0;
-            let isDrawing = false,
-                isPanning = false;
-            let lastDist = 0,
-                lastCX = 0,
-                lastCY = 0;
-            let history = [],
-                histIdx = -1;
-            let canvas, ctx, wrapper;
-            let brushPreviewVis = false,
-                brushPX = 0,
-                brushPY = 0;
-            let rafId = null;
-
-            $('#toolContent').innerHTML = `
-            <div class="clean-canvas-wrap" id="cWrap" style="height:420px">
-              <canvas id="cCanvas" style="display:none"></canvas>
-              <div class="zoom-indicator" id="cZoom">100%</div>
+            <button class="btn btn-primary" onclick="doSplit()">✂️ تقسیم</button>
+          </div>
+          <div id="split-results" style="display:none;" class="stack">
+            <div class="row">
+              <span class="section-title" style="margin:0;flex:1;">نتایج</span>
+              <button class="btn btn-primary btn-sm" onclick="downloadAllSplits()">📦 دانلود همه</button>
             </div>
-            <div class="rng"><span>سایز قلم:</span><input type="range" id="cSize" min="3" max="100" value="20" oninput="brushSize=parseInt(this.value);$('#cSizeV').textContent=this.value;updateBrushPrev()"><span class="val" id="cSizeV">20</span></div>
-            <div class="colors" id="cColors">
-              <div class="color-dot active" style="background:#FFF" data-c="#FFFFFF" onclick="selCC(this)"></div>
-              <div class="color-dot" style="background:#000" data-c="#000000" onclick="selCC(this)"></div>
-              <div class="color-dot" style="background:#888" data-c="#888888" onclick="selCC(this)"></div>
-              <div class="color-dot" style="background:#F5DEB3" data-c="#F5DEB3" onclick="selCC(this)"></div>
-              <div class="color-dot" style="background:#C8E6C9" data-c="#C8E6C9" onclick="selCC(this)"></div>
-              <div class="color-dot" style="background:#E8E8E8" data-c="#E8E8E8" onclick="selCC(this)"></div>
+            <div id="split-grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STITCH PANEL -->
+      <div id="stitch-panel" class="panel">
+        <div class="panel-header">
+          <button class="back-btn" onclick="showPanel('home')">←</button>
+          <span class="panel-title">چسباندن اسکرین‌شات</span>
+        </div>
+        <div class="tool-scroll">
+          <div class="upload-zone" id="stitch-upload">
+            <input type="file" accept="image/*" multiple onchange="loadStitchImages(this)">
+            <div class="upload-icon">🔗</div>
+            <div class="upload-text">چند تصویر انتخاب کنید</div>
+            <div class="upload-sub">ترتیب از بالا به پایین</div>
+          </div>
+          <div id="stitch-list" style="display:none;" class="stack">
+            <div id="stitch-thumbs" class="row" style="flex-wrap:wrap;gap:8px;"></div>
+            <div class="form-group">
+              <label class="form-label">تشخیص همپوشانی</label>
+              <div class="tabs">
+                <button class="tab active" onclick="setStitchMode('auto',this)">خودکار</button>
+                <button class="tab" onclick="setStitchMode('manual',this)">دستی</button>
+              </div>
             </div>
-            <div class="clean-toolbar">
-              <button onclick="undoC()" id="cUndo" disabled>↩️</button>
-              <button onclick="redoC()" id="cRedo" disabled>↪️</button>
-              <button onclick="zoomIn()">🔍+</button>
-              <button onclick="zoomOut()">🔍−</button>
-              <button onclick="fitScreen()">📐</button>
-              <button onclick="actualSize()">1:1</button>
+            <div id="stitch-manual-wrap" style="display:none;" class="form-group">
+              <label class="form-label">درصد همپوشانی دستی</label>
+              <input type="range" id="stitch-overlap" min="0" max="50" value="10">
             </div>
-            <button class="btn btn-p" onclick="selCI()">📂 انتخاب عکس</button>
-            <button class="btn btn-s" id="cSave" disabled onclick="saveCleaned()">💾 ذخیره</button>`;
+            <button class="btn btn-primary" onclick="doStitch()">🔗 چسباندن</button>
+          </div>
+          <div id="stitch-result" style="display:none;" class="stack">
+            <div class="section-title">نتیجه</div>
+            <canvas id="stitch-canvas" style="width:100%;border-radius:var(--radius-sm);display:block;"></canvas>
+            <button class="btn btn-primary" onclick="downloadStitch()">💾 دانلود</button>
+          </div>
+        </div>
+      </div>
 
-            canvas = $('#cCanvas');
-            ctx = canvas.getContext('2d');
-            wrapper = $('#cWrap');
+      <!-- PDF PANEL -->
+      <div id="pdf-panel" class="panel">
+        <div class="panel-header">
+          <button class="back-btn" onclick="showPanel('home')">←</button>
+          <span class="panel-title">ساخت PDF</span>
+        </div>
+        <div class="tool-scroll">
+          <div class="upload-zone">
+            <input type="file" accept="image/*" multiple onchange="loadPdfImages(this)">
+            <div class="upload-icon">📄</div>
+            <div class="upload-text">تصاویر را انتخاب کنید</div>
+            <div class="upload-sub">می‌توانید چند تصویر انتخاب کنید</div>
+          </div>
+          <div id="pdf-controls" style="display:none;" class="stack">
+            <div id="pdf-thumbs" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+            <div class="form-group">
+              <label class="form-label">سایز صفحه</label>
+              <select id="pdf-size">
+                <option value="fit">متناسب با تصویر</option>
+                <option value="a4">A4</option>
+                <option value="a5">A5</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">کیفیت</label>
+              <div class="slider-wrap">
+                <div class="slider-label"><span>کیفیت خروجی</span><span id="pdf-quality-val">92%</span></div>
+                <input type="range" id="pdf-quality" min="50" max="100" value="92" oninput="document.getElementById('pdf-quality-val').textContent=this.value+'%'">
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="buildPdf()">📄 ساخت PDF</button>
+          </div>
+        </div>
+      </div>
 
-            window.selCC = (dot) => { $$('#cColors .color-dot').forEach(d => d.classList.remove('active'));
-                dot.classList.add('active');
-                brushColor = dot.dataset.c;
-                updateBrushPrev(); };
+      <!-- OCR PANEL -->
+      <div id="ocr-panel" class="panel">
+        <div class="panel-header">
+          <button class="back-btn" onclick="showPanel('home')">←</button>
+          <span class="panel-title">استخراج متن (OCR)</span>
+        </div>
+        <div class="tool-scroll">
+          <div class="upload-zone">
+            <input type="file" accept="image/*" onchange="loadOcrImage(this)">
+            <div class="upload-icon">🔤</div>
+            <div class="upload-text">تصویر را انتخاب کنید</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">زبان</label>
+            <select id="ocr-lang">
+              <option value="fas">فارسی</option>
+              <option value="eng">انگلیسی</option>
+              <option value="ara">عربی</option>
+              <option value="fas+eng">فارسی + انگلیسی</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="runOcr()">🔤 استخراج متن</button>
+          <div id="ocr-progress-wrap" style="display:none;" class="stack">
+            <div class="loader"><div class="spinner"></div><div class="loader-text" id="ocr-status">در حال پردازش...</div></div>
+            <div class="progress-bar"><div class="progress-fill" id="ocr-prog" style="width:0%"></div></div>
+          </div>
+          <div id="ocr-output-wrap" style="display:none;" class="stack">
+            <div class="row">
+              <div class="section-title" style="margin:0;flex:1;">نتیجه</div>
+              <span id="ocr-confidence" class="chip success"></span>
+            </div>
+            <textarea id="ocr-output" readonly></textarea>
+            <div class="row">
+              <button class="btn btn-secondary btn-sm" onclick="copyOcrText()">📋 کپی</button>
+              <button class="btn btn-secondary btn-sm" onclick="downloadOcrTxt()">💾 TXT</button>
+              <button class="btn btn-primary btn-sm" onclick="downloadOcrPdf()">📄 PDF متنی</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-            window.selCI = () => { const inp = fileInp();
-                inp.onchange = (e) => { const f = e.target.files[0]; if (!f) return;
-                    const r = new FileReader();
-                    r.onload = (ev) => { const img = new Image();
-                        img.onload = () => { cImg = img;
-                            canvas.style.display = 'block';
-                            canvas.width = img.width;
-                            canvas.height = img.height;
-                            ctx.drawImage(img, 0, 0);
-                            history = [ctx.getImageData(0, 0, canvas.width, canvas.height)];
-                            histIdx = 0;
-                            $('#cSave').disabled = false;
-                            $('#cUndo').disabled = false;
-                            fitScreen(); };
-                        img.src = ev.target.result; };
-                    r.readAsDataURL(f); };
-                inp.click(); };
+      <!-- QR PANEL -->
+      <div id="qr-panel" class="panel">
+        <div class="panel-header">
+          <button class="back-btn" onclick="showPanel('home')">←</button>
+          <span class="panel-title">QR Scanner</span>
+        </div>
+        <div class="tool-scroll">
+          <div class="tabs" style="margin-bottom:4px;">
+            <button class="tab active" onclick="setQrMode('image',this)">📷 از تصویر</button>
+            <button class="tab" onclick="setQrMode('camera',this)">🎥 دوربین</button>
+          </div>
+          <div id="qr-image-mode" class="stack">
+            <div class="upload-zone">
+              <input type="file" accept="image/*" onchange="scanQrFromFile(this)">
+              <div class="upload-icon">📷</div>
+              <div class="upload-text">تصویر QR را انتخاب کنید</div>
+            </div>
+          </div>
+          <div id="qr-camera-mode" style="display:none;" class="stack">
+            <div style="position:relative;border-radius:var(--radius);overflow:hidden;background:#000;">
+              <video id="qr-video" autoplay muted playsinline style="width:100%;display:block;"></video>
+              <canvas id="qr-scan-canvas" style="display:none;"></canvas>
+              <div style="position:absolute;inset:0;border:2px solid var(--accent);border-radius:var(--radius);pointer-events:none;"></div>
+            </div>
+            <button class="btn btn-primary" onclick="startQrCamera()">🎥 شروع دوربین</button>
+            <button class="btn btn-secondary" onclick="stopQrCamera()" id="stop-cam-btn" style="display:none;">⛔ توقف</button>
+          </div>
+          <div id="qr-result-box" style="display:none;" class="stack">
+            <div class="section-title">نتیجه اسکن</div>
+            <div id="qr-result-text" style="font-size:14px;line-height:1.7;word-break:break-all;padding:12px;background:var(--glass);border-radius:var(--radius-sm);border:1px solid var(--glass-border);"></div>
+            <div class="row">
+              <button class="btn btn-secondary btn-sm" onclick="copyQrResult()">📋 کپی</button>
+              <button class="btn btn-primary btn-sm" id="qr-open-btn" style="display:none;" onclick="openQrUrl()">🔗 باز کردن</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-            function updateTransform() {
-                canvas.style.transform = `matrix(${scale},0,0,${scale},${panX},${panY})`;
-                $('#cZoom').textContent = Math.round(scale * 100) + '%';
-                updateBrushPrev();
-            }
+      <!-- RESIZE PANEL -->
+      <div id="resize-panel" class="panel">
+        <div class="panel-header">
+          <button class="back-btn" onclick="showPanel('home')">←</button>
+          <span class="panel-title">تغییر سایز</span>
+        </div>
+        <div class="tool-scroll">
+          <div class="upload-zone">
+            <input type="file" accept="image/*" onchange="loadResizeImage(this)">
+            <div class="upload-icon">📐</div>
+            <div class="upload-text">بارگذاری تصویر</div>
+          </div>
+          <div id="resize-controls" style="display:none;" class="stack">
+            <div id="resize-info" class="stack">
+              <div class="info-row"><span class="k">ابعاد اصلی</span><span class="v" id="resize-orig-size"></span></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">نوع تغییر سایز</label>
+              <div class="tabs">
+                <button class="tab active" onclick="setResizeMode('px',this)">پیکسل</button>
+                <button class="tab" onclick="setResizeMode('pct',this)">درصد</button>
+              </div>
+            </div>
+            <div id="resize-px-mode" class="row">
+              <div class="form-group">
+                <label class="form-label">عرض</label>
+                <input type="number" id="resize-w" min="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">ارتفاع</label>
+                <input type="number" id="resize-h" min="1">
+              </div>
+            </div>
+            <div id="resize-pct-mode" style="display:none;" class="form-group">
+              <label class="form-label">درصد</label>
+              <input type="number" id="resize-pct" min="1" max="500" value="50">
+            </div>
+            <div class="row" style="align-items:center;gap:6px;">
+              <input type="checkbox" id="resize-aspect" checked style="width:16px;height:16px;accent-color:var(--accent);">
+              <label for="resize-aspect" class="form-label" style="margin:0;">حفظ نسبت تصویر</label>
+            </div>
+            <div class="form-group">
+              <label class="form-label">فرمت خروجی</label>
+              <select id="resize-format">
+                <option value="jpeg">JPG</option>
+                <option value="png">PNG</option>
+                <option value="webp">WebP</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="doResize()">📐 تغییر سایز</button>
+          </div>
+        </div>
+      </div>
 
-            function updateBrushPrev() { if (brushPreviewVis) { drawBrushPreview(
-                brushPX, brushPY); } }
+      <!-- WATERMARK PANEL -->
+      <div id="watermark-panel" class="panel">
+        <div class="panel-header">
+          <button class="back-btn" onclick="showPanel('home')">←</button>
+          <span class="panel-title">واترمارک</span>
+        </div>
+        <div class="tool-scroll">
+          <div class="upload-zone">
+            <input type="file" accept="image/*" onchange="loadWmImage(this)">
+            <div class="upload-icon">💧</div>
+            <div class="upload-text">تصویر اصلی را انتخاب کنید</div>
+          </div>
+          <div id="wm-controls" style="display:none;" class="stack">
+            <div class="tabs">
+              <button class="tab active" onclick="setWmType('text',this)">متنی</button>
+              <button class="tab" onclick="setWmType('image',this)">تصویری</button>
+            </div>
+            <div id="wm-text-opts" class="stack">
+              <div class="form-group">
+                <label class="form-label">متن واترمارک</label>
+                <input type="text" id="wm-text" value="© تصویریار" oninput="previewWm()">
+              </div>
+              <div class="row">
+                <div class="form-group">
+                  <label class="form-label">رنگ</label>
+                  <input type="color" id="wm-color" value="#ffffff" onchange="previewWm()">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">اندازه فونت</label>
+                  <input type="number" id="wm-fontsize" value="40" min="8" max="200" oninput="previewWm()">
+                </div>
+              </div>
+              <div class="slider-wrap">
+                <div class="slider-label"><span>شفافیت</span><span id="wm-op-val">70%</span></div>
+                <input type="range" id="wm-opacity" min="10" max="100" value="70" oninput="document.getElementById('wm-op-val').textContent=this.value+'%';previewWm()">
+              </div>
+              <div class="slider-wrap">
+                <div class="slider-label"><span>چرخش (درجه)</span><span id="wm-rot-val">-30°</span></div>
+                <input type="range" id="wm-rotate" min="-180" max="180" value="-30" oninput="document.getElementById('wm-rot-val').textContent=this.value+'°';previewWm()">
+              </div>
+            </div>
+            <div id="wm-img-opts" style="display:none;" class="stack">
+              <div class="upload-zone" style="margin:0;">
+                <input type="file" accept="image/*" onchange="loadWmOverlay(this)">
+                <div class="upload-text">تصویر واترمارک</div>
+              </div>
+              <div class="slider-wrap">
+                <div class="slider-label"><span>شفافیت</span><span id="wm-img-op-val">70%</span></div>
+                <input type="range" id="wm-img-opacity" min="10" max="100" value="70" oninput="document.getElementById('wm-img-op-val').textContent=this.value+'%';previewWm()">
+              </div>
+              <div class="slider-wrap">
+                <div class="slider-label"><span>اندازه (%)</span><span id="wm-img-sz-val">30%</span></div>
+                <input type="range" id="wm-img-size" min="5" max="100" value="30" oninput="document.getElementById('wm-img-sz-val').textContent=this.value+'%';previewWm()">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">موقعیت</label>
+              <div class="position-grid" id="wm-pos-grid">
+                <button class="pos-btn" data-pos="top-right" onclick="setWmPos('top-right',this)">↖</button>
+                <button class="pos-btn" data-pos="top-center" onclick="setWmPos('top-center',this)">↑</button>
+                <button class="pos-btn" data-pos="top-left" onclick="setWmPos('top-left',this)">↗</button>
+                <button class="pos-btn" data-pos="mid-right" onclick="setWmPos('mid-right',this)">←</button>
+                <button class="pos-btn active" data-pos="center" onclick="setWmPos('center',this)">●</button>
+                <button class="pos-btn" data-pos="mid-left" onclick="setWmPos('mid-left',this)">→</button>
+                <button class="pos-btn" data-pos="bot-right" onclick="setWmPos('bot-right',this)">↙</button>
+                <button class="pos-btn" data-pos="bot-center" onclick="setWmPos('bot-center',this)">↓</button>
+                <button class="pos-btn" data-pos="bot-left" onclick="setWmPos('bot-left',this)">↘</button>
+              </div>
+            </div>
+            <canvas id="wm-preview-canvas" style="width:100%;border-radius:var(--radius-sm);display:block;max-height:220px;object-fit:contain;"></canvas>
+            <button class="btn btn-primary" onclick="downloadWm()">💾 دانلود</button>
+          </div>
+        </div>
+      </div>
 
-            function drawBrushPreview(cx, cy) {
-                const wrapperRect = wrapper.getBoundingClientRect();
-                const canvasX = (cx - wrapperRect.left - panX) / scale;
-                const canvasY = (cy - wrapperRect.top - panY) / scale;
-                ctx.save();
-                ctx.setTransform(1, 0, 0, 1, 0, 0);
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(cImg, 0, 0);
-                const overlay = document.createElement('canvas');
-                overlay.width = canvas.width;
-                overlay.height = canvas.height;
-                const ovCtx = overlay.getContext('2d');
-                ovCtx.drawImage(cImg, 0, 0);
-                for (let i = 1; i <= histIdx; i++) { ovCtx.putImageData(history[i], 0, 0); }
-                ctx.drawImage(overlay, 0, 0);
-                ctx.restore();
-                updateTransform();
-                const px = canvasX * scale + panX + wrapperRect.left;
-                const py = canvasY * scale + panY + wrapperRect.top;
-                const div = document.createElement('div');
-                div.style.cssText =
-                    `position:fixed;pointer-events:none;border:2px dashed ${brushColor};border-radius:50%;width:${brushSize*scale}px;height:${brushSize*scale}px;left:${px-brushSize*scale/2}px;top:${py-brushSize*scale/2}px;z-index:999`;
-                div.id = 'brushPrev';
-                const old = $('#brushPrev');
-                if (old) old.remove();
-                document.body.appendChild(div);
-            }
+      <!-- COMPRESS PANEL -->
+      <div id="compress-panel" class="panel">
+        <div class="panel-header">
+          <button class="back-btn" onclick="showPanel('home')">←</button>
+          <span class="panel-title">فشرده‌سازی</span>
+        </div>
+        <div class="tool-scroll">
+          <div class="upload-zone">
+            <input type="file" accept="image/*" onchange="loadCompressImage(this)">
+            <div class="upload-icon">📦</div>
+            <div class="upload-text">تصویر را انتخاب کنید</div>
+          </div>
+          <div id="compress-controls" style="display:none;" class="stack">
+            <div class="form-group">
+              <label class="form-label">فرمت خروجی</label>
+              <select id="compress-fmt">
+                <option value="jpeg">JPG</option>
+                <option value="png">PNG</option>
+                <option value="webp">WebP</option>
+              </select>
+            </div>
+            <div class="slider-wrap">
+              <div class="slider-label"><span>کیفیت</span><span id="compress-q-val">85%</span></div>
+              <input type="range" id="compress-q" min="10" max="100" value="85" oninput="document.getElementById('compress-q-val').textContent=this.value+'%'">
+            </div>
+            <button class="btn btn-primary" onclick="doCompress()">📦 فشرده‌سازی</button>
+            <div id="compress-result" style="display:none;" class="stack">
+              <div class="divider"></div>
+              <div class="info-row"><span class="k">حجم اصلی</span><span class="v" id="comp-orig-size"></span></div>
+              <div class="info-row"><span class="k">حجم جدید</span><span class="v" id="comp-new-size"></span></div>
+              <div class="info-row"><span class="k">کاهش حجم</span><span class="v" id="comp-reduction" style="color:var(--emerald)"></span></div>
+              <button class="btn btn-primary" onclick="downloadCompressed()">💾 دانلود</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-            function getCanvasPos(e) {
-                const rect = wrapper.getBoundingClientRect();
-                const cx = e.touches ? e.touches[0].clientX : e.clientX;
-                const cy = e.touches ? e.touches[0].clientY : e.clientY;
-                return {
-                    x: (cx - rect.left - panX) / scale,
-                    y: (cy - rect.top - panY) / scale,
-                    rawX: cx,
-                    rawY: cy
-                };
-            }
+      <!-- BATCH PANEL -->
+      <div id="batch-panel" class="panel">
+        <div class="panel-header">
+          <button class="back-btn" onclick="showPanel('home')">←</button>
+          <span class="panel-title">پردازش گروهی</span>
+        </div>
+        <div class="tool-scroll">
+          <div class="upload-zone">
+            <input type="file" accept="image/*" multiple onchange="loadBatchImages(this)">
+            <div class="upload-icon">⚡</div>
+            <div class="upload-text">چند تصویر انتخاب کنید</div>
+          </div>
+          <div id="batch-controls" style="display:none;" class="stack">
+            <div id="batch-thumbs" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+            <div class="form-group">
+              <label class="form-label">عملیات</label>
+              <div class="tabs">
+                <button class="tab active" onclick="setBatchOp('resize',this)">سایز</button>
+                <button class="tab" onclick="setBatchOp('compress',this)">فشرده</button>
+                <button class="tab" onclick="setBatchOp('watermark',this)">واترمارک</button>
+                <button class="tab" onclick="setBatchOp('convert',this)">فرمت</button>
+              </div>
+            </div>
+            <div id="batch-op-resize" class="stack">
+              <div class="row">
+                <div class="form-group"><label class="form-label">عرض</label><input type="number" id="batch-w" placeholder="پیکسل"></div>
+                <div class="form-group"><label class="form-label">ارتفاع</label><input type="number" id="batch-h" placeholder="پیکسل"></div>
+              </div>
+            </div>
+            <div id="batch-op-compress" style="display:none;" class="stack">
+              <div class="slider-wrap">
+                <div class="slider-label"><span>کیفیت</span><span id="batch-q-val">80%</span></div>
+                <input type="range" id="batch-q" min="10" max="100" value="80" oninput="document.getElementById('batch-q-val').textContent=this.value+'%'">
+              </div>
+            </div>
+            <div id="batch-op-watermark" style="display:none;" class="form-group">
+              <label class="form-label">متن واترمارک</label>
+              <input type="text" id="batch-wm-text" value="© تصویریار">
+            </div>
+            <div id="batch-op-convert" style="display:none;" class="form-group">
+              <label class="form-label">فرمت</label>
+              <select id="batch-fmt">
+                <option value="jpeg">JPG</option>
+                <option value="png">PNG</option>
+                <option value="webp">WebP</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="doBatch()">⚡ پردازش و دانلود ZIP</button>
+            <div id="batch-progress" style="display:none;" class="stack">
+              <div class="progress-bar"><div class="progress-fill" id="batch-prog" style="width:0%"></div></div>
+              <div id="batch-status" style="font-size:12px;color:var(--text-dim)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-            wrapper.addEventListener('pointerdown', (e) => {
-                if (e.pointerType === 'pen' || e.pointerType === 'touch' || e.pointerType ===
-                    'mouse') {
-                    if (e.isPrimary === false) return;
-                    isDrawing = true;
-                    brushPreviewVis = true;
-                    const pos = getCanvasPos(e);
-                    brushPX = pos.rawX;
-                    brushPY = pos.rawY;
-                    drawAt(pos);
-                    e.preventDefault();
-                }
-            });
+      <!-- COLOR PICK PANEL -->
+      <div id="colorpick-panel" class="panel">
+        <div class="panel-header">
+          <button class="back-btn" onclick="showPanel('home')">←</button>
+          <span class="panel-title">انتخاب رنگ</span>
+        </div>
+        <div class="tool-scroll">
+          <div class="upload-zone">
+            <input type="file" accept="image/*" onchange="loadColorPickImage(this)">
+            <div class="upload-icon">🎨</div>
+            <div class="upload-text">تصویر را بارگذاری کنید</div>
+          </div>
+          <div id="colorpick-area" style="display:none;" class="stack">
+            <div id="pixel-canvas-wrap">
+              <canvas id="colorpick-canvas" style="width:100%;border-radius:var(--radius-sm);display:block;cursor:crosshair;"></canvas>
+              <div id="pixel-crosshair"></div>
+            </div>
+            <div class="row" style="gap:12px;align-items:center;">
+              <div id="pixel-display" style="background:#fff;"></div>
+              <div class="stack" style="flex:1;gap:4px;">
+                <div class="info-row"><span class="k">HEX</span><span class="v" id="cp-hex">#ffffff</span></div>
+                <div class="info-row"><span class="k">RGB</span><span class="v" id="cp-rgb">255, 255, 255</span></div>
+                <div class="info-row"><span class="k">HSL</span><span class="v" id="cp-hsl">0°, 0%, 100%</span></div>
+              </div>
+            </div>
+            <div id="cp-magnifier" style="display:none;background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius-sm);padding:8px;image-rendering:pixelated;"></div>
+            <button class="btn btn-secondary btn-sm" onclick="copyHex()">📋 کپی HEX</button>
+          </div>
+        </div>
+      </div>
 
-            wrapper.addEventListener('pointermove', (e) => {
-                if (isDrawing && (e.pointerType === 'pen' || e.pointerType === 'touch' || e
-                        .pointerType === 'mouse')) {
-                    const pos = getCanvasPos(e);
-                    brushPX = pos.rawX;
-                    brushPY = pos.rawY;
-                    drawAt(pos);
-                    e.preventDefault();
-                } else if (!isDrawing) {
-                    const pos = getCanvasPos(e);
-                    brushPX = pos.rawX;
-                    brushPY = pos.rawY;
-                    brushPreviewVis = true;
-                    drawBrushPreview(pos.rawX, pos.rawY);
-                }
-            });
+    </div><!-- /content -->
+  </div><!-- /main -->
 
-            wrapper.addEventListener('pointerup', () => {
-                if (isDrawing) {
-                    saveState();
-                    isDrawing = false;
-                    brushPreviewVis = false;
-                    const old = $('#brushPrev');
-                    if (old) old.remove();
-                    redrawCanvas();
-                }
-            });
+  <!-- BOTTOM NAV (mobile) -->
+  <nav id="bottom-nav">
+    <button class="nav-btn active" onclick="showPanel('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+      خانه
+    </button>
+    <button class="nav-btn" onclick="showPanel('eraser')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20H7L3 16l10-10 7 7-3.5 3.5"/></svg>
+      پاک‌کن
+    </button>
+    <button class="nav-btn" onclick="showPanel('enhance')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M11 8v6M8 11h6"/></svg>
+      بهبود
+    </button>
+    <button class="nav-btn" onclick="showPanel('split')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="8" height="18" rx="1"/><rect x="13" y="3" width="8" height="18" rx="1"/></svg>
+      ابزار
+    </button>
+    <button class="nav-btn" onclick="showPanel('pdf')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>
+      PDF
+    </button>
+  </nav>
 
-            wrapper.addEventListener('pointerleave', () => {
-                if (isDrawing) { saveState();
-                    isDrawing = false; }
-                brushPreviewVis = false;
-                const old = $('#brushPrev');
-                if (old) old.remove();
-                redrawCanvas();
-            });
+</div><!-- /app -->
 
-            // Pinch zoom
-            wrapper.addEventListener('touchstart', (e) => {
-                if (e.touches.length === 2) {
-                    isPanning = true;
-                    isDrawing = false;
-                    lastDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0]
-                        .clientY - e.touches[1].clientY);
-                    lastCX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-                    lastCY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-                }
-            }, { passive: false });
+<!-- Toast container -->
+<div id="toast-container"></div>
 
-            wrapper.addEventListener('touchmove', (e) => {
-                if (isPanning && e.touches.length === 2) {
-                    const rect = wrapper.getBoundingClientRect();
-                    const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0]
-                        .clientY - e.touches[1].clientY);
-                    const cx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-                    const cy = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-                    const oldScale = scale;
-                    scale *= dist / lastDist;
-                    scale = Math.min(10, Math.max(0.1, scale));
-                    panX = cx - rect.left - (cx - rect.left - panX) * (scale / oldScale);
-                    panY = cy - rect.top - (cy - rect.top - panY) * (scale / oldScale);
-                    lastDist = dist;
-                    lastCX = cx;
-                    lastCY = cy;
-                    updateTransform();
-                    redrawCanvas();
-                }
-                e.preventDefault();
-            }, { passive: false });
+<script>
+// ========================
+// CORE UTILS
+// ========================
+const $ = id => document.getElementById(id);
+const toast = (msg, type='info', dur=3000) => {
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  const icons = {success:'✅',error:'❌',info:'ℹ️'};
+  t.textContent = (icons[type]||'') + ' ' + msg;
+  $('toast-container').appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transition='opacity 0.3s'; setTimeout(()=>t.remove(),300); }, dur);
+};
 
-            wrapper.addEventListener('touchend', () => { isPanning = false;
-                lastDist = 0; });
+const fileToDataURL = file => new Promise(r=>{const fr=new FileReader();fr.onload=e=>r(e.target.result);fr.readAsDataURL(file);});
+const loadImage = src => new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=src;});
+const downloadBlob = (blob, name) => { const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click(); };
+const canvasToBlob = (canvas, type='image/jpeg', q=0.92) => new Promise(r=>canvas.toBlob(r,type,q));
+const formatBytes = b => b<1024?b+'B':b<1048576?(b/1024).toFixed(1)+'KB':(b/1048576).toFixed(2)+'MB';
 
-            function drawAt(pos) {
-                if (!cImg) return;
-                const overlay = document.createElement('canvas');
-                overlay.width = canvas.width;
-                overlay.height = canvas.height;
-                const ovCtx = overlay.getContext('2d');
-                ovCtx.drawImage(cImg, 0, 0);
-                for (let i = 1; i <= histIdx; i++) { ovCtx.putImageData(history[i], 0, 0); }
-                ovCtx.fillStyle = brushColor;
-                ovCtx.beginPath();
-                ovCtx.arc(pos.x, pos.y, brushSize / 2 / scale, 0, Math.PI * 2);
-                ovCtx.fill();
-                ctx.setTransform(1, 0, 0, 1, 0, 0);
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(overlay, 0, 0);
-                updateTransform();
-            }
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tool-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const p = $(name+'-panel');
+  if(p) p.classList.add('active');
+  document.querySelectorAll(`[data-panel="${name}"]`).forEach(b=>b.classList.add('active'));
+}
 
-            function redrawCanvas() {
-                if (!cImg) return;
-                ctx.setTransform(1, 0, 0, 1, 0, 0);
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(cImg, 0, 0);
-                for (let i = 1; i <= histIdx; i++) { ctx.putImageData(history[i], 0, 0); }
-                updateTransform();
-            }
+function showAbout() {
+  toast('تصویریار - ابزار حرفه‌ای ویرایش تصویر | نسخه ۲.۰', 'info', 4000);
+}
 
-            function saveState() {
-                history = history.slice(0, histIdx + 1);
-                history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
-                histIdx++;
-                if (history.length > 50) { history.shift();
-                    histIdx--; }
-                $('#cRedo').disabled = true;
-                $('#cUndo').disabled = false;
-            }
+// ========================
+// ERASER (ibisPaint style)
+// ========================
+let eraserState = {
+  img: null, canvas: null, ctx: null,
+  layers: [], // history stacks
+  undoStack: [], redoStack: [],
+  isDrawing: false,
+  lastX: 0, lastY: 0,
+  zoom: 1, panX: 0, panY: 0,
+  brushSize: 30, opacity: 1, hardness: 0.8,
+  brushColor: '#000000',
+  // touch tracking
+  lastTouchDist: null, lastTouchMidX: null, lastTouchMidY: null,
+  eraseMode: true, // true=erase, false=draw
+};
 
-            window.undoC = () => { if (histIdx > 0) { histIdx--;
-                    redrawCanvas();
-                    $('#cRedo').disabled = false; if (histIdx === 0) $('#cUndo').disabled = true; } };
-            window.redoC = () => { if (histIdx < history.length - 1) { histIdx++;
-                    redrawCanvas();
-                    $('#cUndo').disabled = false; if (histIdx >= history.length - 1) $('#cRedo').disabled =
-                    true; } };
-            window.zoomIn = () => { scale = Math.min(10, scale * 1.3);
-                updateTransform();
-                redrawCanvas(); };
-            window.zoomOut = () => { scale = Math.max(0.1, scale / 1.3);
-                updateTransform();
-                redrawCanvas(); };
-            window.fitScreen = () => { if (!cImg) return;
-                const rect = wrapper.getBoundingClientRect();
-                scale = Math.min((rect.width - 20) / cImg.width, (rect.height - 20) / cImg.height);
-                panX = 0;
-                panY = 0;
-                updateTransform();
-                redrawCanvas(); };
-            window.actualSize = () => { scale = 1;
-                panX = 0;
-                panY = 0;
-                updateTransform();
-                redrawCanvas(); };
-            window.saveCleaned = () => { if (!canvas) return;
-                redrawCanvas();
-                const dataUrl = canvas.toDataURL('image/jpeg', CFG.quality / 100);
-                saveFile(dataUrl, 'cleaned_' + Date.now() + '.jpg'); };
+function loadEraserImage(input) {
+  const file = input.files[0]; if(!file) return;
+  fileToDataURL(file).then(async src => {
+    const img = await loadImage(src);
+    eraserState.img = img;
+    const wrap = $('eraser-canvas-wrap');
+    const canvas = $('eraser-canvas');
+    eraserState.canvas = canvas;
+    eraserState.ctx = canvas.getContext('2d');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    eraserState.ctx.drawImage(img, 0, 0);
+    // Reset transform
+    const ww = wrap.clientWidth, wh = wrap.clientHeight - 80;
+    const scale = Math.min(ww/img.width, wh/img.height, 1);
+    eraserState.zoom = scale;
+    eraserState.panX = (ww - img.width*scale)/2;
+    eraserState.panY = (wh - img.height*scale)/2;
+    $('eraser-upload-zone').style.display = 'none';
+    canvas.style.display = 'block';
+    $('eraser-top').style.display = 'flex';
+    $('eraser-bottom').style.display = 'flex';
+    eraserState.undoStack = [];
+    eraserState.redoStack = [];
+    saveEraserHistory();
+    renderEraser();
+    attachEraserEvents();
+    updateEraserZoomDisplay();
+  });
+}
+
+function renderEraser() {
+  const {canvas, ctx, img, zoom, panX, panY} = eraserState;
+  const wrap = $('eraser-canvas-wrap');
+  canvas.style.width = (img.width * zoom) + 'px';
+  canvas.style.height = (img.height * zoom) + 'px';
+  canvas.style.left = panX + 'px';
+  canvas.style.top = panY + 'px';
+  updateEraserZoomDisplay();
+}
+
+function updateEraserZoomDisplay() {
+  $('eraser-zoom-info').textContent = Math.round(eraserState.zoom*100) + '%';
+}
+
+function canvasPoint(e) {
+  const canvas = eraserState.canvas;
+  const rect = canvas.getBoundingClientRect();
+  const {zoom} = eraserState;
+  let cx, cy;
+  if(e.touches) {
+    cx = e.touches[0].clientX;
+    cy = e.touches[0].clientY;
+  } else {
+    cx = e.clientX; cy = e.clientY;
+  }
+  return { x: (cx - rect.left)/zoom, y: (cy - rect.top)/zoom };
+}
+
+function saveEraserHistory() {
+  const {canvas} = eraserState;
+  const data = canvas.toDataURL();
+  eraserState.undoStack.push(data);
+  if(eraserState.undoStack.length > 100) eraserState.undoStack.shift();
+  eraserState.redoStack = [];
+}
+
+function eraserUndo() {
+  if(eraserState.undoStack.length <= 1) { toast('چیزی برای بازگشت نیست','info'); return; }
+  const current = eraserState.undoStack.pop();
+  eraserState.redoStack.push(current);
+  const prev = eraserState.undoStack[eraserState.undoStack.length-1];
+  loadImage(prev).then(img2 => {
+    eraserState.ctx.clearRect(0,0,eraserState.canvas.width,eraserState.canvas.height);
+    eraserState.ctx.drawImage(img2, 0, 0);
+  });
+}
+
+function eraserRedo() {
+  if(!eraserState.redoStack.length) { toast('چیزی برای از سر کردن نیست','info'); return; }
+  const next = eraserState.redoStack.pop();
+  eraserState.undoStack.push(next);
+  loadImage(next).then(img2 => {
+    eraserState.ctx.clearRect(0,0,eraserState.canvas.width,eraserState.canvas.height);
+    eraserState.ctx.drawImage(img2, 0, 0);
+  });
+}
+
+function eraserReset() {
+  const {ctx, img, canvas} = eraserState;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.drawImage(img, 0, 0);
+  saveEraserHistory();
+  toast('تصویر به حالت اول برگشت','success');
+}
+
+function updateBrush() {
+  eraserState.brushSize = parseInt($('brush-size').value);
+  eraserState.opacity = parseInt($('brush-opacity').value)/100;
+  eraserState.hardness = parseInt($('brush-hard').value)/100;
+  $('brush-size-val').textContent = eraserState.brushSize;
+  $('brush-opacity-val').textContent = eraserState.opacity*100 + '%';
+  $('brush-hard-val').textContent = eraserState.hardness*100 + '%';
+}
+
+function drawBrush(x, y) {
+  const {ctx, brushSize, opacity, hardness, brushColor, eraseMode} = eraserState;
+  const r = brushSize / 2;
+  const gradient = ctx.createRadialGradient(x, y, 0, x, y, r);
+  if(eraseMode) {
+    gradient.addColorStop(0, `rgba(0,0,0,${opacity})`);
+    gradient.addColorStop(hardness, `rgba(0,0,0,${opacity * 0.8})`);
+    gradient.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.globalCompositeOperation = 'destination-out';
+  } else {
+    const c = hexToRgb(brushColor) || {r:0,g:0,b:0};
+    gradient.addColorStop(0, `rgba(${c.r},${c.g},${c.b},${opacity})`);
+    gradient.addColorStop(hardness, `rgba(${c.r},${c.g},${c.b},${opacity*0.8})`);
+    gradient.addColorStop(1, `rgba(${c.r},${c.g},${c.b},0)`);
+    ctx.globalCompositeOperation = 'source-over';
+  }
+  ctx.fillStyle = gradient;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI*2);
+  ctx.fill();
+  ctx.globalCompositeOperation = 'source-over';
+}
+
+function hexToRgb(hex) {
+  const r=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return r?{r:parseInt(r[1],16),g:parseInt(r[2],16),b:parseInt(r[3],16)}:null;
+}
+
+function interpolate(x1,y1,x2,y2,steps) {
+  const pts = [];
+  for(let i=0;i<=steps;i++) {
+    pts.push({x:x1+(x2-x1)*(i/steps), y:y1+(y2-y1)*(i/steps)});
+  }
+  return pts;
+}
+
+let brushCursorEl = $('brush-cursor');
+
+function showBrushCursor(e) {
+  const {zoom, brushSize} = eraserState;
+  const canvas = eraserState.canvas;
+  const rect = canvas.getBoundingClientRect();
+  let cx, cy;
+  if(e.touches) { cx=e.touches[0].clientX; cy=e.touches[0].clientY; }
+  else { cx=e.clientX; cy=e.clientY; }
+  const size = brushSize * zoom;
+  brushCursorEl.style.width = size+'px';
+  brushCursorEl.style.height = size+'px';
+  brushCursorEl.style.left = cx+'px';
+  brushCursorEl.style.top = cy+'px';
+  brushCursorEl.style.display = 'block';
+}
+
+function attachEraserEvents() {
+  const wrap = $('eraser-canvas-wrap');
+  // Remove old listeners by cloning - use flags instead
+  wrap._eraserReady = true;
+
+  const onStart = (e) => {
+    if(e.touches && e.touches.length === 2) return; // pinch start - handled by touchmove
+    e.preventDefault();
+    eraserState.isDrawing = true;
+    const p = canvasPoint(e);
+    eraserState.lastX = p.x; eraserState.lastY = p.y;
+    drawBrush(p.x, p.y);
+    showBrushCursor(e);
+  };
+  const onMove = (e) => {
+    e.preventDefault();
+    if(e.touches && e.touches.length === 2) {
+      // Pinch zoom + pan
+      const t1=e.touches[0], t2=e.touches[1];
+      const dist = Math.hypot(t2.clientX-t1.clientX, t2.clientY-t1.clientY);
+      const midX = (t1.clientX+t2.clientX)/2;
+      const midY = (t1.clientY+t2.clientY)/2;
+      if(eraserState.lastTouchDist !== null) {
+        const delta = dist / eraserState.lastTouchDist;
+        const prevZoom = eraserState.zoom;
+        eraserState.zoom = Math.min(20, Math.max(0.1, eraserState.zoom * delta));
+        // Adjust pan to zoom around midpoint
+        const wrapRect = wrap.getBoundingClientRect();
+        const localMidX = midX - wrapRect.left;
+        const localMidY = midY - wrapRect.top;
+        eraserState.panX = localMidX - (localMidX - eraserState.panX) * (eraserState.zoom/prevZoom);
+        eraserState.panY = localMidY - (localMidY - eraserState.panY) * (eraserState.zoom/prevZoom);
+        // Pan delta
+        const dmx = midX - eraserState.lastTouchMidX;
+        const dmy = midY - eraserState.lastTouchMidY;
+        eraserState.panX += dmx; eraserState.panY += dmy;
+      }
+      eraserState.lastTouchDist = dist;
+      eraserState.lastTouchMidX = midX; eraserState.lastTouchMidY = midY;
+      eraserState.isDrawing = false;
+      renderEraser();
+      return;
+    }
+    if(!eraserState.isDrawing) { showBrushCursor(e); return; }
+    const p = canvasPoint(e);
+    const dx = p.x - eraserState.lastX;
+    const dy = p.y - eraserState.lastY;
+    const dist2 = Math.sqrt(dx*dx+dy*dy);
+    const steps = Math.max(1, Math.ceil(dist2 / (eraserState.brushSize * 0.25)));
+    const pts = interpolate(eraserState.lastX, eraserState.lastY, p.x, p.y, steps);
+    pts.forEach(pt => drawBrush(pt.x, pt.y));
+    eraserState.lastX = p.x; eraserState.lastY = p.y;
+    showBrushCursor(e);
+  };
+  const onEnd = (e) => {
+    if(eraserState.isDrawing) { saveEraserHistory(); }
+    eraserState.isDrawing = false;
+    eraserState.lastTouchDist = null;
+    brushCursorEl.style.display = 'none';
+  };
+  // Wheel zoom
+  const onWheel = (e) => {
+    e.preventDefault();
+    const wrapRect = wrap.getBoundingClientRect();
+    const localX = e.clientX - wrapRect.left;
+    const localY = e.clientY - wrapRect.top;
+    const prevZoom = eraserState.zoom;
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    eraserState.zoom = Math.min(20, Math.max(0.1, eraserState.zoom * delta));
+    eraserState.panX = localX - (localX - eraserState.panX) * (eraserState.zoom/prevZoom);
+    eraserState.panY = localY - (localY - eraserState.panY) * (eraserState.zoom/prevZoom);
+    renderEraser();
+  };
+
+  wrap.addEventListener('mousedown', onStart, {passive:false});
+  wrap.addEventListener('mousemove', onMove, {passive:false});
+  wrap.addEventListener('mouseup', onEnd, {passive:false});
+  wrap.addEventListener('mouseleave', onEnd, {passive:false});
+  wrap.addEventListener('touchstart', onStart, {passive:false});
+  wrap.addEventListener('touchmove', onMove, {passive:false});
+  wrap.addEventListener('touchend', onEnd, {passive:false});
+  wrap.addEventListener('wheel', onWheel, {passive:false});
+}
+
+async function saveEraserResult() {
+  const blob = await canvasToBlob(eraserState.canvas, 'image/png');
+  downloadBlob(blob, 'tasviriyar-erased.png');
+  toast('تصویر ذخیره شد','success');
+}
+
+// ========================
+// ENHANCE
+// ========================
+let enhanceState = { img: null, origData: null };
+
+function loadEnhanceImage(input) {
+  const file = input.files[0]; if(!file) return;
+  fileToDataURL(file).then(async src => {
+    const img = await loadImage(src);
+    enhanceState.img = img;
+    const canvas = $('enhance-canvas');
+    canvas.width = img.width; canvas.height = img.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img,0,0);
+    enhanceState.origData = ctx.getImageData(0,0,img.width,img.height);
+    $('enhance-preview-wrap').style.display = 'flex';
+    $('enhance-preview-wrap').style.flexDirection = 'column';
+    $('enhance-preview-wrap').style.gap = '12px';
+    applyEnhance();
+    toast('تصویر بارگذاری شد','success');
+  });
+}
+
+function applyEnhance() {
+  const canvas = $('enhance-canvas');
+  const ctx = canvas.getContext('2d');
+  const orig = enhanceState.origData;
+  if(!orig) return;
+  const d = new ImageData(new Uint8ClampedArray(orig.data), orig.width, orig.height);
+  const data = d.data;
+  const bright = parseInt($('sl-bright').value);
+  const contrast = parseInt($('sl-contrast').value);
+  const sat = parseInt($('sl-sat').value);
+  const sharpen = parseInt($('sl-sharpen').value);
+  const clarity = parseInt($('sl-clarity').value);
+  const denoise = parseInt($('sl-denoise').value);
+
+  $('val-bright').textContent = bright;
+  $('val-contrast').textContent = contrast;
+  $('val-sat').textContent = sat;
+  $('val-sharpen').textContent = sharpen;
+  $('val-clarity').textContent = clarity;
+  $('val-denoise').textContent = denoise;
+
+  const cf = (contrast/100)*127;
+  const bf = bright * 2.55;
+  const sf = sat/100;
+
+  for(let i=0;i<data.length;i+=4) {
+    let r=data[i],g=data[i+1],b=data[i+2];
+    // Brightness
+    r+=bf; g+=bf; b+=bf;
+    // Contrast
+    r=(r-128)*(1+cf/127)+128;
+    g=(g-128)*(1+cf/127)+128;
+    b=(b-128)*(1+cf/127)+128;
+    // Saturation
+    if(sf !== 0) {
+      const gray=0.2126*r+0.7152*g+0.0722*b;
+      r=gray+(r-gray)*(1+sf);
+      g=gray+(g-gray)*(1+sf);
+      b=gray+(b-gray)*(1+sf);
+    }
+    data[i]=Math.max(0,Math.min(255,r));
+    data[i+1]=Math.max(0,Math.min(255,g));
+    data[i+2]=Math.max(0,Math.min(255,b));
+  }
+  ctx.putImageData(d,0,0);
+
+  // Sharpen / Clarity convolution
+  if(sharpen > 0 || clarity > 0) {
+    const amount = sharpen * 0.4 + clarity * 0.3;
+    applySharpen(ctx, canvas.width, canvas.height, amount);
+  }
+  // Denoise (box blur)
+  if(denoise > 0) {
+    applyBoxBlur(ctx, canvas.width, canvas.height, denoise);
+  }
+}
+
+function applySharpen(ctx, w, h, amount) {
+  const imageData = ctx.getImageData(0,0,w,h);
+  const d = imageData.data;
+  const out = new Uint8ClampedArray(d);
+  const k = [-1,-1,-1,-1,8+amount/0.5,-1,-1,-1,-1]; // sharpening kernel
+  for(let y=1;y<h-1;y++) {
+    for(let x=1;x<w-1;x++) {
+      for(let c=0;c<3;c++) {
+        let v=0;
+        for(let ky=-1;ky<=1;ky++) for(let kx=-1;kx<=1;kx++) {
+          v+=d[((y+ky)*w+(x+kx))*4+c]*k[(ky+1)*3+(kx+1)];
         }
+        out[(y*w+x)*4+c]=Math.max(0,Math.min(255,v));
+      }
+      out[(y*w+x)*4+3]=d[(y*w+x)*4+3];
+    }
+  }
+  imageData.data.set(out);
+  ctx.putImageData(imageData,0,0);
+}
 
-        // ==================== TOOL 4: ENHANCER ====================
-        function enhancer() {
-            let eFile = null;
-            $('#toolContent').innerHTML = `
-            <div class="rng"><span>روشنایی:</span><input type="range" id="eB" min="50" max="200" value="100" oninput="$('#eBV').textContent=this.value"><span class="val" id="eBV">100</span></div>
-            <div class="rng"><span>کنتراست:</span><input type="range" id="eC" min="50" max="200" value="100" oninput="$('#eCV').textContent=this.value"><span class="val" id="eCV">100</span></div>
-            <div class="rng"><span>اشباع:</span><input type="range" id="eS" min="0" max="200" value="100" oninput="$('#eSV').textContent=this.value"><span class="val" id="eSV">100</span></div>
-            <div class="rng"><span>شارپنس:</span><input type="range" id="eSh" min="0" max="100" value="0" oninput="$('#eShV').textContent=this.value"><span class="val" id="eShV">0</span></div>
-            <div class="prev" id="ePrev"><span style="color:var(--text2)">عکسی انتخاب نشده</span></div>
-            <button class="btn btn-p" onclick="selEF()">📂 انتخاب عکس</button>
-            <button class="btn btn-s" id="eBtn" disabled onclick="doE()">✨ اعمال</button>
-            <div id="eRes"></div>
-            <button class="btn btn-o" id="eSave" disabled onclick="saveFile(window._er,'enhanced_'+Date.now()+'.jpg')">💾 ذخیره</button>`;
+function applyBoxBlur(ctx, w, h, radius) {
+  const r = Math.round(radius);
+  ctx.filter = `blur(${r}px)`;
+  const temp = document.createElement('canvas');
+  temp.width=w; temp.height=h;
+  const tctx=temp.getContext('2d');
+  tctx.filter=`blur(${r}px)`;
+  tctx.drawImage(ctx.canvas,0,0);
+  ctx.filter='none';
+  ctx.clearRect(0,0,w,h);
+  ctx.drawImage(temp,0,0);
+}
 
-            window.selEF = () => { const inp = fileInp();
-                inp.onchange = (e) => { eFile = e.target.files[0]; if (!eFile) return;
-                    const r = new FileReader();
-                    r.onload = (ev) => { $('#ePrev').innerHTML =
-                            `<img src="${ev.target.result}" style="max-width:100%;max-height:200px;border-radius:10px">`; };
-                    r.readAsDataURL(eFile);
-                    $('#eBtn').disabled = false; };
-                inp.click(); };
-            window.doE = async () => { const btn = $('#eBtn');
-                btn.disabled = true;
-                const { img } = await loadImg(eFile);
-                const c = document.createElement('canvas');
-                c.width = img.width;
-                c.height = img.height;
-                const ctx = c.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                const id = ctx.getImageData(0, 0, c.width, c.height);
-                const d = id.data;
-                const b = parseInt($('#eB').value) / 100;
-                const co = parseInt($('#eC').value) / 100;
-                const s = parseInt($('#eS').value) / 100;
-                const sh = parseInt($('#eSh').value) / 100; for (let i = 0; i < d.length; i += 4) { d[i] = Math.min(
-                        255, d[i] * b);
-                    d[i + 1] = Math.min(255, d[i + 1] * b);
-                    d[i + 2] = Math.min(255, d[i + 2] * b); for (let j = 0; j < 3; j++) { d[i + j] = ((d[i + j] /
-                            255 - 0.5) * co + 0.5) * 255;
-                        d[i + j] = Math.max(0, Math.min(255, d[i + j])); } const g = 0.2989 * d[i] + 0.5870 * d[i +
-                        1] + 0.1140 * d[i + 2];
-                    d[i] = Math.min(255, g + s * (d[i] - g));
-                    d[i + 1] = Math.min(255, g + s * (d[i + 1] - g));
-                    d[i + 2] = Math.min(255, g + s * (d[i + 2] - g)); } if (sh > 0) { const kernel = [0, -sh, 0, -
-                        sh, 1 + 4 * sh, -sh, 0, -sh, 0
-                    ]; }
-                ctx.putImageData(id, 0, 0);
-                window._er = c.toDataURL('image/jpeg', CFG.quality / 100);
-                const r = new FileReader();
-                r.onload = (ev) => { $('#eRes').innerHTML =
-                        `<div class="comp"><div><img src="${ev.target.result}"><div class="lbl">📷 قبل</div></div><div><img src="${window._er}"><div class="lbl">✨ بعد</div></div></div>`; };
-                r.readAsDataURL(eFile);
-                $('#eSave').disabled = false;
-                btn.disabled = false; };
+function resetEnhance() {
+  ['sl-bright','sl-contrast','sl-sat','sl-sharpen','sl-clarity','sl-denoise'].forEach(id=>$(id).value=0);
+  applyEnhance();
+}
+
+async function downloadEnhanced() {
+  const canvas = $('enhance-canvas');
+  const blob = await canvasToBlob(canvas,'image/jpeg',0.95);
+  downloadBlob(blob,'tasviriyar-enhanced.jpg');
+  toast('تصویر دانلود شد','success');
+}
+
+// ========================
+// SPLIT
+// ========================
+let splitState = { img: null, mode: 'rows', results: [] };
+
+function loadSplitImage(input) {
+  const file = input.files[0]; if(!file) return;
+  fileToDataURL(file).then(async src => {
+    splitState.img = await loadImage(src);
+    $('split-controls').style.display = 'flex';
+    $('split-controls').style.flexDirection = 'column';
+    $('split-controls').style.gap = '12px';
+    $('split-results').style.display = 'none';
+    toast('تصویر بارگذاری شد','success');
+  });
+}
+
+function setSplitMode(m, btn) {
+  splitState.mode = m;
+  document.querySelectorAll('#split-controls .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  $('split-label1').textContent = m==='cols'?'تعداد ستون':'تعداد ردیف';
+  $('split-col-wrap').style.display = m==='grid'?'block':'none';
+}
+
+async function doSplit() {
+  const {img, mode} = splitState;
+  const n1 = parseInt($('split-count1').value)||2;
+  const n2 = mode==='grid' ? (parseInt($('split-count2').value)||2) : 1;
+  const W=img.width, H=img.height;
+  splitState.results = [];
+
+  if(mode==='rows') {
+    const rh = Math.ceil(H/n1);
+    for(let i=0;i<n1;i++) {
+      const c=document.createElement('canvas');
+      const y=i*rh, h2=Math.min(rh,H-y);
+      c.width=W; c.height=h2;
+      c.getContext('2d').drawImage(img,0,y,W,h2,0,0,W,h2);
+      splitState.results.push(c);
+    }
+  } else if(mode==='cols') {
+    const cw = Math.ceil(W/n1);
+    for(let i=0;i<n1;i++) {
+      const c=document.createElement('canvas');
+      const x=i*cw, w2=Math.min(cw,W-x);
+      c.width=w2; c.height=H;
+      c.getContext('2d').drawImage(img,x,0,w2,H,0,0,w2,H);
+      splitState.results.push(c);
+    }
+  } else {
+    const cw=Math.ceil(W/n2), rh=Math.ceil(H/n1);
+    for(let r=0;r<n1;r++) for(let col=0;col<n2;col++) {
+      const c=document.createElement('canvas');
+      const x=col*cw, y=r*rh;
+      const w2=Math.min(cw,W-x), h2=Math.min(rh,H-y);
+      c.width=w2; c.height=h2;
+      c.getContext('2d').drawImage(img,x,y,w2,h2,0,0,w2,h2);
+      splitState.results.push(c);
+    }
+  }
+
+  const grid = $('split-grid');
+  grid.innerHTML = '';
+  grid.style.gridTemplateColumns = splitState.results.length===1 ? '1fr' : '1fr 1fr';
+  splitState.results.forEach((c,i) => {
+    const card = document.createElement('div');
+    card.className = 'result-card';
+    const img2 = document.createElement('img');
+    img2.src = c.toDataURL(); img2.className = 'preview-img';
+    const acts = document.createElement('div');
+    acts.className = 'result-card-actions';
+    const dlBtn = document.createElement('button');
+    dlBtn.className = 'btn btn-primary btn-sm btn-full';
+    dlBtn.textContent = '💾 دانلود';
+    dlBtn.onclick = async () => {
+      const blob = await canvasToBlob(c,'image/jpeg',0.92);
+      downloadBlob(blob,`split-${i+1}.jpg`);
+    };
+    acts.appendChild(dlBtn);
+    card.appendChild(img2); card.appendChild(acts);
+    grid.appendChild(card);
+  });
+  $('split-results').style.display = 'flex';
+  $('split-results').style.flexDirection = 'column';
+  $('split-results').style.gap = '12px';
+  toast(`تصویر به ${splitState.results.length} قسمت تقسیم شد`,'success');
+}
+
+async function downloadAllSplits() {
+  if(typeof JSZip==='undefined') { toast('کتابخانه ZIP بارگذاری نشده','error'); return; }
+  const zip = new JSZip();
+  for(let i=0;i<splitState.results.length;i++) {
+    const blob = await canvasToBlob(splitState.results[i],'image/jpeg',0.92);
+    zip.file(`split-${i+1}.jpg`, blob);
+  }
+  const zblob = await zip.generateAsync({type:'blob'});
+  downloadBlob(zblob,'tasviriyar-splits.zip');
+  toast('فایل ZIP دانلود شد','success');
+}
+
+// ========================
+// STITCH
+// ========================
+let stitchState = { imgs: [], mode: 'auto' };
+
+function loadStitchImages(input) {
+  const files = Array.from(input.files); if(!files.length) return;
+  Promise.all(files.map(f=>fileToDataURL(f).then(loadImage))).then(imgs => {
+    stitchState.imgs = imgs;
+    const thumbs = $('stitch-thumbs');
+    thumbs.innerHTML = '';
+    imgs.forEach((img,i) => {
+      const c = document.createElement('canvas');
+      c.width=60; c.height=80;
+      c.style.cssText='border-radius:6px;border:1px solid var(--glass-border);';
+      const ctx=c.getContext('2d');
+      ctx.drawImage(img,0,0,img.width,img.height,0,0,60,img.width>img.height?60*img.height/img.width:80);
+      thumbs.appendChild(c);
+    });
+    $('stitch-list').style.display = 'flex';
+    $('stitch-list').style.flexDirection = 'column';
+    $('stitch-list').style.gap = '12px';
+    $('stitch-result').style.display = 'none';
+    toast(`${imgs.length} تصویر آماده چسباندن`,'success');
+  });
+}
+
+function setStitchMode(m, btn) {
+  stitchState.mode = m;
+  document.querySelectorAll('#stitch-list .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  $('stitch-manual-wrap').style.display = m==='manual'?'flex':'none';
+}
+
+function detectOverlap(imgA, imgB, maxOverlapPct=0.4) {
+  // Compare bottom of imgA with top of imgB using pixel sampling
+  const w = Math.min(imgA.width, imgB.width);
+  const sampleW = Math.min(w, 100);
+  const maxOverlap = Math.floor(imgA.height * maxOverlapPct);
+
+  const cA = document.createElement('canvas');
+  cA.width=sampleW; cA.height=imgA.height;
+  const ctxA=cA.getContext('2d');
+  ctxA.drawImage(imgA,0,0,imgA.width,imgA.height,0,0,sampleW,imgA.height);
+  const dA = ctxA.getImageData(0,0,sampleW,imgA.height).data;
+
+  const cB = document.createElement('canvas');
+  cB.width=sampleW; cB.height=imgB.height;
+  const ctxB=cB.getContext('2d');
+  ctxB.drawImage(imgB,0,0,imgB.width,imgB.height,0,0,sampleW,imgB.height);
+  const dB = ctxB.getImageData(0,0,sampleW,imgB.height).data;
+
+  let bestOverlap=0, bestScore=Infinity;
+  for(let ov=4; ov<=Math.min(maxOverlap, imgB.height); ov+=2) {
+    let diff=0, count=0;
+    const rowsToCheck = Math.min(ov, 30);
+    for(let y=0; y<rowsToCheck; y++) {
+      const yA = imgA.height - ov + y;
+      const yB = y;
+      for(let x=0;x<sampleW;x+=3) {
+        const iA=(yA*sampleW+x)*4, iB=(yB*sampleW+x)*4;
+        diff+=Math.abs(dA[iA]-dB[iB])+Math.abs(dA[iA+1]-dB[iB+1])+Math.abs(dA[iA+2]-dB[iB+2]);
+        count++;
+      }
+    }
+    const score = diff/count;
+    if(score < bestScore) { bestScore=score; bestOverlap=ov; }
+  }
+  return bestScore < 20 ? bestOverlap : 0;
+}
+
+async function doStitch() {
+  const {imgs, mode} = stitchState;
+  if(imgs.length < 2) { toast('حداقل ۲ تصویر لازم است','error'); return; }
+
+  const W = imgs[0].width;
+  let overlaps = [];
+
+  if(mode==='auto') {
+    toast('در حال تشخیص همپوشانی...','info',2000);
+    for(let i=0;i<imgs.length-1;i++) {
+      overlaps.push(detectOverlap(imgs[i], imgs[i+1]));
+    }
+  } else {
+    const pct = parseInt($('stitch-overlap').value)/100;
+    for(let i=0;i<imgs.length-1;i++) overlaps.push(Math.floor(imgs[i].height*pct));
+  }
+
+  let totalH = imgs.reduce((s,img)=>s+img.height,0) - overlaps.reduce((s,o)=>s+o,0);
+  const canvas = $('stitch-canvas');
+  canvas.width = W; canvas.height = totalH;
+  const ctx = canvas.getContext('2d');
+  let y=0;
+  imgs.forEach((img,i) => {
+    const srcY = i===0 ? 0 : overlaps[i-1];
+    const srcH = img.height - (i===0 ? 0 : overlaps[i-1]);
+    ctx.drawImage(img,0,srcY,W,srcH, 0,y,W,srcH);
+    y += srcH;
+  });
+  $('stitch-result').style.display = 'flex';
+  $('stitch-result').style.flexDirection = 'column';
+  $('stitch-result').style.gap = '12px';
+  toast('تصاویر با موفقیت چسبانده شدند','success');
+}
+
+async function downloadStitch() {
+  const blob = await canvasToBlob($('stitch-canvas'),'image/jpeg',0.95);
+  downloadBlob(blob,'tasviriyar-stitch.jpg');
+  toast('دانلود شد','success');
+}
+
+// ========================
+// PDF
+// ========================
+let pdfImages = [];
+
+function loadPdfImages(input) {
+  const files = Array.from(input.files); if(!files.length) return;
+  Promise.all(files.map(f=>fileToDataURL(f))).then(srcs => {
+    pdfImages = srcs;
+    const thumbs = $('pdf-thumbs');
+    thumbs.innerHTML = '';
+    srcs.forEach((src,i) => {
+      const img = document.createElement('img');
+      img.src=src; img.style.cssText='height:60px;border-radius:6px;border:1px solid var(--glass-border);';
+      thumbs.appendChild(img);
+    });
+    $('pdf-controls').style.display = 'flex';
+    $('pdf-controls').style.flexDirection = 'column';
+    $('pdf-controls').style.gap = '12px';
+    toast(`${files.length} تصویر آماده`,'success');
+  });
+}
+
+async function buildPdf() {
+  if(!pdfImages.length) return;
+  const {jsPDF} = window.jspdf;
+  const size = $('pdf-size').value;
+  const quality = parseInt($('pdf-quality').value)/100;
+
+  const imgs = await Promise.all(pdfImages.map(loadImage));
+  let pdf;
+  if(size === 'a4') pdf = new jsPDF({format:'a4',unit:'mm'});
+  else if(size === 'a5') pdf = new jsPDF({format:'a5',unit:'mm'});
+  else {
+    const w=imgs[0].width, h=imgs[0].height;
+    pdf = new jsPDF({unit:'px',format:[w,h]});
+  }
+
+  for(let i=0;i<imgs.length;i++) {
+    const img = imgs[i];
+    if(i>0) {
+      if(size==='fit') pdf.addPage([img.width,img.height],'px');
+      else pdf.addPage();
+    }
+    const pw = pdf.internal.pageSize.getWidth();
+    const ph = pdf.internal.pageSize.getHeight();
+    let iw=pw, ih=(img.height/img.width)*pw;
+    if(ih>ph) { ih=ph; iw=(img.width/img.height)*ph; }
+    const xoff=(pw-iw)/2, yoff=(ph-ih)/2;
+    // No margins, no gaps
+    if(size==='fit') pdf.addImage(pdfImages[i],'JPEG',0,0,img.width,img.height,undefined,'FAST');
+    else pdf.addImage(pdfImages[i],'JPEG',xoff,yoff,iw,ih,undefined,'FAST');
+  }
+  pdf.save('tasviriyar.pdf');
+  toast('PDF ساخته شد','success');
+}
+
+// ========================
+// OCR
+// ========================
+let ocrImageFile = null;
+
+function loadOcrImage(input) {
+  ocrImageFile = input.files[0];
+  if(ocrImageFile) toast('تصویر آماده است. روی «استخراج متن» کلیک کنید','info');
+}
+
+async function runOcr() {
+  if(!ocrImageFile) { toast('ابتدا تصویر انتخاب کنید','error'); return; }
+  const lang = $('ocr-lang').value;
+  $('ocr-progress-wrap').style.display = 'flex';
+  $('ocr-progress-wrap').style.flexDirection = 'column';
+  $('ocr-progress-wrap').style.gap = '12px';
+  $('ocr-output-wrap').style.display = 'none';
+
+  try {
+    const worker = await Tesseract.createWorker(lang, 1, {
+      logger: m => {
+        if(m.status==='recognizing text') {
+          $('ocr-prog').style.width = (m.progress*100).toFixed(0)+'%';
+          $('ocr-status').textContent = 'در حال تشخیص متن... ' + Math.round(m.progress*100) + '%';
         }
+      }
+    });
+    const { data: { text, confidence } } = await worker.recognize(ocrImageFile);
+    await worker.terminate();
+    $('ocr-progress-wrap').style.display = 'none';
+    $('ocr-output').value = text;
+    $('ocr-confidence').textContent = 'دقت: ' + confidence.toFixed(0) + '%';
+    $('ocr-output-wrap').style.display = 'flex';
+    $('ocr-output-wrap').style.flexDirection = 'column';
+    $('ocr-output-wrap').style.gap = '10px';
+    toast('متن با موفقیت استخراج شد','success');
+  } catch(err) {
+    $('ocr-progress-wrap').style.display = 'none';
+    toast('خطا در OCR: ' + err.message,'error');
+  }
+}
 
-        // ==================== TOOL 5: SPLIT (Preview only) ====================
-        function split() {
-            let splitParts = [];
-            $('#toolContent').innerHTML = `
-            <button class="btn btn-p" onclick="selSplit()">📂 انتخاب عکس بلند</button>
-            <div class="inp"><label>تعداد بخش:</label><input type="number" id="spCnt" value="3" min="2" max="20"></div>
-            <button class="btn btn-s" onclick="doSplit()">✂️ پیش‌نمایش</button>
-            <div id="spRes"></div>
-            <button class="btn btn-o" id="spSaveAll" disabled onclick="saveAllSplit()">💾 ذخیره همه</button>
-            <button class="btn btn-o" id="spZip" disabled onclick="downloadSplitZip()">📦 دانلود ZIP</button>`;
+function copyOcrText() {
+  navigator.clipboard.writeText($('ocr-output').value).then(()=>toast('متن کپی شد','success'));
+}
 
-            window.selSplit = () => { const inp = fileInp();
-                inp.onchange = (e) => { window._spFile = e.target.files[0];
-                    toast('✅ انتخاب شد'); };
-                inp.click(); };
-            window.doSplit = async () => { if (!window._spFile) { toast('⚠️ عکس انتخاب کن'); return; }
-                const { img } = await loadImg(window._spFile);
-                const count = parseInt($('#spCnt').value);
-                const ph = Math.floor(img.height / count);
-                splitParts = [];
-                $('#spRes').innerHTML = ''; for (let i = 0; i < count; i++) { const c = document.createElement(
-                        'canvas');
-                    c.width = img.width;
-                    c.height = ph;
-                    c.getContext('2d').drawImage(img, 0, i * ph, img.width, ph, 0, 0, img.width, ph);
-                    const dataUrl = c.toDataURL('image/jpeg', CFG.quality / 100);
-                    const blob = dataUrlToBlob(dataUrl);
-                    splitParts.push({ dataUrl, blob, index: i, size: blob.size, w: c.width, h: c.height });
-                    $('#spRes').innerHTML +=
-                        `<div style="margin:8px 0;padding:8px;background:var(--glass);border-radius:10px"><p style="font-size:11px;color:var(--text2)">📐 بخش ${i+1}: ${c.width}×${c.height} | 📦 ${fmtBytes(blob.size)}</p><img src="${dataUrl}" style="width:100%;border-radius:8px"><button class="btn btn-o btn-sm" onclick="saveFile('${dataUrl}','split_${i+1}_'+Date.now()+'.jpg')">💾 ذخیره</button></div>`; }
-                $('#spSaveAll').disabled = false;
-                $('#spZip').disabled = false;
-                toast('✅ پیش‌نمایش آماده'); };
-            window.saveAllSplit = () => { splitParts.forEach(p => saveFile(p.dataUrl,
-                    `split_${p.index+1}_${Date.now()}.jpg`));
-                toast('✅ همه ذخیره شد'); };
-            window.downloadSplitZip = async () => { const zip = new JSZip();
-                splitParts.forEach(p => zip.file(`part_${p.index+1}.jpg`, p.blob));
-                const zblob = await zip.generateAsync({ type: 'blob' });
-                saveBlob(zblob, 'split_parts_' + Date.now() + '.zip'); };
-        }
+function downloadOcrTxt() {
+  const blob = new Blob([$('ocr-output').value],{type:'text/plain;charset=utf-8'});
+  downloadBlob(blob,'ocr-result.txt');
+}
 
-        // ==================== TOOL 6: WATERMARK ====================
-        function watermark() {
-            $('#toolContent').innerHTML = `
-            <div class="inp"><label>متن واترمارک:</label><input type="text" id="wmTxt" value="© ${new Date().getFullYear()}"></div>
-            <div class="rng"><span>شفافیت:</span><input type="range" id="wmOp" min="10" max="100" value="40" oninput="$('#wmOpV').textContent=this.value+'%'"><span class="val" id="wmOpV">40%</span></div>
-            <div class="rng"><span>اندازه:</span><input type="range" id="wmSz" min="10" max="100" value="50" oninput="$('#wmSzV').textContent=this.value"><span class="val" id="wmSzV">50</span></div>
-            <button class="btn btn-p" onclick="selWM()">📂 انتخاب عکس</button>
-            <button class="btn btn-s" onclick="doWM()">💧 اعمال</button>
-            <div id="wmRes"></div>
-            <button class="btn btn-o" id="wmSave" disabled onclick="saveFile(window._wm,'watermarked_'+Date.now()+'.jpg')">💾 ذخیره</button>`;
+function downloadOcrPdf() {
+  const {jsPDF} = window.jspdf;
+  const pdf = new jsPDF();
+  const text = $('ocr-output').value;
+  pdf.setFontSize(12);
+  const lines = pdf.splitTextToSize(text, 180);
+  pdf.text(lines, 15, 20);
+  pdf.save('ocr-result.pdf');
+  toast('PDF متنی دانلود شد','success');
+}
 
-            window.selWM = () => { const inp = fileInp();
-                inp.onchange = (e) => { window._wmFile = e.target.files[0];
-                    toast('✅ انتخاب شد'); };
-                inp.click(); };
-            window.doWM = async () => { if (!window._wmFile) { toast('⚠️ عکس انتخاب کن'); return; }
-                const { img } = await loadImg(window._wmFile);
-                const c = document.createElement('canvas');
-                c.width = img.width;
-                c.height = img.height;
-                const ctx = c.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                ctx.globalAlpha = parseInt($('#wmOp').value) / 100;
-                const sz = parseInt($('#wmSz').value);
-                const fs = Math.max(20, img.width * sz / 100);
-                ctx.font = `bold ${fs}px Arial`;
-                ctx.fillStyle = '#FFF';
-                ctx.strokeStyle = '#000';
-                ctx.lineWidth = 3;
-                ctx.textAlign = 'center';
-                const txt = $('#wmTxt').value;
-                for (let y = fs; y < img.height; y += fs * 2) { for (let x = fs; x < img.width; x += ctx.measureText(txt)
-                        .width * 1.5) { ctx.strokeText(txt, x, y);
-                        ctx.fillText(txt, x, y); } }
-                window._wm = c.toDataURL('image/jpeg', CFG.quality / 100);
-                $('#wmRes').innerHTML = `<img src="${window._wm}" style="width:100%;border-radius:10px">`;
-                $('#wmSave').disabled = false; };
-        }
+// ========================
+// QR SCANNER
+// ========================
+let qrCameraStream = null, qrScanInterval = null, qrLastResult = '';
 
-        // ==================== TOOL 7: COMPRESSOR ====================
-        function compressor() {
-            $('#toolContent').innerHTML = `
-            <div class="inp"><label>فرمت خروجی:</label><select id="compFmt"><option value="jpeg">JPG</option><option value="webp">WEBP</option></select></div>
-            <div class="rng"><span>کیفیت:</span><input type="range" id="compQ" min="5" max="100" value="60" oninput="$('#compQV').textContent=this.value+'%'"><span class="val" id="compQV">60%</span></div>
-            <button class="btn btn-p" onclick="selComp()">📂 انتخاب عکس</button>
-            <button class="btn btn-s" onclick="doComp()">📦 فشرده‌سازی</button>
-            <div id="compRes"></div>
-            <button class="btn btn-o" id="compSave" disabled onclick="saveFile(window._comp,'compressed_'+Date.now()+'.'+($('#compFmt').value==='jpeg'?'jpg':'webp'))">💾 ذخیره</button>`;
+function setQrMode(m, btn) {
+  document.querySelectorAll('#qr-panel .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  $('qr-image-mode').style.display = m==='image'?'flex':'none';
+  $('qr-camera-mode').style.display = m==='camera'?'flex':'none';
+  if($('qr-image-mode').style.display!=='none') $('qr-image-mode').style.flexDirection='column';
+  if($('qr-camera-mode').style.display!=='none') $('qr-camera-mode').style.flexDirection='column';
+  if(m==='image') stopQrCamera();
+}
 
-            window.selComp = () => { const inp = fileInp();
-                inp.onchange = (e) => { window._compFile = e.target.files[0];
-                    toast('✅ انتخاب شد'); };
-                inp.click(); };
-            window.doComp = async () => { if (!window._compFile) { toast('⚠️ عکس انتخاب کن'); return; }
-                const fmt = $('#compFmt').value;
-                const q = parseInt($('#compQ').value) / 100;
-                const mime = fmt === 'jpeg' ? 'image/jpeg' : 'image/webp';
-                const { img } = await loadImg(window._compFile);
-                const c = document.createElement('canvas');
-                c.width = img.width;
-                c.height = img.height;
-                c.getContext('2d').drawImage(img, 0, 0);
-                window._comp = c.toDataURL(mime, q);
-                const orig = window._compFile.size;
-                const comp = dataUrlToBlob(window._comp).size;
-                $('#compRes').innerHTML =
-                    `<div style="background:var(--glass);border-radius:10px;padding:12px;margin:10px 0"><p>📦 قبل: ${fmtBytes(orig)} | بعد: ${fmtBytes(comp)}</p><p style="color:var(--green)">✅ ${((1-comp/orig)*100).toFixed(1)}% کاهش</p></div><img src="${window._comp}" style="width:100%;border-radius:10px">`;
-                $('#compSave').disabled = false; };
-        }
+function scanQrFromFile(input) {
+  const file = input.files[0]; if(!file) return;
+  fileToDataURL(file).then(async src => {
+    const img = await loadImage(src);
+    const c = document.createElement('canvas');
+    c.width=img.width; c.height=img.height;
+    const ctx=c.getContext('2d');
+    ctx.drawImage(img,0,0);
+    const d = ctx.getImageData(0,0,c.width,c.height);
+    const code = jsQR(d.data, d.width, d.height);
+    if(code) showQrResult(code.data);
+    else toast('کد QR پیدا نشد','error');
+  });
+}
 
-        // ==================== TOOL 8: CONVERTER ====================
-        function converter() {
-            $('#toolContent').innerHTML = `
-            <div class="inp"><label>تبدیل به:</label><select id="convFmt"><option value="jpeg">JPG</option><option value="png">PNG</option><option value="webp">WEBP</option></select></div>
-            <button class="btn btn-p" onclick="selConv()">📂 انتخاب عکس</button>
-            <button class="btn btn-s" onclick="doConv()">🔄 تبدیل</button>
-            <div id="convRes"></div>
-            <button class="btn btn-o" id="convSave" disabled onclick="saveFile(window._cv,'converted.'+(document.getElementById('convFmt').value==='jpeg'?'jpg':document.getElementById('convFmt').value))">💾 ذخیره</button>`;
+async function startQrCamera() {
+  try {
+    qrCameraStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    $('qr-video').srcObject = qrCameraStream;
+    $('stop-cam-btn').style.display = 'flex';
+    qrScanInterval = setInterval(scanQrFrame, 300);
+  } catch(e) {
+    toast('دسترسی به دوربین ممنوع است','error');
+  }
+}
 
-            window.selConv = () => { const inp = fileInp();
-                inp.onchange = (e) => { window._cvFile = e.target.files[0];
-                    toast('✅ انتخاب شد'); };
-                inp.click(); };
-            window.doConv = async () => { if (!window._cvFile) { toast('⚠️ عکس انتخاب کن'); return; }
-                const fmt = $('#convFmt').value;
-                const mime = fmt === 'jpeg' ? 'image/jpeg' : fmt === 'png' ? 'image/png' : 'image/webp';
-                const { img } = await loadImg(window._cvFile);
-                const c = document.createElement('canvas');
-                c.width = img.width;
-                c.height = img.height;
-                c.getContext('2d').drawImage(img, 0, 0);
-                window._cv = c.toDataURL(mime, CFG.quality / 100);
-                $('#convRes').innerHTML =
-                    `<p>📦 قبل: ${fmtBytes(window._cvFile.size)} | بعد: ${fmtBytes(dataUrlToBlob(window._cv).size)}</p><img src="${window._cv}" style="width:100%;border-radius:10px">`;
-                $('#convSave').disabled = false; };
-        }
+function scanQrFrame() {
+  const video = $('qr-video');
+  if(!video.readyState) return;
+  const c = $('qr-scan-canvas');
+  c.width=video.videoWidth; c.height=video.videoHeight;
+  const ctx=c.getContext('2d');
+  ctx.drawImage(video,0,0);
+  const d=ctx.getImageData(0,0,c.width,c.height);
+  const code = jsQR(d.data,d.width,d.height);
+  if(code && code.data !== qrLastResult) {
+    qrLastResult = code.data;
+    showQrResult(code.data);
+  }
+}
 
-        // ==================== TOOL 9: RESIZE ====================
-        function resize() {
-            $('#toolContent').innerHTML = `
-            <div class="grid2"><div class="inp"><label>عرض (px):</label><input type="number" id="rW" placeholder="auto"></div><div class="inp"><label>ارتفاع (px):</label><input type="number" id="rH" placeholder="auto"></div></div>
-            <label style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:8px;margin:8px 0"><input type="checkbox" id="rRatio" checked> حفظ نسبت تصویر</label>
-            <button class="btn btn-p" onclick="selResize()">📂 انتخاب عکس</button>
-            <button class="btn btn-s" onclick="doResize()">📐 تغییر سایز</button>
-            <div id="resizeRes"></div>
-            <button class="btn btn-o" id="resizeSave" disabled onclick="saveFile(window._rs,'resized_'+Date.now()+'.jpg')">💾 ذخیره</button>`;
+function stopQrCamera() {
+  if(qrCameraStream) { qrCameraStream.getTracks().forEach(t=>t.stop()); qrCameraStream=null; }
+  clearInterval(qrScanInterval);
+  $('stop-cam-btn').style.display = 'none';
+}
 
-            window.selResize = () => { const inp = fileInp();
-                inp.onchange = (e) => { window._rsFile = e.target.files[0];
-                    toast('✅ انتخاب شد'); };
-                inp.click(); };
-            window.doResize = async () => { if (!window._rsFile) { toast('⚠️ عکس انتخاب کن'); return; }
-                const { img } = await loadImg(window._rsFile);
-                let w = parseInt($('#rW').value) || img.width;
-                let h = parseInt($('#rH').value) || img.height; if ($('#rRatio').checked) { if (!$('#rW').value) w =
-                        Math.round(img.width * (h / img.height)); if (!$('#rH').value) h = Math.round(img.height * (
-                        w / img.width)); }
-                const c = document.createElement('canvas');
-                c.width = w;
-                c.height = h;
-                const ctx = c.getContext('2d');
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = 'high';
-                ctx.drawImage(img, 0, 0, w, h);
-                window._rs = c.toDataURL('image/jpeg', CFG.quality / 100);
-                $('#resizeRes').innerHTML =
-                    `<p>📐 ${img.width}×${img.height} → <b>${w}×${h}</b></p><img src="${window._rs}" style="width:100%;border-radius:10px">`;
-                $('#resizeSave').disabled = false; };
-        }
+function showQrResult(text) {
+  qrLastResult = text;
+  $('qr-result-text').textContent = text;
+  $('qr-result-box').style.display = 'flex';
+  $('qr-result-box').style.flexDirection = 'column';
+  $('qr-result-box').style.gap = '10px';
+  const isUrl = /^https?:\/\//i.test(text);
+  $('qr-open-btn').style.display = isUrl ? 'flex' : 'none';
+  toast('QR اسکن شد','success');
+}
 
-        // ==================== TOOL 10: QR GENERATOR ====================
-        function qrgen() {
-            $('#toolContent').innerHTML = `
-            <div class="inp"><label>نوع:</label><select id="qrType" onchange="updQRPH()"><option value="text">متن</option><option value="url">لینک</option><option value="tel">تلفن</option><option value="email">ایمیل</option></select></div>
-            <div class="inp"><label>محتوا:</label><textarea id="qrContent" rows="3" placeholder="متن یا لینک..."></textarea></div>
-            <div class="grid2"><div class="inp"><label>رنگ QR:</label><input type="color" id="qrFG" value="#000000"></div><div class="inp"><label>پس‌زمینه:</label><input type="color" id="qrBG" value="#FFFFFF"></div></div>
-            <div class="rng"><span>اندازه:</span><input type="range" id="qrSize" min="200" max="600" value="300" oninput="$('#qrSizeV').textContent=this.value+'px'"><span class="val" id="qrSizeV">300px</span></div>
-            <button class="btn btn-s" onclick="genQR()">📱 تولید QR</button>
-            <div id="qrGenRes" style="text-align:center;margin:15px 0"></div>
-            <button class="btn btn-o" id="qrSave" disabled onclick="saveFile(window._qrData,'qr_'+Date.now()+'.png','image/png')">💾 ذخیره</button>`;
+function copyQrResult() {
+  navigator.clipboard.writeText($('qr-result-text').textContent).then(()=>toast('کپی شد','success'));
+}
 
-            window.updQRPH = () => { const ph = { text: 'متن دلخواه...', url: 'https://example.com',
-                    tel: '+989123456789', email: 'email@example.com' };
-                $('#qrContent').placeholder = ph[$('#qrType').value] || ''; };
-            updQRPH();
-            window.genQR = () => { let content = $('#qrContent').value.trim(); if (!content) { toast('⚠️ محتوا وارد کن'); return; }
-                const type = $('#qrType').value; if (type === 'tel') content = 'tel:' + content.replace(/[^+\d]/g,
-                    ''); else if (type === 'email') content = 'mailto:' + content; else if (type === 'url' && !content
-                    .startsWith('http')) content = 'https://' + content;
-                const c = document.createElement('canvas');
-                QRCode.toCanvas(c, content, { width: parseInt($('#qrSize').value), margin: 2, color: { dark: $(
-                        '#qrFG').value, light: $('#qrBG').value } }, (err) => { if (err) { toast(
-                        '❌ خطا'); return; }
-                    $('#qrGenRes').innerHTML = '';
-                    $('#qrGenRes').appendChild(c);
-                    window._qrData = c.toDataURL('image/png');
-                    $('#qrSave').disabled = false; }); };
-        }
+function openQrUrl() {
+  window.open(qrLastResult,'_blank');
+}
 
-        // ==================== TOOL 11: QR SCANNER (با jsQR) ====================
-        function qrscan() {
-            $('#toolContent').innerHTML = `
-            <button class="btn btn-p" onclick="scanCam()">📷 اسکن با دوربین</button>
-            <button class="btn btn-o" onclick="scanImg()">🖼️ اسکن از عکس</button>
-            <div id="qrScanRes" style="text-align:center;margin:15px 0;word-break:break-all"></div>
-            <button class="btn btn-o btn-sm" id="qrCopy" disabled onclick="copyQRR()">📋 کپی</button>
-            <button class="btn btn-o btn-sm" id="qrOpen" disabled onclick="openQR()">🔗 باز کردن</button>`;
+// ========================
+// RESIZE
+// ========================
+let resizeState = { img: null, origW: 0, origH: 0, mode: 'px' };
 
-            window.scanCam = () => { const modal = $('#globalModal');
-                modal.classList.add('show');
-                $('#globalModalContent').innerHTML =
-                    `<h3 style="text-align:center;margin-bottom:15px">📷 اسکن QR</h3><video id="qrVid" style="width:100%;border-radius:10px" autoplay playsinline></video><canvas id="qrScanC" style="display:none"></canvas><p id="qrScanTxt" style="text-align:center;margin:10px 0;color:var(--text2)">در حال اسکن...</p><button class="btn btn-danger" onclick="stopQR()">❌ بستن</button>`;
-                const video = $('#qrVid');
-                const canvas = $('#qrScanC');
-                const ctx = canvas.getContext('2d');
-                let scanning = true; if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }).then(
-                        stream => {
-                            video.srcObject = stream;
-                            video.play();
-                            const scan = () => { if (!scanning) return; if (video.readyState ===
-                                    video.HAVE_ENOUGH_DATA) {
-                                    canvas.width = video.videoWidth;
-                                    canvas.height = video.videoHeight;
-                                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas
-                                        .height);
-                                    const code = jsQR(imageData.data, canvas.width, canvas
-                                    .height); if (code) { scanning = false;
-                                        $('#qrScanTxt').textContent = code.data;
-                                        window._qrResult = code.data;
-                                        $('#qrCopy').disabled = false;
-                                        $('#qrOpen').disabled = !(code.data
-                                            .startsWith('http'));
-                                        stream.getTracks().forEach(t => t.stop());
-                                        toast('✅ شناسایی شد'); } }
-                                requestAnimationFrame(scan); };
-                            scan();
-                        }).catch(() => { $('#qrScanTxt').textContent = '⚠️ دسترسی به دوربین رد شد'; }); } };
-            window.scanImg = () => { const inp = fileInp();
-                inp.onchange = (e) => { const f = e.target.files[0]; if (!f) return;
-                    const r = new FileReader();
-                    r.onload = (ev) => { const img = new Image();
-                        img.onload = () => { const c = document.createElement('canvas');
-                            c.width = img.width;
-                            c.height = img.height;
-                            const ctx = c.getContext('2d');
-                            ctx.drawImage(img, 0, 0);
-                            const id = ctx.getImageData(0, 0, c.width, c.height);
-                            const code = jsQR(id.data, c.width, c.height); if (code) {
-                                $('#qrScanRes').textContent = code.data;
-                                window._qrResult = code.data;
-                                $('#qrCopy').disabled = false;
-                                $('#qrOpen').disabled = !code.data.startsWith(
-                                'http');
-                                toast('✅ شناسایی شد'); } else { toast('❌ QR پیدا نشد'); } };
-                        img.src = ev.target.result; };
-                    r.readAsDataURL(f); };
-                inp.click(); };
-            window.copyQRR = () => { if (window._qrResult) navigator.clipboard.writeText(window._qrResult).then(() =>
-                    toast('📋 کپی شد')); };
-            window.openQR = () => { if (window._qrResult && window._qrResult.startsWith('http')) window.open(window._qrResult,
-                    '_blank'); };
-        }
+function loadResizeImage(input) {
+  const file = input.files[0]; if(!file) return;
+  fileToDataURL(file).then(async src => {
+    const img = await loadImage(src);
+    resizeState.img = img;
+    resizeState.origW = img.width;
+    resizeState.origH = img.height;
+    $('resize-orig-size').textContent = `${img.width} × ${img.height} px`;
+    $('resize-w').value = img.width;
+    $('resize-h').value = img.height;
+    $('resize-controls').style.display = 'flex';
+    $('resize-controls').style.flexDirection = 'column';
+    $('resize-controls').style.gap = '12px';
+    setupResizeListeners();
+    toast('تصویر بارگذاری شد','success');
+  });
+}
 
-        function stopQR() {
-            $('#globalModal').classList.remove('show');
-            const v = $('#qrVid');
-            if (v && v.srcObject) v.srcObject.getTracks().forEach(t => t.stop());
-        }
+function setResizeMode(m, btn) {
+  resizeState.mode = m;
+  document.querySelectorAll('#resize-controls .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  $('resize-px-mode').style.display = m==='px'?'flex':'none';
+  $('resize-pct-mode').style.display = m==='pct'?'block':'none';
+}
 
-        // ==================== TOOL 12: OCR ====================
-        function ocr() {
-            $('#toolContent').innerHTML = `
-            <button class="btn btn-p" onclick="selOCR()">📂 انتخاب عکس</button>
-            <div class="prog" id="ocrProg" style="display:none"><div class="bar" id="ocrBar"></div></div>
-            <div class="ptxt" id="ocrPTxt" style="display:none"></div>
-            <div id="ocrRes"></div>
-            <div class="grid2"><button class="btn btn-o btn-sm" id="ocrCopy" disabled onclick="copyOCR()">📋 کپی</button><button class="btn btn-o btn-sm" id="ocrSave" disabled onclick="saveOCR()">💾 TXT</button></div>`;
+function setupResizeListeners() {
+  $('resize-w').addEventListener('input', () => {
+    if($('resize-aspect').checked) {
+      const w = parseInt($('resize-w').value)||1;
+      $('resize-h').value = Math.round(w * resizeState.origH / resizeState.origW);
+    }
+  });
+  $('resize-h').addEventListener('input', () => {
+    if($('resize-aspect').checked) {
+      const h = parseInt($('resize-h').value)||1;
+      $('resize-w').value = Math.round(h * resizeState.origW / resizeState.origH);
+    }
+  });
+}
 
-            window.selOCR = () => { const inp = fileInp();
-                inp.onchange = async (e) => { const f = e.target.files[0]; if (!f) return;
-                    $('#ocrProg').style.display = 'block';
-                    $('#ocrPTxt').style.display = 'block'; try { const worker = await Tesseract.createWorker();
-                        await worker.loadLanguage('eng+fas');
-                        await worker.initialize('eng+fas');
-                        const { data: { text } } = await worker.recognize(f);
-                        await worker.terminate();
-                        window._ocrText = text.trim() || 'متنی پیدا نشد';
-                        $('#ocrRes').innerHTML =
-                            `<textarea id="ocrTA" style="width:100%;min-height:180px;background:var(--glass);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:14px;resize:vertical">${escapeHtml(window._ocrText)}</textarea>`;
-                        $('#ocrCopy').disabled = false;
-                        $('#ocrSave').disabled = false;
-                        $('#ocrProg').style.display = 'none';
-                        $('#ocrPTxt').style.display = 'none';
-                        toast('✅ متن استخراج شد'); } catch (e) { toast('❌ خطا در OCR');
-                        $('#ocrProg').style.display = 'none';
-                        $('#ocrPTxt').style.display = 'none'; } };
-                inp.click(); };
-            window.copyOCR = () => { const t = $('#ocrTA')?.value || window._ocrText; if (t) navigator.clipboard.writeText(
-                    t).then(() => toast('📋 کپی شد')); };
-            window.saveOCR = () => { const t = $('#ocrTA')?.value || window._ocrText; if (t) saveBlob(new Blob([t], { type: 'text/plain' }),
-                    'ocr_' + Date.now() + '.txt'); };
-        }
+async function doResize() {
+  const {img, origW, origH, mode} = resizeState;
+  if(!img) return;
+  let tw, th;
+  if(mode==='px') {
+    tw = parseInt($('resize-w').value)||origW;
+    th = parseInt($('resize-h').value)||origH;
+  } else {
+    const pct = parseInt($('resize-pct').value)||100;
+    tw = Math.round(origW*pct/100);
+    th = Math.round(origH*pct/100);
+  }
+  const c = document.createElement('canvas');
+  c.width=tw; c.height=th;
+  const ctx=c.getContext('2d');
+  ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
+  ctx.drawImage(img,0,0,tw,th);
+  const fmt = $('resize-format').value;
+  const blob = await canvasToBlob(c,'image/'+fmt,0.92);
+  downloadBlob(blob,`resized.${fmt==='jpeg'?'jpg':fmt}`);
+  toast(`تصویر به ${tw}×${th} تغییر سایز داد`,'success');
+}
 
-        // ==================== TOOL 13: COLOR PICKER ====================
-        function colorpick() {
-            $('#toolContent').innerHTML = `
-            <button class="btn btn-p" onclick="selCP()">📂 انتخاب عکس</button>
-            <canvas id="cpCanvas" style="display:none;max-width:100%;cursor:crosshair;border-radius:10px"></canvas>
-            <div id="cpInfo" style="text-align:center;margin:10px 0"></div>
-            <div class="grid3"><button class="btn btn-o btn-sm" id="cpHex" disabled onclick="cpCopy('hex')">📋 HEX</button><button class="btn btn-o btn-sm" id="cpRgb" disabled onclick="cpCopy('rgb')">📋 RGB</button><button class="btn btn-o btn-sm" id="cpHsl" disabled onclick="cpCopy('hsl')">📋 HSL</button></div>`;
+// ========================
+// WATERMARK
+// ========================
+let wmState = { img: null, overlay: null, type: 'text', pos: 'center' };
 
-            window.selCP = () => { const inp = fileInp();
-                inp.onchange = (e) => { const f = e.target.files[0]; if (!f) return;
-                    const r = new FileReader();
-                    r.onload = (ev) => { const img = new Image();
-                        img.onload = () => { const canvas = $('#cpCanvas');
-                            canvas.style.display = 'block';
-                            const mw = Math.min(img.width, 350);
-                            const s = mw / img.width;
-                            canvas.width = mw;
-                            canvas.height = img.height * s;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                            canvas.onclick = (e2) => { const rect = canvas.getBoundingClientRect();
-                                const x = Math.floor((e2.clientX - rect.left) * (canvas.width /
-                                    rect.width));
-                                const y = Math.floor((e2.clientY - rect.top) * (canvas.height /
-                                    rect.height));
-                                const px = ctx.getImageData(x, y, 1, 1).data;
-                                const [r, g, b] = px;
-                                const hex = '#' + [r, g, b].map(v => v.toString(16).padStart(
-                                    2, '0')).join('');
-                                const hsl = rgbToHsl(r, g, b);
-                                $('#cpInfo').innerHTML =
-                                    `<div style="width:60px;height:60px;background:${hex};border-radius:15px;margin:0 auto;border:3px solid #fff;box-shadow:0 0 20px ${hex}44"></div><p style="margin-top:8px"><b>HEX:</b> ${hex}</p><p><b>RGB:</b> (${r},${g},${b})</p><p><b>HSL:</b> (${hsl.h}°,${hsl.s}%,${hsl.l}%)</p>`;
-                                window._cp = { hex, rgb: `rgb(${r},${g},${b})`,
-                                    hsl: `hsl(${hsl.h},${hsl.s}%,${hsl.l}%)` };
-                                $('#cpHex').disabled = false;
-                                $('#cpRgb').disabled = false;
-                                $('#cpHsl').disabled = false; }; };
-                        img.src = ev.target.result; };
-                    r.readAsDataURL(f); };
-                inp.click(); };
-            window.cpCopy = (type) => { if (window._cp && window._cp[type]) navigator.clipboard.writeText(window._cp[type])
-                    .then(() => toast('📋 کپی شد')); };
-        }
+function loadWmImage(input) {
+  const file=input.files[0]; if(!file) return;
+  fileToDataURL(file).then(async src => {
+    wmState.img = await loadImage(src);
+    $('wm-controls').style.display = 'flex';
+    $('wm-controls').style.flexDirection = 'column';
+    $('wm-controls').style.gap = '12px';
+    previewWm();
+    toast('تصویر بارگذاری شد','success');
+  });
+}
 
-        // ==================== TOOL 14: SCREEN STITCH (Auto Overlap) ====================
-        function screenstitch() {
-            $('#toolContent').innerHTML = `
-            <button class="btn btn-p" onclick="selSS()">📂 انتخاب اسکرین‌شات‌ها</button>
-            <button class="btn btn-s" onclick="doSS()">🖼️ چسباندن هوشمند</button>
-            <div id="ssRes"></div>
-            <button class="btn btn-o" id="ssSave" disabled onclick="saveFile(window._ssRes,'screen_stitch_'+Date.now()+'.jpg')">💾 ذخیره</button>`;
+function loadWmOverlay(input) {
+  const file=input.files[0]; if(!file) return;
+  fileToDataURL(file).then(async src => {
+    wmState.overlay = await loadImage(src);
+    previewWm();
+  });
+}
 
-            window.selSS = () => { const inp = fileInp('image/*', true);
-                inp.onchange = (e) => { window._ssFiles = Array.from(e.target.files).filter(f => f.type.startsWith(
-                        'image/')); if (window._ssFiles.length < 2) { toast('⚠️ حداقل ۲ عکس'); return; }
-                    toast('✅ ' + window._ssFiles.length + ' عکس'); };
-                inp.click(); };
-            window.doSS = async () => { if (!window._ssFiles || window._ssFiles.length < 2) { toast('⚠️ حداقل ۲ عکس انتخاب کن'); return; }
-                const imgs = [];
-                for (let f of window._ssFiles) { const { img } = await loadImg(f);
-                    imgs.push(img); }
-                // Auto-detect overlap
-                const overlaps = [0];
-                for (let i = 1; i < imgs.length; i++) {
-                    const prev = imgs[i - 1];
-                    const curr = imgs[i];
-                    const c1 = document.createElement('canvas');
-                    c1.width = prev.width;
-                    c1.height = prev.height;
-                    c1.getContext('2d').drawImage(prev, 0, 0);
-                    const c2 = document.createElement('canvas');
-                    c2.width = curr.width;
-                    c2.height = curr.height;
-                    c2.getContext('2d').drawImage(curr, 0, 0);
-                    const h = Math.min(prev.height, curr.height);
-                    let bestOverlap = 0,
-                        bestScore = Infinity;
-                    for (let o = 10; o < h; o += 5) {
-                        let score = 0;
-                        const d1 = c1.getContext('2d').getImageData(0, prev.height - o, prev.width, Math.min(o, 30));
-                        const d2 = c2.getContext('2d').getImageData(0, 0, curr.width, Math.min(o, 30));
-                        const len = Math.min(d1.data.length, d2.data.length);
-                        for (let j = 0; j < len; j += 4) score += Math.abs(d1.data[j] - d2.data[j]);
-                        if (score < bestScore) { bestScore = score;
-                            bestOverlap = o; }
-                    }
-                    overlaps.push(bestOverlap || 60);
-                }
-                let totalH = imgs[0].height;
-                for (let i = 1; i < imgs.length; i++) totalH += imgs[i].height - overlaps[i];
-                const c = document.createElement('canvas');
-                c.width = imgs[0].width;
-                c.height = totalH;
-                const ctx = c.getContext('2d');
-                ctx.fillStyle = '#FFF';
-                ctx.fillRect(0, 0, c.width, totalH);
-                let y = 0;
-                for (let i = 0; i < imgs.length; i++) { ctx.drawImage(imgs[i], 0, y); if (i < imgs.length - 1) y += imgs[
-                        i].height - overlaps[i + 1];
-                    else y += imgs[i].height; }
-                window._ssRes = c.toDataURL('image/jpeg', CFG.quality / 100);
-                $('#ssRes').innerHTML = `<img src="${window._ssRes}" style="width:100%;border-radius:10px">`;
-                $('#ssSave').disabled = false;
-                toast('✅ چسباندن هوشمند انجام شد'); };
-        }
+function setWmType(t, btn) {
+  wmState.type = t;
+  document.querySelectorAll('#wm-controls .tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  $('wm-text-opts').style.display = t==='text'?'flex':'none';
+  $('wm-img-opts').style.display = t==='image'?'flex':'none';
+  if($('wm-text-opts').style.display!=='none') $('wm-text-opts').style.flexDirection='column';
+  if($('wm-img-opts').style.display!=='none') $('wm-img-opts').style.flexDirection='column';
+  previewWm();
+}
 
-        // ==================== TOOL 15: BATCH ====================
-        function batch() {
-            $('#toolContent').innerHTML = `
-            <div class="inp"><label>عملیات:</label><select id="bOp"><option value="compress">📦 فشرده‌سازی</option><option value="resize">📐 تغییر سایز (800px)</option><option value="watermark">💧 واترمارک</option><option value="convert">🔄 تبدیل به JPG</option></select></div>
-            <button class="btn btn-p" onclick="selB()">📂 انتخاب تصاویر</button>
-            <button class="btn btn-s" id="bBtn" disabled onclick="doB()">📋 اجرا</button>
-            <div class="prog" id="bProg" style="display:none"><div class="bar" id="bBar"></div></div>
-            <div class="ptxt" id="bPTxt" style="display:none"></div>
-            <div id="bRes"></div>
-            <button class="btn btn-o" id="bZip" disabled onclick="downloadBZip()">📦 دانلود ZIP</button>`;
+function setWmPos(pos, btn) {
+  wmState.pos = pos;
+  document.querySelectorAll('.pos-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  previewWm();
+}
 
-            window.selB = () => { const inp = fileInp('image/*', true);
-                inp.onchange = (e) => { window._bFiles = Array.from(e.target.files).filter(f => f.type.startsWith(
-                        'image/'));
-                    $('#bBtn').disabled = !window._bFiles.length;
-                    toast('✅ ' + (window._bFiles?.length || 0) + ' عکس'); };
-                inp.click(); };
-            window.doB = async () => { if (!window._bFiles?.length) { toast('⚠️ عکس انتخاب کن'); return; }
-                const op = $('#bOp').value;
-                $('#bProg').style.display = 'block';
-                $('#bPTxt').style.display = 'block';
-                window._bResults = [];
-                $('#bRes').innerHTML = ''; for (let i = 0; i < window._bFiles.length; i++) { const { img } =
-                        await loadImg(window._bFiles[i]);
-                    const c = document.createElement('canvas'); if (op === 'resize') { const r = 800 / img.width;
-                        c.width = 800;
-                        c.height = Math.round(img.height * r); } else { c.width = img.width;
-                        c.height = img.height; }
-                    const ctx = c.getContext('2d');
-                    ctx.drawImage(img, 0, 0, c.width, c.height); if (op === 'watermark') { ctx.globalAlpha = 0.4;
-                        ctx.font = 'bold 30px Arial';
-                        ctx.fillStyle = '#FFF';
-                        ctx.textAlign = 'center';
-                        ctx.fillText('©', c.width / 2, c.height / 2); }
-                    const q = op === 'compress' ? 0.5 : CFG.quality / 100;
-                    const dataUrl = c.toDataURL('image/jpeg', q);
-                    window._bResults.push({ dataUrl, blob: dataUrlToBlob(dataUrl), name: `batch_${i+1}.jpg` });
-                    $('#bRes').innerHTML +=
-                        `<img src="${dataUrl}" style="width:48%;margin:1%;border-radius:8px;display:inline-block">`;
-                    $('#bBar').style.width = ((i + 1) / window._bFiles.length * 100) + '%';
-                    $('#bPTxt').textContent = `${i+1} از ${window._bFiles.length}`;
-                    await new Promise(r => setTimeout(r, 200)); }
-                $('#bProg').style.display = 'none';
-                $('#bPTxt').style.display = 'none';
-                $('#bZip').disabled = false;
-                toast('✅ پردازش گروهی کامل شد'); };
-            window.downloadBZip = async () => { if (!window._bResults?.length) return;
-                const zip = new JSZip();
-                window._bResults.forEach(r => zip.file(r.name, r.blob));
-                const zblob = await zip.generateAsync({ type: 'blob' });
-                saveBlob(zblob, 'batch_' + Date.now() + '.zip'); };
-        }
+function getWmXY(canvas, wmW, wmH, pos, padding=20) {
+  const cw=canvas.width, ch=canvas.height;
+  const map = {
+    'top-right':[padding,padding],
+    'top-center':[(cw-wmW)/2,padding],
+    'top-left':[cw-wmW-padding,padding],
+    'mid-right':[padding,(ch-wmH)/2],
+    'center':[(cw-wmW)/2,(ch-wmH)/2],
+    'mid-left':[cw-wmW-padding,(ch-wmH)/2],
+    'bot-right':[padding,ch-wmH-padding],
+    'bot-center':[(cw-wmW)/2,ch-wmH-padding],
+    'bot-left':[cw-wmW-padding,ch-wmH-padding],
+  };
+  return map[pos]||map['center'];
+}
 
-        // ==================== INIT ====================
-        function init() {
-            renderHome();
-            window.addEventListener('popstate', (e) => {
-                if (e.state && e.state.page === 'tool') navTo('tool', e.state.toolId, false);
-                else if (e.state && e.state.page === 'settings') navTo('settings', null, false);
-                else navTo('home', null, false);
-            });
-            document.addEventListener('backbutton', handleBack, false);
-        }
+function drawWm(canvas) {
+  const {img, overlay, type, pos} = wmState;
+  if(!img) return;
+  canvas.width=img.width; canvas.height=img.height;
+  const ctx=canvas.getContext('2d');
+  ctx.drawImage(img,0,0);
+  ctx.save();
+  if(type==='text') {
+    const text=$('wm-text').value||'واترمارک';
+    const color=$('wm-color').value;
+    const fontSize=parseInt($('wm-fontsize').value)||40;
+    const opacity=parseInt($('wm-opacity').value)/100;
+    const rotate=(parseInt($('wm-rotate').value)||0)*Math.PI/180;
+    ctx.globalAlpha=opacity;
+    ctx.font=`bold ${fontSize}px Vazirmatn, sans-serif`;
+    ctx.fillStyle=color;
+    ctx.textAlign='left'; ctx.textBaseline='top';
+    const tm=ctx.measureText(text);
+    const [wx,wy]=getWmXY(canvas,tm.width,fontSize,pos);
+    ctx.translate(wx+tm.width/2, wy+fontSize/2);
+    ctx.rotate(rotate);
+    ctx.fillText(text,-tm.width/2,-fontSize/2);
+    // Shadow
+    ctx.shadowColor='rgba(0,0,0,0.5)'; ctx.shadowBlur=4; ctx.shadowOffsetX=2; ctx.shadowOffsetY=2;
+    ctx.fillText(text,-tm.width/2,-fontSize/2);
+  } else if(type==='image' && overlay) {
+    const sz=parseInt($('wm-img-size').value)/100;
+    const opacity=parseInt($('wm-img-opacity').value)/100;
+    const ow=Math.round(img.width*sz), oh=Math.round(overlay.height*(ow/overlay.width));
+    const [wx,wy]=getWmXY(canvas,ow,oh,pos);
+    ctx.globalAlpha=opacity;
+    ctx.drawImage(overlay,wx,wy,ow,oh);
+  }
+  ctx.restore();
+}
 
-        document.addEventListener('DOMContentLoaded', init);
-        if (typeof cordova !== 'undefined') document.addEventListener('deviceready', init, false);
-    </script>
-</body>
-</html>
+function previewWm() {
+  const canvas = $('wm-preview-canvas');
+  drawWm(canvas);
+}
+
+async function downloadWm() {
+  const canvas = document.createElement('canvas');
+  drawWm(canvas);
+  const blob = await canvasToBlob(canvas,'image/jpeg',0.95);
+  downloadBlob(blob,'tasviriyar-watermark.jpg');
+  toast('دانلود شد','success');
+}
+
+// ========================
+// COMPRESS
+// ========================
+let compressState = { img: null, origSize: 0, compressedBlob: null };
+
+function loadCompressImage(input) {
+  const file=input.files[0]; if(!file) return;
+  compressState.origSize = file.size;
+  fileToDataURL(file).then(async src => {
+    compressState.img = await loadImage(src);
+    $('compress-controls').style.display='flex';
+    $('compress-controls').style.flexDirection='column';
+    $('compress-controls').style.gap='12px';
+    $('compress-result').style.display='none';
+    toast('تصویر بارگذاری شد','success');
+  });
+}
+
+async function doCompress() {
+  const {img, origSize} = compressState;
+  if(!img) return;
+  const fmt=$('compress-fmt').value;
+  const q=parseInt($('compress-q').value)/100;
+  const c=document.createElement('canvas');
+  c.width=img.width; c.height=img.height;
+  c.getContext('2d').drawImage(img,0,0);
+  const blob=await canvasToBlob(c,'image/'+fmt,q);
+  compressState.compressedBlob=blob;
+  const reduction=((1-blob.size/origSize)*100).toFixed(1);
+  $('comp-orig-size').textContent=formatBytes(origSize);
+  $('comp-new-size').textContent=formatBytes(blob.size);
+  $('comp-reduction').textContent=reduction+'% کاهش';
+  $('compress-result').style.display='flex';
+  $('compress-result').style.flexDirection='column';
+  $('compress-result').style.gap='10px';
+  toast('فشرده‌سازی انجام شد','success');
+}
+
+function downloadCompressed() {
+  if(!compressState.compressedBlob) return;
+  const fmt=$('compress-fmt').value;
+  downloadBlob(compressState.compressedBlob,`compressed.${fmt==='jpeg'?'jpg':fmt}`);
+  toast('دانلود شد','success');
+}
+
+// ========================
+// BATCH
+// ========================
+let batchFiles=[], batchOp='resize';
+
+function loadBatchImages(input) {
+  batchFiles = Array.from(input.files);
+  const thumbs=$('batch-thumbs');
+  thumbs.innerHTML='';
+  batchFiles.forEach(f=>{
+    const img=document.createElement('img');
+    img.src=URL.createObjectURL(f);
+    img.style.cssText='height:48px;border-radius:6px;border:1px solid var(--glass-border);';
+    thumbs.appendChild(img);
+  });
+  $('batch-controls').style.display='flex';
+  $('batch-controls').style.flexDirection='column';
+  $('batch-controls').style.gap='12px';
+  toast(`${batchFiles.length} تصویر انتخاب شد`,'success');
+}
+
+function setBatchOp(op, btn) {
+  batchOp=op;
+  document.querySelectorAll('#batch-controls .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  ['resize','compress','watermark','convert'].forEach(o=>{
+    $('batch-op-'+o).style.display=o===op?'flex':'none';
+    if(o===op&&o!=='compress') $('batch-op-'+o).style.flexDirection='column';
+  });
+}
+
+async function doBatch() {
+  if(!batchFiles.length) { toast('ابتدا تصاویر انتخاب کنید','error'); return; }
+  if(typeof JSZip==='undefined') { toast('کتابخانه ZIP بارگذاری نشده','error'); return; }
+  const zip=new JSZip();
+  $('batch-progress').style.display='flex';
+  $('batch-progress').style.flexDirection='column';
+  $('batch-progress').style.gap='6px';
+
+  for(let i=0;i<batchFiles.length;i++) {
+    const f=batchFiles[i];
+    $('batch-status').textContent=`پردازش ${i+1} از ${batchFiles.length}: ${f.name}`;
+    $('batch-prog').style.width=((i/batchFiles.length)*100)+'%';
+    const src=await fileToDataURL(f);
+    const img=await loadImage(src);
+    const c=document.createElement('canvas');
+    let fmt='jpeg';
+
+    if(batchOp==='resize') {
+      const w=parseInt($('batch-w').value)||img.width;
+      const h=parseInt($('batch-h').value)||img.height;
+      c.width=w; c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+    } else if(batchOp==='compress') {
+      c.width=img.width; c.height=img.height;
+      c.getContext('2d').drawImage(img,0,0);
+    } else if(batchOp==='watermark') {
+      c.width=img.width; c.height=img.height;
+      const ctx=c.getContext('2d');
+      ctx.drawImage(img,0,0);
+      const text=$('batch-wm-text').value||'© تصویریار';
+      ctx.globalAlpha=0.6; ctx.font=`bold ${Math.max(20,img.width/20)}px Vazirmatn,sans-serif`;
+      ctx.fillStyle='#ffffff'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.translate(img.width/2,img.height/2); ctx.rotate(-0.4);
+      ctx.fillText(text,0,0);
+      fmt='png';
+    } else if(batchOp==='convert') {
+      fmt=$('batch-fmt').value;
+      c.width=img.width; c.height=img.height;
+      c.getContext('2d').drawImage(img,0,0);
+    }
+
+    const q=batchOp==='compress'?(parseInt($('batch-q').value)/100):0.92;
+    const blob=await canvasToBlob(c,'image/'+fmt,q);
+    const outName=f.name.replace(/\.[^.]+$/,'')+'.'+(fmt==='jpeg'?'jpg':fmt);
+    zip.file(outName,blob);
+  }
+
+  $('batch-prog').style.width='100%';
+  $('batch-status').textContent='در حال ساخت فایل ZIP...';
+  const zblob=await zip.generateAsync({type:'blob'});
+  downloadBlob(zblob,'tasviriyar-batch.zip');
+  $('batch-progress').style.display='none';
+  toast('فایل ZIP آماده و دانلود شد','success');
+}
+
+// ========================
+// COLOR PICKER
+// ========================
+let cpState = { img: null, canvas: null };
+
+function loadColorPickImage(input) {
+  const file=input.files[0]; if(!file) return;
+  fileToDataURL(file).then(async src => {
+    const img=await loadImage(src);
+    cpState.img=img;
+    const canvas=$('colorpick-canvas');
+    cpState.canvas=canvas;
+    canvas.width=img.width; canvas.height=img.height;
+    canvas.getContext('2d').dr
